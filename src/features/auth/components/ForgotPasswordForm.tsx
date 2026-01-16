@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Leaf } from 'lucide-react';
 
 export default function ForgotPasswordForm({ role }: { role: string | null }) {
   const [isSent, setIsSent] = useState(false);
@@ -16,10 +17,10 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
   };
 
   return (
-    <div className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md flex flex-col items-center border border-gray-100 animate-in fade-in zoom-in duration-500">
+    <div className="bg-white rounded-[2.5rem] shadow-2xl p-10 w-full max-w-md flex flex-col items-center border-3 border-[#1B831B] animate-in fade-in zoom-in duration-500">
       {/* Logo Smart Agro */}
       <div className="mb-4">
-        <Image src="/logo.jpg" alt="Logo" width={40} height={40} className="object-contain" />
+         <div className="p-2 bg-[#1B831B]/10 rounded-lg"><Leaf className="w-6 h-6 sm:w-8 sm:h-8 text-[#1B831B]" /></div>
       </div>
 
       <h1 className="text-2xl font-bold text-gray-900 mb-8 text-center">

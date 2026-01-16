@@ -3,16 +3,17 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Leaf } from 'lucide-react';
 
 export default function RegisterForm({ role }: { role: string | null }) {
   const [step, setStep] = useState(1);
   const isAdmin = role === 'admin';
 
   return (
-    <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 w-full max-w-md flex flex-col items-center border border-gray-100">
+    <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 w-full max-w-md flex flex-col items-center border-3 border-[#1B831B]">
       {/* Logo & Titre */}
       <div className="flex flex-col items-center mb-6">
-        <Image src="/logo.jpg" alt="Logo" width={40} height={40} className="object-contain mb-2" />
+         <div className="p-2 bg-[#1B831B]/10 rounded-lg"><Leaf className="w-6 h-6 sm:w-8 sm:h-8 text-[#1B831B]" /></div>
         <h1 className="text-2xl font-bold text-gray-900">Créer un compte</h1>
       </div>
 
