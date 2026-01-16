@@ -445,10 +445,6 @@ export default function LandingPage() {
                                     Voir la démo
                                 </Link>
                             </div>
-
-                            <p className="text-white/60 text-xs sm:text-sm mt-6 sm:mt-8">
-                                Aucune carte bancaire requise • Essai gratuit de 14 jours
-                            </p>
                         </div>
                     </div>
                 </section>
