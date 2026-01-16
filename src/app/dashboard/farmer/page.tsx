@@ -31,7 +31,7 @@ export default function FarmerDashboard() {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [unreadNotifications, setUnreadNotifications] = useState(3);
-
+ 
   useEffect(() => {
     const loadAllData = async () => {
       try {
@@ -98,38 +98,7 @@ export default function FarmerDashboard() {
 
       <main className="flex-grow w-full">
         {/* Enhanced Top Bar with Search and Profile */}
-        <div className="sticky top-[60px] z-40 bg-white border-b border-gray-200 px-6 lg:px-12 py-4 shadow-sm">
-          <div className="max-w-7xl mx-auto flex flex-col gap-4">
-            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-              <div>
-                <h1 className="text-3xl font-bold text-[#2E7D32]">Aperçu Général</h1>
-                <p className="text-[#757575] text-sm mt-1">Gérez vos ressources et analysez vos performances agricoles</p>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="relative hidden sm:block flex-1 md:flex-none md:w-64">
-                  <input
-                    type="text"
-                    placeholder="Rechercher une parcelle ou une prédiction..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full px-4 py-2 bg-[#E8F5E9] text-gray-700 text-sm rounded-lg border border-[#4CAF50]/20 focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all"
-                  />
-                </div>
-                <button className="relative p-2 text-[#757575] hover:text-[#4CAF50] transition-colors" title="Notifications" aria-label="Notifications">
-                  <Bell className="w-6 h-6" />
-                  {unreadNotifications > 0 && (
-                    <span className="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                      {unreadNotifications}
-                    </span>
-                  )}
-                </button>
-                <div className="w-10 h-10 rounded-full bg-[#4CAF50] flex items-center justify-center text-white font-bold hover:bg-[#2E7D32] transition-colors cursor-pointer" title="Profil" aria-label="Profil utilisateur">
-                  J
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+       
 
         {/* Main Content Area */}
         <div className="p-6 lg:p-12 max-w-7xl mx-auto w-full">

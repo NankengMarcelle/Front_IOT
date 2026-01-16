@@ -5,20 +5,40 @@ import DashboardFooter from '@/components/layout/Footer';
 import TerrainForm from "@/features/terrains/components/TerrainForm";
 import { TerrainsService } from "@/lib/services/TerrainsService";
 import { useTranslation } from "@/providers/TranslationProvider";
+import { 
+  MapPin, 
+  Plus, 
+  ChevronDown, 
+  ChevronUp,
+  Edit2,
+  Trash2,
+  Search,
+  AlertCircle,
+  Leaf,
+  Droplets,
+  Zap
+} from "lucide-react";
 
 export default function TerrainsPage() {
   const { t } = useTranslation();
   const [view, setView] = useState("list");
   const [terrains, setTerrains] = useState<any[]>([]);
   const [selectedTerrain, setSelectedTerrain] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [expandedTerrainId, setExpandedTerrainId] = useState<string | null>(null);
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
     try {
+      setLoading(true);
       const data = await TerrainsService.getAllTerrainsApiV1TerrainsTerrainsGet();
       setTerrains(data);
       setView("list");
     } catch (error) {
       console.error("Error loading terrains:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -29,78 +49,294 @@ export default function TerrainsPage() {
     return { count: terrains.length, surface: totalSurface };
   }, [terrains]);
 
+  // Filter terrains based on search query
+  const filteredTerrains = useMemo(() => {
+    if (!searchQuery.trim()) return terrains;
+    return terrains.filter(t => 
+      t.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (t.superficie?.toString() || "").includes(searchQuery)
+    );
+  }, [terrains, searchQuery]);
+
   const handleDelete = async (id: string) => {
-    if (confirm(t('terrains.delete_confirm'))) {
-      try {
-        await TerrainsService.deleteTerrainApiV1TerrainsTerrainsTerrainIdDelete(id);
-        loadData();
-      } catch (error) {
-        console.error("Error deleting terrain:", error);
-      }
+    try {
+      await TerrainsService.deleteTerrainApiV1TerrainsTerrainsTerrainIdDelete(id);
+      setDeleteConfirmId(null);
+      loadData();
+    } catch (error) {
+      console.error("Error deleting terrain:", error);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F1F8F4]">
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#FFFFFF" }}>
       <DashboardHeader />
 
-      <main className="flex-grow p-8 max-w-7xl mx-auto w-full">
+      <main className="flex-grow w-full">
         {view === "form" ? (
-          <TerrainForm
-            initialData={selectedTerrain}
-            onSuccess={loadData}
-            onCancel={() => setView("list")}
-          />
+          <div className="p-6 lg:p-12 max-w-7xl mx-auto w-full">
+            <TerrainForm
+              initialData={selectedTerrain}
+              onSuccess={loadData}
+              onCancel={() => setView("list")}
+            />
+          </div>
         ) : (
           <>
-            <div className="flex justify-between items-center mb-10">
-              <div>
-                <h1 className="text-3xl font-extrabold text-green-900">{t('terrains.title')}</h1>
-                <p className="text-gray-500 font-medium">
-                  {t('terrains.total')} : <span className="text-green-600">{stats.count}</span> |
-                  {t('terrains.surface')} : <span className="text-green-600">{stats.surface} m²</span>
-                </p>
+            {/* Top Bar Header */}
+            <div className="sticky top-[60px] z-40 bg-white border-b border-gray-200 px-6 lg:px-12 py-4 shadow-sm">
+              <div className="max-w-7xl mx-auto flex flex-col gap-4">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                  <div>
+                    <h1 className="text-3xl font-bold text-[#2E7D32]">Mes Terrains</h1>
+                    <p className="text-[#757575] text-sm mt-1">
+                      Total : <span className="font-semibold text-[#2E7D32]">{stats.count}</span> | 
+                      Surface : <span className="font-semibold text-[#2E7D32]">{stats.surface} m²</span>
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => { setSelectedTerrain(null); setView("form"); }}
+                    className="flex items-center gap-2 bg-[#4CAF50] text-white px-6 py-2 rounded-lg font-semibold hover:bg-[#2E7D32] transition-all duration-300 transform hover:scale-105 shadow-md"
+                    aria-label="Ajouter un terrain"
+                  >
+                    <Plus className="w-5 h-5" />
+                    Ajouter
+                  </button>
+                </div>
+
+                {/* Search Bar */}
+                <div className="relative w-full md:w-64">
+                  <Search className="absolute left-3 top-3 w-5 h-5 text-[#757575]" />
+                  <input
+                    type="text"
+                    placeholder="Rechercher un terrain par nom ou superficie..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full pl-10 pr-4 py-2 bg-[#E8F5E9] text-gray-700 text-sm rounded-lg border border-[#4CAF50]/20 focus:outline-none focus:ring-2 focus:ring-[#4CAF50] transition-all"
+                    aria-label="Rechercher terrains"
+                  />
+                </div>
               </div>
-              <button
-                onClick={() => { setSelectedTerrain(null); setView("form"); }}
-                className="bg-[#22C55E] text-white px-8 py-3 rounded-2xl font-bold hover:bg-[#16A34A] shadow-lg shadow-green-100 transition-all"
-              >
-                + {t('terrains.add_button')}
-              </button>
             </div>
 
-            {terrains.length === 0 ? (
-              <div className="bg-white rounded-[40px] border-2 border-dashed border-gray-200 h-[400px] flex flex-col items-center justify-center">
-                <p className="text-gray-400 text-xl font-semibold">{t('terrains.no_terrains')}</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {terrains.map((t_node) => (
-                  <div key={t_node.id} className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-50 hover:shadow-md transition-all">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="bg-green-50 p-3 rounded-2xl text-[#22C55E]">
-                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
-                      </div>
-                      <div className="flex gap-3">
-                        <button onClick={() => { setSelectedTerrain(t_node); setView("form"); }} className="text-blue-500 font-bold text-sm">{t('terrains.modify')}</button>
-                        <button onClick={() => handleDelete(t_node.id)} className="text-red-400 font-bold text-sm">{t('terrains.delete')}</button>
-                      </div>
-                    </div>
-                    <h3 className="font-extrabold text-xl text-gray-800">{t_node.nom}</h3>
-                    <p className="text-gray-400 text-sm mb-4">{t_node.ville}, {t_node.quartier}</p>
-                    <div className="flex justify-between items-center pt-4 border-t border-gray-50">
-                      <span className="text-gray-500 font-medium">{t('terrains.superficie')}</span>
-                      <span className="text-[#22C55E] font-black text-lg">{t_node.superficie} m²</span>
+            {/* Main Content Area */}
+            <div className="p-6 lg:p-12 max-w-7xl mx-auto w-full">
+              {/* Empty State */}
+              {terrains.length === 0 && !loading ? (
+                <div className="text-center py-24">
+                  <div className="flex justify-center mb-6">
+                    <div className="w-20 h-20 rounded-full bg-[#E8F5E9] flex items-center justify-center">
+                      <Leaf className="w-10 h-10 text-[#4CAF50]" />
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
+                  <h3 className="text-2xl font-bold text-[#2E7D32] mb-2">Aucun terrain ajouté</h3>
+                  <p className="text-[#757575] mb-6">Cliquez sur "+ Ajouter" pour commencer à gérer vos terrains.</p>
+                  <button
+                    onClick={() => { setSelectedTerrain(null); setView("form"); }}
+                    className="inline-flex items-center gap-2 bg-[#4CAF50] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E7D32] transition-all"
+                  >
+                    <Plus className="w-5 h-5" />
+                    Ajouter un premier terrain
+                  </button>
+                </div>
+              ) : filteredTerrains.length === 0 ? (
+                <div className="text-center py-16">
+                  <AlertCircle className="w-12 h-12 text-[#757575] mx-auto mb-4 opacity-50" />
+                  <p className="text-[#757575]">Aucun résultat pour "{searchQuery}"</p>
+                </div>
+              ) : (
+                /* Terrain Cards Grid */
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {filteredTerrains.map((terrain) => (
+                    <TerrainCard
+                      key={terrain.id}
+                      terrain={terrain}
+                      isExpanded={expandedTerrainId === terrain.id}
+                      onToggleExpand={() => setExpandedTerrainId(expandedTerrainId === terrain.id ? null : terrain.id)}
+                      onEdit={() => { setSelectedTerrain(terrain); setView("form"); }}
+                      onDelete={() => setDeleteConfirmId(terrain.id)}
+                      isDeleteConfirming={deleteConfirmId === terrain.id}
+                      onConfirmDelete={() => handleDelete(terrain.id)}
+                      onCancelDelete={() => setDeleteConfirmId(null)}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </>
         )}
       </main>
 
       <DashboardFooter />
+    </div>
+  );
+}
+
+interface TerrainCardProps {
+  terrain: any;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  isDeleteConfirming: boolean;
+  onConfirmDelete: () => void;
+  onCancelDelete: () => void;
+}
+
+function TerrainCard({
+  terrain,
+  isExpanded,
+  onToggleExpand,
+  onEdit,
+  onDelete,
+  isDeleteConfirming,
+  onConfirmDelete,
+  onCancelDelete,
+}: TerrainCardProps) {
+  // Mock data for soil health and predictions
+  const mockSoilHealth = {
+    N: Math.floor(Math.random() * 60) + 20,
+    P: Math.floor(Math.random() * 40) + 10,
+    K: Math.floor(Math.random() * 50) + 15
+  };
+
+  const mockPrediction = "Maïs";
+
+  const getSoilIndicatorColor = (value: number) => {
+    if (value >= 50) return "bg-[#4CAF50]";
+    if (value >= 30) return "bg-[#FFEB3B]";
+    return "bg-[#FF6B6B]";
+  };
+
+  return (
+    <div className="bg-white rounded-2xl border border-gray-200 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden">
+      {/* Card Header */}
+      <div className="p-6">
+        <div className="flex items-start justify-between mb-4">
+          <div className="w-12 h-12 rounded-full bg-[#E8F5E9] flex items-center justify-center">
+            <MapPin className="w-6 h-6 text-[#4CAF50]" />
+          </div>
+          <button
+            onClick={onToggleExpand}
+            className="text-[#757575] hover:text-[#4CAF50] transition-colors"
+            aria-label={isExpanded ? "Réduire" : "Développer"}
+          >
+            {isExpanded ? (
+              <ChevronUp className="w-5 h-5" />
+            ) : (
+              <ChevronDown className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+
+        <h3 className="text-lg font-bold text-[#2E7D32] mb-2">{terrain.nom}</h3>
+        {(terrain.ville || terrain.quartier) && (
+          <p className="text-xs text-[#757575] mb-4">
+            {[terrain.ville, terrain.quartier].filter(Boolean).join(", ")}
+          </p>
+        )}
+
+        {/* Superficie Display */}
+        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+          <span className="text-sm font-medium text-[#757575]">Superficie</span>
+          <span className="text-lg font-bold text-[#4CAF50]">{terrain.superficie} m²</span>
+        </div>
+      </div>
+
+      {/* Expandable Section */}
+      {isExpanded && (
+        <div className="border-t border-gray-100 bg-[#F1F8F6] p-6 space-y-4">
+          {/* Soil Status */}
+          <div>
+            <p className="text-sm font-semibold text-[#2E7D32] mb-3 flex items-center gap-2">
+              <Droplets className="w-4 h-4" />
+              Statut du Sol
+            </p>
+            <div className="space-y-2">
+              {Object.entries(mockSoilHealth).map(([nutrient, value]) => (
+                <div key={nutrient}>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs text-[#757575]">{nutrient}</span>
+                    <span className="text-xs font-bold text-[#2E7D32]">{value}%</span>
+                  </div>
+                  <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full transition-all ${getSoilIndicatorColor(value)}`}
+                      style={{ width: `${value}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Latest Prediction */}
+          <div>
+            <p className="text-sm font-semibold text-[#2E7D32] mb-2 flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              Dernière Prédiction
+            </p>
+            <p className="text-sm bg-white rounded-lg p-3 text-[#2E7D32] font-medium border border-[#4CAF50]/20">
+              Culture optimale: <span className="font-bold">{mockPrediction}</span>
+            </p>
+          </div>
+
+          {/* Sensor Count */}
+          <div>
+            <p className="text-sm font-semibold text-[#2E7D32] mb-2 flex items-center gap-2">
+              <Leaf className="w-4 h-4" />
+              Capteurs LoRaWAN
+            </p>
+            <p className="text-sm text-[#757575]">
+              <span className="font-bold text-[#4CAF50]">3</span> capteurs actifs • Signal bon
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Card Footer - Actions */}
+      <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex justify-end gap-3">
+        {isDeleteConfirming ? (
+          <>
+            <p className="text-sm text-[#757575] mr-auto pt-1">Confirmer la suppression?</p>
+            <button
+              onClick={onCancelDelete}
+              className="px-4 py-2 text-sm font-medium text-[#2E7D32] hover:bg-[#E8F5E9] rounded-lg transition-colors"
+              aria-label="Annuler la suppression"
+            >
+              Annuler
+            </button>
+            <button
+              onClick={onConfirmDelete}
+              className="px-4 py-2 text-sm font-bold text-white bg-[#FF6B6B] hover:bg-red-600 rounded-lg transition-colors"
+              aria-label="Confirmer la suppression"
+            >
+              Supprimer
+            </button>
+          </>
+        ) : (
+          <>
+            <button
+              onClick={onEdit}
+              className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-[#4CAF50] hover:text-[#2E7D32] hover:bg-[#E8F5E9] rounded-lg transition-colors"
+              title="Modifier ce terrain"
+              aria-label="Modifier"
+            >
+              <Edit2 className="w-4 h-4" />
+              Modifier
+            </button>
+            <button
+              onClick={onDelete}
+              className="flex items-center gap-1 px-4 py-2 text-sm font-medium text-[#FF6B6B] hover:bg-red-50 rounded-lg transition-colors"
+              title="Supprimer ce terrain"
+              aria-label="Supprimer"
+            >
+              <Trash2 className="w-4 h-4" />
+              Supprimer
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }
