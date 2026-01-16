@@ -26,10 +26,9 @@ export default function DashboardFooter() {
   
   const navLinks = [
     { href: "/dashboard/farmer/terrains", label: t('footer.my_terrains'), icon: Map },
-    { href: "/dashboard/capteurs", label: t('footer.iot_sensors'), icon: RadioTower },
     { href: "/dashboard/parcelles", label: t('footer.my_parcels'), icon: Grid3x3 },
     { href: "/dashboard/predictions", label: t('footer.ai_prediction'), icon: Brain },
-    { href: "/dashboard/farmer/parcelles", label: t('footer.recommendation'), icon: Sprout },
+    { href: "/dashboard/farmer/parcelles", label: t('footer.recommendation'), icon: Sprout }
   ];
 
   const supportLinks = [

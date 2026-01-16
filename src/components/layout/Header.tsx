@@ -48,8 +48,7 @@ export default function DashboardHeader() {
   const navItems = [
     { href: "/dashboard/farmer", label: t('nav.dashboard'), icon: Home },
     { href: "/dashboard/terrains", label: t('nav.terrains'), icon: Map },
-    { href: "/dashboard/parcelles", label: t('nav.parcelles'), icon: Grid3x3 },
-    { href: "/dashboard/capteurs?action=new", label: t('nav.sensors'), icon: RadioTower },
+    { href: "/dashboard/parcelles", label: t('nav.parcelles'), icon: Grid3x3 }
   ];
 
   const getInitial = () => {
