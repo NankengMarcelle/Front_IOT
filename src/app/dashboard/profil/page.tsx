@@ -261,8 +261,13 @@ export default function ProfilPage() {
           )}
 
           <div className="mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Mon Profil</h1>
-            <p className="text-gray-600">Gérez vos informations personnelles et vos préférences</p>
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+              <div className="p-2 bg-[#1B831B]/10 rounded-lg">
+                <User className="w-6 h-6 text-[#1B831B]" />
+              </div>
+              <span>Mon Profil</span>
+            </h1>
+            <p className="text-gray-600 ml-14">Gérez vos informations personnelles et vos préférences</p>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -430,7 +435,12 @@ export default function ProfilPage() {
                   {activeTab === 'profile' && (
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Détails du compte</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                          <div className="p-2 bg-[#1B831B]/10 rounded-lg">
+                            <User className="w-4 h-4 text-[#1B831B]" />
+                          </div>
+                          Détails du compte
+                        </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <ProfileField
                             label="Nom"
@@ -479,7 +489,10 @@ export default function ProfilPage() {
                       </div>
 
                       <div className="pt-6 border-t border-gray-100">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Langue</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                          <Globe className="w-5 h-5 text-[#1B831B]" />
+                          Langue
+                        </h3>
                         <div className="flex flex-wrap gap-3">
                           {[
                             { value: 'fr', label: 'Français', flag: '🇫🇷' },
@@ -509,8 +522,13 @@ export default function ProfilPage() {
                   {activeTab === 'security' && (
                     <div className="space-y-6">
                       <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Changer le mot de passe</h3>
-                        <p className="text-gray-600 mb-6">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                          <div className="p-2 bg-[#1B831B]/10 rounded-lg">
+                            <Shield className="w-4 h-4 text-[#1B831B]" />
+                          </div>
+                          Changer le mot de passe
+                        </h3>
+                        <p className="text-gray-600 mb-6 ml-9">
                           Assurez-vous d'utiliser un mot de passe long et aléatoire pour rester en sécurité.
                         </p>
                         
@@ -567,7 +585,10 @@ export default function ProfilPage() {
                       </div>
 
                       <div className="pt-6 border-t border-gray-100">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4">Sécurité du compte</h3>
+                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                          <Shield className="w-5 h-5 text-[#1B831B]" />
+                          Sécurité du compte
+                        </h3>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                             <div>

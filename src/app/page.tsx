@@ -454,8 +454,6 @@ export default function LandingPage() {
                 </section>
             </main>
 
-            <Footer />
-
             {/* Animation keyframes */}
             <style jsx>{`
                 @keyframes blob {
