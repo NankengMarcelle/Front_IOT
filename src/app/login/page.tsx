@@ -4,6 +4,18 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import LoginForm from '@/features/auth/components/LoginForm';
 import { Suspense } from 'react';
+import { 
+  User, 
+  LogOut, 
+  Home, 
+  Map, 
+  Grid3x3, 
+  RadioTower, 
+  Leaf,
+  Menu,
+  ChevronDown,
+  Settings
+} from 'lucide-react';
 
 // Composant interne pour gérer les SearchParams (nécessaire pour Next.js 15+)
 function LoginContent() {
