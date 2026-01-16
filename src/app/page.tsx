@@ -3,50 +3,58 @@
 import Link from 'next/link';
 import { useTranslation } from '@/providers/TranslationProvider';
 import Footer from '@/components/layout/Footer';
-import { ArrowRight, Leaf, Cpu, BarChart3, Shield, Zap, Users, Target, Globe, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRight, Leaf, Cpu, BarChart3, Shield, Zap, Users, Target, Globe, ChevronDown, Cloud, Wifi, Database, Brain, Smartphone, Radio, Cpu as CpuIcon, FileText, Wifi as WifiIcon } from 'lucide-react';
+import { useState, useRef, RefObject } from 'react';
 
 export default function LandingPage() {
     const { t, isLoading } = useTranslation();
     const [language, setLanguage] = useState('fr');
     const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
+    const solutionRef = useRef<HTMLDivElement>(null);
+    const featuresRef = useRef<HTMLDivElement>(null);
 
-    const team = [
-        { name: "Dr. Marie Dubois", roleKey: "agronomist", img: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=400&fit=crop&crop=face", expertise: "Agronomie durable" },
-        { name: "Ing. Lucas Moreau", roleKey: "engineer", img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face", expertise: "IoT & Hardware" },
-        { name: "Dr. Sophie Laurent", roleKey: "product_manager", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face", expertise: "Data Science" }
-    ];
+    const scrollToSection = (ref: RefObject<HTMLDivElement>) => {
+        if (ref.current) {
+            ref.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
-    const features = [
+    const technologies = [
         {
-            icon: <Leaf className="w-8 h-8" />,
-            title: "Durabilité",
-            desc: "Préserver le sol pour les générations futures."
+            icon: <Radio className="w-8 h-8" />,
+            title: "Capteurs IoT",
+            desc: "Capteurs LoRaWAN mesurant N, P, K, pH, humidité, température",
+            details: "DevEUI unique • Longue portée • Faible consommation"
         },
         {
-            icon: <Cpu className="w-8 h-8" />,
-            title: "Innovation IoT",
-            desc: "Suivi en temps réel de vos parcelles."
+            icon: <Brain className="w-8 h-8" />,
+            title: "Modèle Random Forest",
+            desc: "Algorithme ML pour prédiction des cultures optimales",
+            details: "Haute précision • Analyse multi-paramètres • Apprentissage continu"
         },
         {
-            icon: <BarChart3 className="w-8 h-8" />,
-            title: "Intelligence Artificielle",
-            desc: "Prédictions précises pour chaque type de culture."
+            icon: <Cloud className="w-8 h-8" />,
+            title: "Plateforme Cloud",
+            desc: "Serveur ChripStack pour stockage et traitement des données",
+            details: "Scalable • Sécurisé • Temps réel"
         },
         {
-            icon: <Shield className="w-8 h-8" />,
-            title: "Sécurité des Données",
-            desc: "Protection avancée des données agricoles sensibles."
+            icon: <WifiIcon className="w-8 h-8" />,
+            title: "Réseau LoRaWAN",
+            desc: "Communication longue distance pour zones rurales",
+            details: "Portée étendue • Autonomie maximale • Faible coût"
         },
         {
-            icon: <Zap className="w-8 h-8" />,
-            title: "Surveillance Continue",
-            desc: "Monitoring 24h/24 des paramètres critiques."
+            icon: <FileText className="w-8 h-8" />,
+            title: "Système Expert",
+            desc: "Recommandations basées sur données météo et sol",
+            details: "Prévisions 7 jours • Actions préventives • Personnalisé"
         },
         {
-            icon: <Target className="w-8 h-8" />,
-            title: "Précision Maximale",
-            desc: "Mesures exactes pour une agriculture optimisée."
+            icon: <Smartphone className="w-8 h-8" />,
+            title: "Dashboard Intuitif",
+            desc: "Interface utilisateur pour gestion et visualisation",
+            details: "Temps réel • Multi-utilisateurs • Rapports détaillés"
         }
     ];
 
@@ -54,6 +62,39 @@ export default function LandingPage() {
         { value: "+40%", label: "Gain de Productivité" },
         { value: "24/7", label: "Surveillance Continue" },
         { value: "99.8%", label: "Précision des Mesures" }
+    ];
+
+    const features = [
+        {
+            icon: <Leaf className="w-8 h-8" />,
+            title: "Recommandations Intelligentes",
+            desc: "Système expert basé sur Random Forest pour sélection optimale des cultures"
+        },
+        {
+            icon: <Cpu className="w-8 h-8" />,
+            title: "Capteurs LoRaWAN",
+            desc: "Mesure en temps réel des paramètres du sol (N, P, K, pH, humidité, température)"
+        },
+        {
+            icon: <BarChart3 className="w-8 h-8" />,
+            title: "Analyse Prédictive",
+            desc: "Prédictions basées sur données sol et prévisions météorologiques"
+        },
+        {
+            icon: <Shield className="w-8 h-8" />,
+            title: "Gestion Centralisée",
+            desc: "Dashboard pour gestion des utilisateurs, parcelles et capteurs"
+        },
+        {
+            icon: <Zap className="w-8 h-8" />,
+            title: "Connectivité Étendue",
+            desc: "Communication longue distance adaptée aux zones rurales"
+        },
+        {
+            icon: <Target className="w-8 h-8" />,
+            title: "Agriculture de Précision",
+            desc: "Optimisation des ressources et préservation environnementale"
+        }
     ];
 
     const languages = [
@@ -82,7 +123,7 @@ export default function LandingPage() {
                 <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#22C55E]/5 rounded-full blur-3xl"></div>
             </div>
 
-            {/* Logo Smart Agro en haut à gauche - RESPONSIVE FIX */}
+            {/* Logo Smart Agro en haut à gauche */}
             <div className="absolute top-4 sm:top-6 left-3 sm:left-6 z-50 max-w-[50%]">
                 <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
                     <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-all duration-300 flex-shrink-0">
@@ -96,7 +137,7 @@ export default function LandingPage() {
                 </Link>
             </div>
 
-            {/* Language Toggle amélioré avec dropdown - RESPONSIVE FIX */}
+            {/* Language Toggle */}
             <div className="absolute top-4 sm:top-6 right-3 sm:right-6 z-50">
                 <div className="relative">
                     <button
@@ -112,7 +153,6 @@ export default function LandingPage() {
                         <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 text-white/70 group-hover:text-[#b2f2bb] transition-all duration-300 ${showLanguageDropdown ? 'rotate-180' : ''}`} />
                     </button>
 
-                    {/* Dropdown menu */}
                     {showLanguageDropdown && (
                         <div className="absolute top-full right-0 mt-2 w-40 sm:w-48 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-fadeIn">
                             <div className="py-2">
@@ -149,7 +189,7 @@ export default function LandingPage() {
             )}
 
             <main className="flex-grow relative z-10">
-                {/* HERO SECTION - Agriculture Intelligente sur la même ligne */}
+                {/* HERO SECTION */}
                 <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
                     <div
                         className="absolute inset-0 bg-gradient-to-br from-agro-dark via-[#1A4D2E] to-agro-primary"
@@ -161,7 +201,6 @@ export default function LandingPage() {
                         }}
                     />
 
-                    {/* Animated gradient overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-agro-dark/90 via-transparent to-transparent"></div>
 
                     {/* Floating elements */}
@@ -177,30 +216,101 @@ export default function LandingPage() {
                         </h1>
 
                         <p className="text-base xs:text-lg sm:text-xl md:text-2xl text-white/80 font-light leading-relaxed max-w-3xl mx-auto mb-8 sm:mb-12 px-4">
-                            Optimisez vos récoltes avec notre plateforme IoT et IA
+                            Système IoT intelligent recommandant la culture optimale basée sur l'analyse du sol et les prévisions météorologiques
                         </p>
                     </div>
 
                     {/* Scroll indicator */}
-                    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-                        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
+                    <button
+                        onClick={() => scrollToSection(solutionRef)}
+                        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer"
+                    >
+                        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center hover:border-white/80 transition-colors">
                             <div className="w-1 h-3 bg-white/70 rounded-full mt-2"></div>
+                        </div>
+                    </button>
+                </section>
+
+                {/* PROBLEM & SOLUTION SECTION - Photo à gauche, texte à droite */}
+                <section ref={solutionRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-agro-bg-gray">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center">
+                            {/* Image à gauche - Agriculture traditionnelle */}
+                            <div className="relative">
+                                <div className="rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
+                                    <img
+                                        src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=2070&auto=format&fit=crop"
+                                        alt="Agriculture traditionnelle"
+                                        className="w-full h-64 sm:h-80 md:h-96 object-cover transform hover:scale-105 transition-transform duration-700"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                                    <div className="absolute bottom-6 left-6 right-6">
+                                        <span className="inline-block px-4 py-2 bg-red-500/90 backdrop-blur-sm text-white rounded-full text-sm font-semibold">
+                                            Problématique Actuelle
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-red-500 to-orange-500 rounded-full -z-10 blur-xl opacity-30"></div>
+                            </div>
+
+                            {/* Solution à droite */}
+                            <div>
+                                <div className="mb-6 sm:mb-8">
+                                    <h2 className="text-3xl sm:text-4xl font-black text-agro-dark mb-4 sm:mb-6 leading-tight">
+                                        Défi de l'Agriculture Traditionnelle
+                                    </h2>
+                                </div>
+
+                                <div className="space-y-4 sm:space-y-6">
+                                    <div className="flex items-start gap-3 sm:gap-4">
+                                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-full"></div>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-gray-800 text-base sm:text-lg mb-1">Décisions Empiriques</h4>
+                                            <p className="text-gray-600 text-sm sm:text-base">
+                                                Choix des cultures basés sur l'expérience plutôt que sur des données scientifiques
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-3 sm:gap-4">
+                                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-full"></div>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-gray-800 text-base sm:text-lg mb-1">Gaspillage des Ressources</h4>
+                                            <p className="text-gray-600 text-sm sm:text-base">
+                                                Irrigation et fertilisation non optimisées entraînant des pertes économiques
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-start gap-3 sm:gap-4">
+                                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                                            <div className="w-3 h-3 sm:w-4 sm:h-4 bg-red-500 rounded-full"></div>
+                                        </div>
+                                        <div>
+                                            <h4 className="font-bold text-gray-800 text-base sm:text-lg mb-1">Connectivité Limitée</h4>
+                                            <p className="text-gray-600 text-sm sm:text-base">
+                                                Absence de monitoring en temps réel dans les zones rurales isolées
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                {/* STATS SECTION - Responsive */}
-                <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-agro-bg-gray">
+                {/* STATS SECTION */}
+                <section className="py-16 sm:py-20 bg-gradient-to-b from-agro-bg-gray to-white">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
                             {stats.map((stat, index) => (
                                 <div
                                     key={index}
                                     className="text-center p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl bg-white/90 backdrop-blur-sm border border-gray-100 shadow-lg hover:shadow-xl sm:hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 sm:hover:-translate-y-2"
-                                    style={{
-                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
-                                        boxShadow: '0 10px 30px rgba(34, 197, 94, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05)'
-                                    }}
                                 >
                                     <div
                                         className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 leading-none"
@@ -227,8 +337,8 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* FEATURES SECTION - Responsive */}
-                <section id="features" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-agro-bg-gray to-white">
+                {/* NOTRE SOLUTION COMPLÈTE SECTION - CORRIGÉ : Image à droite, texte à gauche */}
+                <section ref={featuresRef} id="features" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-agro-bg-gray">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div className="text-center mb-12 sm:mb-16">
                             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-agro-dark mb-4 sm:mb-6">
@@ -239,6 +349,61 @@ export default function LandingPage() {
                             </p>
                         </div>
 
+                        {/* CORRECTION ICI : Image à droite, texte à gauche */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center mb-12 sm:mb-16">
+                            {/* Texte à GAUCHE (présentation de notre solution) */}
+                            <div className="order-2 lg:order-1">
+                                <div className="space-y-6 sm:space-y-8">
+                                    <div className="p-6 sm:p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-lg">
+                                        <h3 className="text-xl sm:text-2xl font-bold text-agro-dark mb-3 sm:mb-4">
+                                            Collecte de Données Intelligente
+                                        </h3>
+                                        <p className="text-gray-600 leading-relaxed">
+                                            Capteurs IoT LoRaWAN mesurent en temps réel les paramètres essentiels du sol : azote (N), phosphore (P), potassium (K), pH, humidité et température.
+                                        </p>
+                                    </div>
+
+                                    <div className="p-6 sm:p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-lg">
+                                        <h3 className="text-xl sm:text-2xl font-bold text-agro-dark mb-3 sm:mb-4">
+                                            Intelligence Artificielle Avancée
+                                        </h3>
+                                        <p className="text-gray-600 leading-relaxed">
+                                            Modèle Random Forest analyse les données pour prédire la culture optimale et générer des recommandations basées sur les prévisions météo sur 7 jours.
+                                        </p>
+                                    </div>
+
+                                    <div className="p-6 sm:p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-lg">
+                                        <h3 className="text-xl sm:text-2xl font-bold text-agro-dark mb-3 sm:mb-4">
+                                            Dashboard Complet
+                                        </h3>
+                                        <p className="text-gray-600 leading-relaxed">
+                                            Interface intuitive permettant la gestion des utilisateurs, parcelles, capteurs et la réception des recommandations personnalisées en temps réel.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Image à DROITE (agriculture intelligente combinant IA et IoT) */}
+                            <div className="relative order-1 lg:order-2">
+                                <div className="rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
+                                    <img
+                                        src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=2070&auto=format&fit=crop"
+                                        alt="Agriculture intelligente combinant IA et IoT"
+                                        className="w-full h-64 sm:h-80 md:h-96 object-cover transform hover:scale-105 transition-transform duration-700"
+                                    />
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+                                    <div className="absolute bottom-6 left-6 right-6">
+                                        <span className="inline-block px-4 py-2 bg-[#22C55E]/90 backdrop-blur-sm text-white rounded-full text-sm font-semibold">
+                                            IA + IoT = Agriculture Intelligente
+                                        </span>
+                                    </div>
+                                </div>
+                                <div className="absolute -top-4 -left-4 w-24 h-24 bg-gradient-to-br from-[#22C55E] to-agro-primary rounded-full -z-10 blur-xl opacity-30"></div>
+                                <div className="absolute -bottom-4 -right-4 w-20 h-20 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-full -z-10 blur-xl opacity-30"></div>
+                            </div>
+                        </div>
+
+                        {/* Features grid - Basé sur "Notre Solution Complète" */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                             {features.map((feature, index) => (
                                 <div
@@ -260,7 +425,90 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* MISSION SECTION - Responsive */}
+                {/* TECHNOLOGIES SECTION (remplace Team) */}
+                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-agro-bg-gray to-white">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                        <div className="text-center mb-12 sm:mb-16">
+                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-agro-dark mb-4 sm:mb-6">
+                                Outils et Technologies
+                            </h2>
+                            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
+                                Stack technologique complète basée sur votre cahier d'analyse IoT
+                            </p>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+                            {technologies.map((tech, idx) => (
+                                <div
+                                    key={idx}
+                                    className="group relative bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl sm:hover:shadow-2xl hover:-translate-y-1 sm:hover:-translate-y-2"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-[#F1F8F4] group-hover:from-[#22C55E]/5 group-hover:to-[#22C55E]/10 transition-all duration-500"></div>
+
+                                    <div className="relative z-10">
+                                        <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-[#22C55E] to-agro-primary rounded-xl sm:rounded-2xl flex items-center justify-center text-white mb-4 sm:mb-6 group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-300">
+                                            {tech.icon}
+                                        </div>
+
+                                        <h3 className="text-lg sm:text-xl md:text-2xl font-bold text-agro-dark mb-2 sm:mb-3">{tech.title}</h3>
+                                        <p className="text-gray-600 text-sm sm:text-base mb-3 sm:mb-4">
+                                            {tech.desc}
+                                        </p>
+                                        <p className="text-agro-primary font-semibold text-xs sm:text-sm">
+                                            {tech.details}
+                                        </p>
+
+                                        <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-100">
+                                            <div className="flex gap-1 sm:gap-2">
+                                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full"></div>
+                                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full"></div>
+                                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Architecture overview - basée sur le diagramme de package */}
+                        <div className="mt-16 sm:mt-20 bg-gradient-to-r from-[#22C55E]/5 to-agro-primary/5 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 border border-[#22C55E]/20">
+                            <h3 className="text-xl sm:text-2xl font-bold text-agro-dark mb-6 text-center">
+                                Architecture du Système (Diagramme de Package)
+                            </h3>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+                                <div className="text-center">
+                                    <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-4 bg-gradient-to-br from-[#22C55E] to-agro-primary rounded-xl flex items-center justify-center text-white">
+                                        <Shield className="w-6 h-6 sm:w-7 sm:h-7" />
+                                    </div>
+                                    <h4 className="font-bold text-agro-dark text-lg sm:text-xl mb-2">Authentification</h4>
+                                    <p className="text-gray-600 text-sm sm:text-base">
+                                        Sécurisation de l'accès à la plateforme
+                                    </p>
+                                </div>
+                                <div className="text-center">
+                                    <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-4 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl flex items-center justify-center text-white">
+                                        <Brain className="w-6 h-6 sm:w-7 sm:h-7" />
+                                    </div>
+                                    <h4 className="font-bold text-agro-dark text-lg sm:text-xl mb-2">Système Expert & ML</h4>
+                                    <p className="text-gray-600 text-sm sm:text-base">
+                                        Prédiction Random Forest et recommandations
+                                    </p>
+                                </div>
+                                <div className="text-center">
+                                    <div className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-4 bg-gradient-to-br from-purple-500 to-pink-400 rounded-xl flex items-center justify-center text-white">
+                                        <Users className="w-6 h-6 sm:w-7 sm:h-7" />
+                                    </div>
+                                    <h4 className="font-bold text-agro-dark text-lg sm:text-xl mb-2">Gestion</h4>
+                                    <p className="text-gray-600 text-sm sm:text-base">
+                                        Utilisateurs, parcelles et capteurs
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* MISSION SECTION */}
                 <section className="py-16 sm:py-20 md:py-24 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-[#F1F8F4] via-white to-[#F1F8F4]"></div>
                     <div className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-white/50 to-transparent"></div>
@@ -273,27 +521,30 @@ export default function LandingPage() {
                                         Notre Mission
                                     </span>
                                     <h2 className="text-3xl sm:text-4xl font-black text-agro-dark mb-4 sm:mb-6 leading-tight">
-                                        Notre Mission
+                                        Objectif du Projet
                                     </h2>
                                 </div>
 
                                 <div className="space-y-4 sm:space-y-6">
                                     <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
-                                        Transformer l'agriculture traditionnelle en une agriculture de précision grâce à l'innovation technologique.
+                                        Conception d'un système IoT intelligent capable de recommander la culture la plus adaptée à un sol donné, basé sur l'analyse des paramètres du sol et les prévisions météorologiques.
                                     </p>
                                     <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
-                                        Nous mettons à votre disposition des outils intelligents pour optimiser vos ressources, augmenter vos rendements et préserver l'environnement.
+                                        Aider les agriculteurs à prendre de meilleures décisions de sélection des cultures en optimisant la production tout en préservant les ressources naturelles.
                                     </p>
                                 </div>
 
                                 <div className="mt-8 sm:mt-10 p-4 sm:p-6 bg-gradient-to-r from-[#22C55E]/5 to-agro-primary/5 rounded-xl sm:rounded-2xl border border-[#22C55E]/20">
                                     <div className="flex items-start sm:items-center gap-3 sm:gap-4">
-                                        <Users className="w-6 h-6 sm:w-8 sm:h-8 text-agro-primary flex-shrink-0" />
+                                        <Target className="w-6 h-6 sm:w-8 sm:h-8 text-agro-primary flex-shrink-0" />
                                         <div>
-                                            <h4 className="font-bold text-agro-dark text-base sm:text-lg mb-1">Notre Engagement</h4>
-                                            <p className="text-gray-600 text-xs sm:text-sm">
-                                                Accompagnement personnalisé et support technique 24/7
-                                            </p>
+                                            <h4 className="font-bold text-agro-dark text-base sm:text-lg mb-1">Fonctions Clés</h4>
+                                            <ul className="text-gray-600 text-xs sm:text-sm space-y-1">
+                                                <li>• Prédiction de la meilleure culture adaptée (Random Forest)</li>
+                                                <li>• Prise en compte des prévisions météorologiques sur 7 jours</li>
+                                                <li>• Recommandations d'actions préventives en temps réel</li>
+                                                <li>• Communication longue distance via LoRaWAN</li>
+                                            </ul>
                                         </div>
                                     </div>
                                 </div>
@@ -304,40 +555,40 @@ export default function LandingPage() {
                                     <div className="space-y-6 sm:space-y-8">
                                         <div className="flex items-start gap-4 sm:gap-6">
                                             <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-[#22C55E] to-agro-primary rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
-                                                <Leaf className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+                                                <Brain className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                                             </div>
                                             <div>
                                                 <h4 className="font-bold text-gray-800 text-base sm:text-lg md:text-xl">
-                                                    Durabilité
+                                                    Modèle Random Forest
                                                 </h4>
                                                 <p className="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-base">
-                                                    Préserver le sol pour les générations futures.
+                                                    Haute précision pour la prédiction des cultures optimales
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="flex items-start gap-4 sm:gap-6">
                                             <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
-                                                <Cpu className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+                                                <WifiIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                                             </div>
                                             <div>
                                                 <h4 className="font-bold text-gray-800 text-base sm:text-lg md:text-xl">
-                                                    Innovation IoT
+                                                    Connectivité LoRaWAN
                                                 </h4>
                                                 <p className="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-base">
-                                                    Suivi en temps réel de vos parcelles.
+                                                    Portée étendue pour zones rurales, faible consommation
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="flex items-start gap-4 sm:gap-6">
                                             <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-purple-500 to-pink-400 rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
-                                                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
+                                                <FileText className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                                             </div>
                                             <div>
                                                 <h4 className="font-bold text-gray-800 text-base sm:text-lg md:text-xl">
-                                                    Intelligence Artificielle
+                                                    Dashboard Complet
                                                 </h4>
                                                 <p className="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-base">
-                                                    Prédictions précises pour chaque type de culture.
+                                                    Gestion des utilisateurs, parcelles, capteurs et recommandations
                                                 </p>
                                             </div>
                                         </div>
@@ -352,64 +603,7 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* TEAM SECTION - Responsive */}
-                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-agro-bg-gray">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                        <div className="text-center mb-12 sm:mb-16">
-                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-agro-dark mb-4 sm:mb-6">
-                                Notre Équipe
-                            </h2>
-                            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
-                                Rencontrez notre équipe d'experts dédiée à la révolution agricole
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-                            {team.map((member, idx) => (
-                                <div
-                                    key={idx}
-                                    className="group relative bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl sm:hover:shadow-2xl hover:-translate-y-1 sm:hover:-translate-y-2"
-                                >
-                                    {/* Background gradient on hover */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-[#F1F8F4] group-hover:from-[#22C55E]/5 group-hover:to-[#22C55E]/10 transition-all duration-500"></div>
-
-                                    <div className="relative z-10">
-                                        <div className="relative mb-6 sm:mb-8">
-                                            <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full mx-auto overflow-hidden border-4 border-white shadow-lg sm:shadow-xl">
-                                                <img
-                                                    src={member.img}
-                                                    alt={member.name}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                                />
-                                            </div>
-                                            <div className="absolute -bottom-1 sm:-bottom-2 right-1/4 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-[#22C55E] rounded-full border-4 border-white"></div>
-                                        </div>
-
-                                        <h3 className="text-xl sm:text-2xl font-bold text-agro-dark text-center mb-2">{member.name}</h3>
-                                        <p className="text-agro-primary font-bold text-center mb-2 sm:mb-3 text-sm sm:text-base">
-                                            {member.roleKey === "agronomist" ? "Agronome" :
-                                                member.roleKey === "engineer" ? "Ingénieur IoT" :
-                                                    "Responsable Produit"}
-                                        </p>
-                                        <p className="text-gray-500 text-xs sm:text-sm text-center font-medium mb-4 sm:mb-6">
-                                            {member.expertise}
-                                        </p>
-
-                                        <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-100">
-                                            <div className="flex justify-center gap-3 sm:gap-4">
-                                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full"></div>
-                                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full"></div>
-                                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* CTA SECTION - Responsive */}
+                {/* CTA SECTION */}
                 <section className="py-16 sm:py-20 md:py-24 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-agro-dark via-[#1A4D2E] to-agro-primary"></div>
                     <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2832')] opacity-10 bg-cover bg-center"></div>
@@ -426,7 +620,7 @@ export default function LandingPage() {
                             </h2>
 
                             <p className="text-lg sm:text-xl text-white/80 mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto">
-                                Rejoignez la révolution agricole intelligente dès aujourd'hui
+                                Découvrez comment notre système IoT intelligent peut optimiser vos cultures
                             </p>
 
                             <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-6 sm:mb-8 md:mb-10">
