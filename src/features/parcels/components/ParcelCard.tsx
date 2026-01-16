@@ -86,35 +86,35 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete }: an
               {parcel.culturePredite || "Analyse..."}
             </p>
             {parcel.confiance && (
-               <p className="text-[10px] font-bold text-green-600/70 italic">
-                 Confiance : {parcel.confiance}%
-               </p>
+              <p className="text-[10px] font-bold text-green-600/70 italic">
+                Confiance : {parcel.confiance}%
+              </p>
             )}
           </div>
         </div>
 
         {/* Section Capteurs utilisés */}
-<div className="pt-2">
-  <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
-    Capteurs utilisés
-  </p>
-  <div className="flex flex-wrap gap-2">
-    {parcel.capteursListe ? (
-      parcel.capteursListe.split(',').map((capteur: string, idx: number) => (
-        <span 
-          key={idx} 
-          className="bg-green-50 text-[#1A8D44] text-[10px] font-bold px-3 py-1.5 rounded-full border border-green-100 shadow-sm transition-hover hover:bg-green-100"
-        >
-          {capteur.trim()}
-        </span>
-      ))
-    ) : (
-      <span className="text-xs font-medium text-gray-400 italic">
-        Aucun capteur actif
-      </span>
-    )}
-  </div>
-</div>
+        <div className="pt-2">
+          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
+            Capteurs utilisés
+          </p>
+          <div className="flex flex-wrap gap-2">
+            {parcel.capteursListe ? (
+              parcel.capteursListe.split(',').map((capteur: string, idx: number) => (
+                <span
+                  key={idx}
+                  className="bg-green-50 text-[#1A8D44] text-[10px] font-bold px-3 py-1.5 rounded-full border border-green-100 shadow-sm transition-hover hover:bg-green-100"
+                >
+                  {capteur.trim()}
+                </span>
+              ))
+            ) : (
+              <span className="text-xs font-medium text-gray-400 italic">
+                Aucun capteur actif
+              </span>
+            )}
+          </div>
+        </div>
         {/* Actions */}
         <div className="flex justify-center gap-10 pt-4 border-t border-gray-50">
           <button onClick={onEdit} className="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors">Modifier</button>

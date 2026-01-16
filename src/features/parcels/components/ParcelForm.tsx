@@ -144,7 +144,7 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
         </div>
 
         <div>
-          <label className="block text-sm font-bold mb-1">Superficie (m²)</label>
+          <label className="block text-sm font-bold mb-1">Superficie (ha)</label>
           <input
             type="number" min="1" placeholder="Ex: 50" className="w-full p-3 border rounded-xl bg-gray-50 outline-none focus:border-green-500"
             value={formData.superficie}

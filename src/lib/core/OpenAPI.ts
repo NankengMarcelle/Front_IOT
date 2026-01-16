@@ -20,7 +20,7 @@ export type OpenAPIConfig = {
 };
 
 export const OpenAPI: OpenAPIConfig = {
-    BASE: '172.29.241.11:8000'/*process.env.NEXT_PUBLIC_API_URL || 'https://iot-soil-backend.onrender.com'*/,
+    BASE: process.env.NEXT_PUBLIC_API_URL || 'https://iot-soil-backend.onrender.com',
     VERSION: '1.0.0',
     WITH_CREDENTIALS: false,
     CREDENTIALS: 'include',

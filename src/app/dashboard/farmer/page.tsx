@@ -68,7 +68,7 @@ export default function FarmerDashboard() {
             title={t('dashboard_home.my_terrains')}
             stats={[
               { label: t('dashboard_home.total'), value: loading ? "..." : `${stats.nbTerrains}` },
-              { label: t('dashboard_home.surface'), value: loading ? "..." : `${stats.surfaceTerrains} m²` }
+              { label: t('dashboard_home.surface'), value: loading ? "..." : `${stats.surfaceTerrains} ha` }
             ]}
             description={t('dashboard_home.terrains_desc')}
             onClick={() => router.push('/dashboard/terrains')}
@@ -80,7 +80,7 @@ export default function FarmerDashboard() {
             title={t('dashboard_home.my_parcelles')}
             stats={[
               { label: t('dashboard_home.active'), value: loading ? "..." : `${stats.nbParcelles}` },
-              { label: t('dashboard_home.surface'), value: loading ? "..." : `${stats.surfaceParcelles} m²` }
+              { label: t('dashboard_home.surface'), value: loading ? "..." : `${stats.surfaceParcelles} ha` }
             ]}
             description={t('dashboard_home.parcelles_desc')}
             onClick={() => router.push('/dashboard/parcelles')}
