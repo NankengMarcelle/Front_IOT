@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { AuthenticationService } from "@/lib/services/AuthenticationService";
+import { Leaf } from 'lucide-react';
 
 interface LoginFormProps {
   role: string | null;
@@ -61,16 +62,11 @@ export default function LoginForm({ role }: LoginFormProps) {
   };
 
   return (
-    <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 md:p-10 w-full max-w-md flex flex-col items-center border border-gray-100 animate-in fade-in zoom-in duration-500">
+    <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 md:p-10 w-full max-w-md flex flex-col items-center border-3 border-[#1B831B] animate-in fade-in zoom-in duration-500">
       {/* Logo Smart Agro */}
       <div className="mb-4">
-        <Image
-          src="/logo.jpg"
-          alt="Smart Agro Logo"
-          width={50}
-          height={50}
-          className="object-contain"
-        />
+         <div className="p-2 bg-[#1B831B]/10 rounded-lg"><Leaf className="w-6 h-6 sm:w-8 sm:h-8 text-[#1B831B]" /></div>
+        
       </div>
 
       <h1 className="text-3xl font-bold text-gray-900 mb-8">Connexion</h1>
