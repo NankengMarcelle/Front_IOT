@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useTranslation } from '@/providers/TranslationProvider';
 import Footer from '@/components/layout/Footer';
-import { ArrowLeft, Play, Pause, SkipBack, SkipForward, Maximize2, Settings, Download, Share2, BarChart3, Cpu, Leaf, Zap, Target, Shield, Clock, Users, CheckCircle, ChevronRight, Globe, ChevronDown, Radio, Brain, Cloud, WifiIcon, FileText, Smartphone, Database, ArrowRight } from 'lucide-react';
+import { ArrowLeft, Play, Pause, SkipBack, SkipForward, Maximize2, Settings, Download, Share2, BarChart3, Cpu, Leaf, Zap, Target, Shield, Clock, Users, CheckCircle, ChevronRight, Globe, ChevronDown, Radio, Brain, Cloud, WifiIcon, FileText, Smartphone, Database, ArrowRight, ChevronUp } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function DemoPage() {
@@ -15,6 +15,7 @@ export default function DemoPage() {
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [activeFeature, setActiveFeature] = useState(0);
     const videoRef = useRef<HTMLVideoElement>(null);
+    const demoRef = useRef<HTMLDivElement>(null);
 
     const languages = [
         { code: 'fr', name: 'Français', flag: '🇫🇷' },
@@ -81,6 +82,12 @@ export default function DemoPage() {
             icon: <Smartphone className="w-6 h-6" />
         }
     ];
+
+    const scrollToDemo = () => {
+        if (demoRef.current) {
+            demoRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
 
     useEffect(() => {
         // Simuler une lecture vidéo
@@ -154,31 +161,41 @@ export default function DemoPage() {
                 <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#16A34A]/5 rounded-full blur-3xl"></div>
             </div>
 
-            {/* Header avec navigation */}
-            <header className="relative z-50">
-                <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
-                    <div className="flex items-center justify-between">
-                        {/* Logo et retour */}
-                        <div className="flex items-center gap-4">
-                            <Link
-                                href="/"
-                                className="flex items-center gap-2 sm:gap-3 text-white hover:text-[#b2f2bb] transition-colors group"
-                            >
-                                <div className="bg-white/10 backdrop-blur-sm rounded-full p-2 sm:p-3 border border-white/20 group-hover:bg-white/15 transition-all">
-                                    <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
-                                </div>
-                                <span className="font-semibold text-sm sm:text-base">Retour à l'accueil</span>
-                            </Link>
+            <main className="flex-grow relative z-10">
+                {/* Hero Section - Plein écran avec logo et toggle */}
+                <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0">
+                        <img
+                            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2832&auto=format&fit=crop&crop=focalpoint&fp-y=.35"
+                            alt="Tableau de bord agricole"
+                            className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#052E16]/95 via-[#14532D]/90 to-[#166534]/85"></div>
+                    </div>
 
-                            <div className="hidden sm:flex items-center gap-3 ml-4">
-                                <div className="w-10 h-10 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl flex items-center justify-center">
-                                    <Leaf className="w-6 h-6 text-white" />
-                                </div>
-                                <span className="text-white text-xl font-bold tracking-tight">Smart Agro</span>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#052E16]/90 via-transparent to-transparent"></div>
+
+                    {/* Floating elements */}
+                    <div className="absolute top-1/4 left-10 w-4 h-4 bg-[#22C55E] rounded-full animate-pulse"></div>
+                    <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-[#22C55E] rounded-full animate-pulse delay-300"></div>
+                    <div className="absolute bottom-1/4 right-20 w-2 h-2 bg-[#22C55E] rounded-full animate-pulse delay-700"></div>
+
+                    {/* Logo Smart Agro en haut à gauche - BLANC */}
+                    <div className="absolute top-4 sm:top-6 left-3 sm:left-6 z-50 max-w-[50%]">
+                        <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-all duration-300 flex-shrink-0">
+                                <Leaf className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
                             </div>
-                        </div>
+                            <div className="flex flex-col overflow-hidden">
+                                <span className="text-white text-sm sm:text-xl font-bold tracking-tight whitespace-nowrap truncate">
+                                    Smart Agro
+                                </span>
+                            </div>
+                        </Link>
+                    </div>
 
-                        {/* Language Toggle */}
+                    {/* Language Toggle en haut à droite */}
+                    <div className="absolute top-4 sm:top-6 right-3 sm:right-6 z-50">
                         <div className="relative">
                             <button
                                 onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
@@ -193,7 +210,6 @@ export default function DemoPage() {
                                 <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 text-white/70 group-hover:text-[#b2f2bb] transition-all duration-300 ${showLanguageDropdown ? 'rotate-180' : ''}`} />
                             </button>
 
-                            {/* Dropdown menu */}
                             {showLanguageDropdown && (
                                 <div className="absolute top-full right-0 mt-2 w-40 sm:w-48 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-fadeIn">
                                     <div className="py-2">
@@ -220,35 +236,14 @@ export default function DemoPage() {
                             )}
                         </div>
                     </div>
-                </div>
 
-                {/* Fermer le dropdown en cliquant ailleurs */}
-                {showLanguageDropdown && (
-                    <div
-                        className="fixed inset-0 z-40"
-                        onClick={() => setShowLanguageDropdown(false)}
-                    />
-                )}
-            </header>
-
-            <main className="flex-grow relative z-10">
-                {/* Hero Section - Même style que landing page */}
-                <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
-                    <div className="absolute inset-0">
-                        <img
-                            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2832&auto=format&fit=crop&crop=focalpoint&fp-y=.35"
-                            alt="Tableau de bord agricole"
-                            className="w-full h-full object-cover"
+                    {/* Fermer le dropdown en cliquant ailleurs */}
+                    {showLanguageDropdown && (
+                        <div
+                            className="fixed inset-0 z-40"
+                            onClick={() => setShowLanguageDropdown(false)}
                         />
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#052E16]/95 via-[#14532D]/90 to-[#166534]/85"></div>
-                    </div>
-
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#052E16]/90 via-transparent to-transparent"></div>
-
-                    {/* Floating elements */}
-                    <div className="absolute top-1/4 left-10 w-4 h-4 bg-[#22C55E] rounded-full animate-pulse"></div>
-                    <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-[#22C55E] rounded-full animate-pulse delay-300"></div>
-                    <div className="absolute bottom-1/4 right-20 w-2 h-2 bg-[#22C55E] rounded-full animate-pulse delay-700"></div>
+                    )}
 
                     <div className="relative z-10 text-center px-4 sm:px-6 w-full">
                         <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 sm:px-6 sm:py-3 border border-white/20 mb-6">
@@ -265,11 +260,30 @@ export default function DemoPage() {
                         <p className="text-lg sm:text-xl md:text-2xl text-white/90 font-light max-w-3xl mx-auto mb-8 px-4">
                             Explorez notre plateforme d'agriculture intelligente à travers cette démo interactive
                         </p>
+
+                        {/* Bouton pour retourner à la landing page */}
+                        <Link
+                            href="/"
+                            className="inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm border border-white/30 hover:border-white/50 text-white rounded-xl sm:rounded-2xl font-medium hover:bg-white/15 transition-all duration-300 group"
+                        >
+                            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
+                            <span>Retour à la page d'accueil</span>
+                        </Link>
                     </div>
+
+                    {/* SCROLL INDICATOR - Centre en bas */}
+                    <button
+                        onClick={scrollToDemo}
+                        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer z-20"
+                    >
+                        <div className="w-8 h-12 border-2 border-white/60 rounded-full flex justify-center hover:border-white/80 transition-colors">
+                            <div className="w-1.5 h-4 bg-white/90 rounded-full mt-3"></div>
+                        </div>
+                    </button>
                 </section>
 
                 {/* Demo Video Section */}
-                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#F0FDF4] via-[#DCFCE7] to-[#BBF7D0]">
+                <section ref={demoRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#F0FDF4] via-[#DCFCE7] to-[#BBF7D0]">
                     <div className="container mx-auto px-4 sm:px-6">
                         <div className="max-w-6xl mx-auto">
                             <div className="text-center mb-12 sm:mb-16">
@@ -533,7 +547,6 @@ export default function DemoPage() {
                     </div>
                 </section>
             </main>
-
 
             {/* Animation keyframes */}
             <style jsx>{`

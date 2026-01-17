@@ -275,50 +275,6 @@ export default function LandingPage() {
                         </div>
                     </div>
                 </section>
-                {/* NOUVELLE SECTION: IMAGE AGRICULTEUR IoT/IA - Image complètement visible */}
-                <section className="relative w-full bg-gradient-to-b from-[#F7FEE7] to-[#D9F99D]">
-                    {/* Conteneur pour l'image avec ratio et centrage */}
-                    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12 sm:py-16">
-                        {/* Conteneur image avec ratio carré 1:1 */}
-                        <div className="relative w-full pb-[100%] overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-[#84CC16]/30">
-                            {/* Image qui couvre tout le conteneur */}
-                            <img
-                                src="/fond.jpg"  // Votre image carrée 1280x1280
-                                alt="Agriculture du futur avec IoT et IA"
-                                className="absolute inset-0 w-full h-full object-cover"
-                            />
-
-                            {/* Overlay léger au bas de l'image */}
-                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-32 sm:h-48">
-                                {/* Éléments IoT/IA au centre */}
-                                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-                                    <div className="flex items-center gap-4 mb-3">
-                                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-                                            <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                                        </div>
-                                        <div className="text-xl sm:text-2xl font-bold text-white">
-                                            +
-                                        </div>
-                                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-                                            <Wifi className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                                        </div>
-                                        <div className="text-xl sm:text-2xl font-bold text-white">
-                                            =
-                                        </div>
-                                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl flex items-center justify-center">
-                                            <Leaf className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                                        </div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-white/95 text-sm sm:text-base font-medium">
-                                            L'agriculture du futur commence ici
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
                 {/* SECTION 3: DÉFI - Jaune ambré */}
                 <section ref={solutionRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#FEFCE8] via-[#FEF9C3] to-[#FEF08A]">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
@@ -383,6 +339,50 @@ export default function LandingPage() {
                                             <p className="text-[#854D0E] text-sm sm:text-base">
                                                 Absence de monitoring en temps réel dans les zones rurales isolées
                                             </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {/* NOUVELLE SECTION: IMAGE AGRICULTEUR IoT/IA - Image complètement visible */}
+                <section className="relative w-full bg-gradient-to-b from-[#F7FEE7] to-[#D9F99D]">
+                    {/* Conteneur pour l'image avec ratio et centrage */}
+                    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12 sm:py-16">
+                        {/* Conteneur image avec ratio carré 1:1 */}
+                        <div className="relative w-full pb-[100%] overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-[#84CC16]/30">
+                            {/* Image qui couvre tout le conteneur */}
+                            <img
+                                src="/fond.jpg"  // Votre image carrée 1280x1280
+                                alt="Agriculture du futur avec IoT et IA"
+                                className="absolute inset-0 w-full h-full object-cover"
+                            />
+
+                            {/* Overlay léger au bas de l'image */}
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-32 sm:h-48">
+                                {/* Éléments IoT/IA au centre */}
+                                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
+                                    <div className="flex items-center gap-4 mb-3">
+                                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                                            <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                                        </div>
+                                        <div className="text-xl sm:text-2xl font-bold text-white">
+                                            +
+                                        </div>
+                                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                                            <Wifi className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                                        </div>
+                                        <div className="text-xl sm:text-2xl font-bold text-white">
+                                            =
+                                        </div>
+                                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl flex items-center justify-center">
+                                            <Leaf className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                                        </div>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-white/95 text-sm sm:text-base font-medium">
+                                            L'agriculture du futur commence ici
                                         </div>
                                     </div>
                                 </div>
