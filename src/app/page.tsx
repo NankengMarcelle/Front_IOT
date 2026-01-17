@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useTranslation } from '@/providers/TranslationProvider';
 import Footer from '@/components/layout/Footer';
-import { ArrowRight, Leaf, Cpu, BarChart3, Shield, Zap, Users, Target, Globe, ChevronDown, Cloud, Wifi, Database, Brain, Smartphone, Radio, Cpu as CpuIcon, FileText, Wifi as WifiIcon } from 'lucide-react';
+import { ArrowRight, Leaf, Cpu, BarChart3, Shield, Zap, Users, Target, Globe, ChevronDown, Cloud, Wifi, Database, Brain, Smartphone, Radio, Cpu as CpuIcon, FileText, Wifi as WifiIcon, ChevronUp } from 'lucide-react';
 import { useState, useRef, RefObject } from 'react';
 
 export default function LandingPage() {
@@ -12,6 +12,7 @@ export default function LandingPage() {
     const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
     const solutionRef = useRef<HTMLDivElement>(null);
     const featuresRef = useRef<HTMLDivElement>(null);
+    const ctaRef = useRef<HTMLDivElement>(null);
 
     const scrollToSection = (ref: RefObject<HTMLDivElement>) => {
         if (ref.current) {
@@ -189,7 +190,7 @@ export default function LandingPage() {
             )}
 
             <main className="flex-grow relative z-10">
-                {/* HERO SECTION */}
+                {/* HERO SECTION - Agriculture Intelligente */}
                 <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
                     <div
                         className="absolute inset-0 bg-gradient-to-br from-agro-dark via-[#1A4D2E] to-agro-primary"
@@ -218,21 +219,54 @@ export default function LandingPage() {
                         <p className="text-base xs:text-lg sm:text-xl md:text-2xl text-white/80 font-light leading-relaxed max-w-3xl mx-auto mb-8 sm:mb-12 px-4">
                             Système IoT intelligent recommandant la culture optimale basée sur l'analyse du sol et les prévisions météorologiques
                         </p>
-                    </div>
 
-                    {/* Scroll indicator */}
-                    <button
-                        onClick={() => scrollToSection(solutionRef)}
-                        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer"
-                    >
-                        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center hover:border-white/80 transition-colors">
-                            <div className="w-1 h-3 bg-white/70 rounded-full mt-2"></div>
-                        </div>
-                    </button>
+                        {/* Bouton pour aller à la section CTA */}
+                        <button
+                            onClick={() => scrollToSection(ctaRef)}
+                            className="mt-8 sm:mt-12 inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm border border-white/30 hover:border-white/50 text-white rounded-xl sm:rounded-2xl font-medium hover:bg-white/15 transition-all duration-300 group"
+                        >
+                            <span>Découvrir la solution</span>
+                            <ChevronDown className="w-4 h-4 group-hover:translate-y-1 transition-transform" />
+                        </button>
+                    </div>
                 </section>
 
-                {/* PROBLEM & SOLUTION SECTION - Photo à gauche, texte à droite */}
-                <section ref={solutionRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-agro-bg-gray">
+                {/* STATS SECTION */}
+                <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-agro-bg-gray">
+                    <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
+                            {stats.map((stat, index) => (
+                                <div
+                                    key={index}
+                                    className="text-center p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl bg-white/90 backdrop-blur-sm border border-gray-100 shadow-lg hover:shadow-xl sm:hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 sm:hover:-translate-y-2"
+                                >
+                                    <div
+                                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 leading-none"
+                                        style={{
+                                            background: 'linear-gradient(135deg, #22C55E 0%, #15803D 100%)',
+                                            WebkitBackgroundClip: 'text',
+                                            WebkitTextFillColor: 'transparent',
+                                            backgroundClip: 'text'
+                                        }}
+                                    >
+                                        {stat.value}
+                                    </div>
+                                    <div className="text-gray-800 text-base sm:text-lg font-bold mb-2">
+                                        {stat.label}
+                                    </div>
+                                    <div className="mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 border-t border-gray-100">
+                                        <div className="text-xs sm:text-sm text-[#22C55E] font-medium">
+                                            Performance moyenne
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* SECTION "Défi de l'Agriculture Traditionnelle" - Maintenant après les stats */}
+                <section ref={solutionRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-agro-bg-gray to-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center">
                             {/* Image à gauche - Agriculture traditionnelle */}
@@ -298,46 +332,15 @@ export default function LandingPage() {
                                         </div>
                                     </div>
                                 </div>
+
+                                {/* Bouton pour remonter au CTA */}
+
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* STATS SECTION */}
-                <section className="py-16 sm:py-20 bg-gradient-to-b from-agro-bg-gray to-white">
-                    <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
-                            {stats.map((stat, index) => (
-                                <div
-                                    key={index}
-                                    className="text-center p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl bg-white/90 backdrop-blur-sm border border-gray-100 shadow-lg hover:shadow-xl sm:hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 sm:hover:-translate-y-2"
-                                >
-                                    <div
-                                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 leading-none"
-                                        style={{
-                                            background: 'linear-gradient(135deg, #22C55E 0%, #15803D 100%)',
-                                            WebkitBackgroundClip: 'text',
-                                            WebkitTextFillColor: 'transparent',
-                                            backgroundClip: 'text'
-                                        }}
-                                    >
-                                        {stat.value}
-                                    </div>
-                                    <div className="text-gray-800 text-base sm:text-lg font-bold mb-2">
-                                        {stat.label}
-                                    </div>
-                                    <div className="mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 border-t border-gray-100">
-                                        <div className="text-xs sm:text-sm text-[#22C55E] font-medium">
-                                            Performance moyenne
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* NOTRE SOLUTION COMPLÈTE SECTION - CORRIGÉ : Image à droite, texte à gauche */}
+                {/* NOTRE SOLUTION COMPLÈTE SECTION */}
                 <section ref={featuresRef} id="features" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-agro-bg-gray">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div className="text-center mb-12 sm:mb-16">
@@ -349,9 +352,9 @@ export default function LandingPage() {
                             </p>
                         </div>
 
-                        {/* CORRECTION ICI : Image à droite, texte à gauche */}
+                        {/* Image à droite, texte à gauche */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center mb-12 sm:mb-16">
-                            {/* Texte à GAUCHE (présentation de notre solution) */}
+                            {/* Texte à GAUCHE */}
                             <div className="order-2 lg:order-1">
                                 <div className="space-y-6 sm:space-y-8">
                                     <div className="p-6 sm:p-8 bg-gradient-to-br from-white to-gray-50 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-lg">
@@ -383,7 +386,7 @@ export default function LandingPage() {
                                 </div>
                             </div>
 
-                            {/* Image à DROITE (agriculture intelligente combinant IA et IoT) */}
+                            {/* Image à DROITE */}
                             <div className="relative order-1 lg:order-2">
                                 <div className="rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl">
                                     <img
@@ -403,7 +406,7 @@ export default function LandingPage() {
                             </div>
                         </div>
 
-                        {/* Features grid - Basé sur "Notre Solution Complète" */}
+                        {/* Features grid */}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
                             {features.map((feature, index) => (
                                 <div
@@ -422,10 +425,13 @@ export default function LandingPage() {
                                 </div>
                             ))}
                         </div>
+
+                        {/* Bouton pour aller à la section CTA */}
+
                     </div>
                 </section>
 
-                {/* TECHNOLOGIES SECTION (remplace Team) */}
+                {/* TECHNOLOGIES SECTION */}
                 <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-agro-bg-gray to-white">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div className="text-center mb-12 sm:mb-16">
@@ -470,7 +476,7 @@ export default function LandingPage() {
                             ))}
                         </div>
 
-                        {/* Architecture overview - basée sur le diagramme de package */}
+                        {/* Architecture overview */}
                         <div className="mt-16 sm:mt-20 bg-gradient-to-r from-[#22C55E]/5 to-agro-primary/5 rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 border border-[#22C55E]/20">
                             <h3 className="text-xl sm:text-2xl font-bold text-agro-dark mb-6 text-center">
                                 Architecture du Système (Diagramme de Package)
@@ -603,8 +609,8 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* CTA SECTION */}
-                <section className="py-16 sm:py-20 md:py-24 relative overflow-hidden">
+                {/* CTA SECTION - avec ref */}
+                <section ref={ctaRef} className="py-16 sm:py-20 md:py-24 relative overflow-hidden">
                     <div className="absolute inset-0 bg-gradient-to-br from-agro-dark via-[#1A4D2E] to-agro-primary"></div>
                     <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2832')] opacity-10 bg-cover bg-center"></div>
 
@@ -643,6 +649,8 @@ export default function LandingPage() {
                     </div>
                 </section>
             </main>
+
+            <Footer />
 
             {/* Animation keyframes */}
             <style jsx>{`
