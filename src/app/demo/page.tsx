@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useTranslation } from '@/providers/TranslationProvider';
 import Footer from '@/components/layout/Footer';
-import { ArrowLeft, Play, Pause, SkipBack, SkipForward, Maximize2, Settings, Download, Share2, BarChart3, Cpu, Leaf, Zap, Target, Shield, Clock, Users, CheckCircle, ChevronRight, Globe, ChevronDown } from 'lucide-react';
+import { ArrowLeft, Play, Pause, SkipBack, SkipForward, Maximize2, Settings, Download, Share2, BarChart3, Cpu, Leaf, Zap, Target, Shield, Clock, Users, CheckCircle, ChevronRight, Globe, ChevronDown, Radio, Brain, Cloud, WifiIcon, FileText, Smartphone, Database, ArrowRight } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function DemoPage() {
@@ -13,6 +13,7 @@ export default function DemoPage() {
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
+    const [activeFeature, setActiveFeature] = useState(0);
     const videoRef = useRef<HTMLVideoElement>(null);
 
     const languages = [
@@ -26,22 +27,26 @@ export default function DemoPage() {
         {
             icon: <BarChart3 className="w-6 h-6" />,
             title: "Tableau de Bord Intuitif",
-            description: "Visualisez toutes vos données en temps réel sur une interface unique."
+            description: "Visualisez toutes vos données en temps réel sur une interface unique.",
+            color: "from-[#22C55E] to-[#16A34A]"
         },
         {
             icon: <Cpu className="w-6 h-6" />,
             title: "Contrôle IoT",
-            description: "Gérez vos capteurs et équipements à distance en un clic."
+            description: "Gérez vos capteurs et équipements à distance en un clic.",
+            color: "from-[#84CC16] to-[#65A30D]"
         },
         {
-            icon: <Leaf className="w-6 h-6" />,
+            icon: <Brain className="w-6 h-6" />,
             title: "Analyse IA",
-            description: "Recevez des recommandations personnalisées pour vos cultures."
+            description: "Recevez des recommandations personnalisées pour vos cultures.",
+            color: "from-[#10B981] to-[#059669]"
         },
         {
             icon: <Zap className="w-6 h-6" />,
             title: "Alertes Intelligentes",
-            description: "Soyez averti des anomalies et des actions nécessaires."
+            description: "Soyez averti des anomalies et des actions nécessaires.",
+            color: "from-[#CA8A04] to-[#A16207]"
         }
     ];
 
@@ -52,6 +57,29 @@ export default function DemoPage() {
         "Prédictions précises à 99,8%",
         "Support technique dédié 7j/7",
         "Formation et accompagnement inclus"
+    ];
+
+    const demoSteps = [
+        {
+            title: "Collecte des Données",
+            description: "Les capteurs IoT mesurent en temps réel les paramètres du sol",
+            icon: <Radio className="w-6 h-6" />
+        },
+        {
+            title: "Analyse IA",
+            description: "Le modèle Random Forest analyse les données collectées",
+            icon: <Brain className="w-6 h-6" />
+        },
+        {
+            title: "Recommandations",
+            description: "Génération de recommandations personnalisées",
+            icon: <FileText className="w-6 h-6" />
+        },
+        {
+            title: "Visualisation",
+            description: "Accès aux résultats sur le dashboard intuitif",
+            icon: <Smartphone className="w-6 h-6" />
+        }
     ];
 
     useEffect(() => {
@@ -70,6 +98,14 @@ export default function DemoPage() {
         }
         return () => clearInterval(interval);
     }, [isPlaying]);
+
+    useEffect(() => {
+        // Animation automatique des features
+        const interval = setInterval(() => {
+            setActiveFeature((prev) => (prev + 1) % demoFeatures.length);
+        }, 3000);
+        return () => clearInterval(interval);
+    }, []);
 
     const handlePlayPause = () => {
         setIsPlaying(!isPlaying);
@@ -101,10 +137,10 @@ export default function DemoPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-agro-bg-gray">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F0FDF4] to-[#DCFCE7]">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-agro-primary border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-agro-dark font-medium">Chargement...</p>
+                    <div className="w-12 h-12 border-4 border-[#22C55E] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[#166534] font-medium">Chargement...</p>
                 </div>
             </div>
         );
@@ -114,29 +150,31 @@ export default function DemoPage() {
         <div className="min-h-screen flex flex-col relative overflow-hidden">
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-agro-primary/5 rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#22C55E]/5 rounded-full blur-3xl"></div>
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#22C55E]/5 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#16A34A]/5 rounded-full blur-3xl"></div>
             </div>
 
             {/* Header avec navigation */}
             <header className="relative z-50">
-                <div className="container mx-auto px-4 sm:px-6 py-4">
+                <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
                     <div className="flex items-center justify-between">
                         {/* Logo et retour */}
                         <div className="flex items-center gap-4">
                             <Link
                                 href="/"
-                                className="flex items-center gap-2 text-white hover:text-[#b2f2bb] transition-colors group"
+                                className="flex items-center gap-2 sm:gap-3 text-white hover:text-[#b2f2bb] transition-colors group"
                             >
-                                <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-                                <span className="font-semibold">Retour</span>
+                                <div className="bg-white/10 backdrop-blur-sm rounded-full p-2 sm:p-3 border border-white/20 group-hover:bg-white/15 transition-all">
+                                    <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
+                                </div>
+                                <span className="font-semibold text-sm sm:text-base">Retour à l'accueil</span>
                             </Link>
 
-                            <div className="hidden sm:flex items-center gap-3">
-                                <div className="w-8 h-8 bg-gradient-to-br from-[#22C55E] to-agro-primary rounded-lg flex items-center justify-center">
-                                    <Leaf className="w-4 h-4 text-white" />
+                            <div className="hidden sm:flex items-center gap-3 ml-4">
+                                <div className="w-10 h-10 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl flex items-center justify-center">
+                                    <Leaf className="w-6 h-6 text-white" />
                                 </div>
-                                <span className="text-white text-xl font-bold">Smart Agro</span>
+                                <span className="text-white text-xl font-bold tracking-tight">Smart Agro</span>
                             </div>
                         </div>
 
@@ -166,10 +204,10 @@ export default function DemoPage() {
                                                     setLanguage(lang.code);
                                                     setShowLanguageDropdown(false);
                                                 }}
-                                                className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 hover:bg-agro-bg-gray transition-all duration-200 ${language === lang.code ? 'bg-agro-bg-gray' : ''}`}
+                                                className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 hover:bg-[#F0FDF4] transition-all duration-200 ${language === lang.code ? 'bg-[#F0FDF4]' : ''}`}
                                             >
-                                                <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-agro-dark flex-shrink-0" />
-                                                <span className={`text-sm sm:text-base font-medium ${language === lang.code ? 'text-agro-primary' : 'text-gray-700'} flex-shrink-0`}>
+                                                <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-gray-700 flex-shrink-0" />
+                                                <span className={`text-sm sm:text-base font-medium ${language === lang.code ? 'text-[#22C55E]' : 'text-gray-700'} flex-shrink-0`}>
                                                     {lang.flag} {lang.name}
                                                 </span>
                                                 {language === lang.code && (
@@ -194,92 +232,145 @@ export default function DemoPage() {
             </header>
 
             <main className="flex-grow relative z-10">
-                {/* Hero Section */}
-                <section className="relative py-12 sm:py-16 md:py-20 bg-gradient-to-br from-agro-dark via-[#1A4D2E] to-agro-primary">
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2832')] opacity-10 bg-cover bg-center"></div>
+                {/* Hero Section - Même style que landing page */}
+                <section className="relative min-h-[60vh] flex items-center justify-center overflow-hidden">
+                    <div className="absolute inset-0">
+                        <img
+                            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2832&auto=format&fit=crop&crop=focalpoint&fp-y=.35"
+                            alt="Tableau de bord agricole"
+                            className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-br from-[#052E16]/95 via-[#14532D]/90 to-[#166534]/85"></div>
+                    </div>
 
-                    <div className="container mx-auto px-4 sm:px-6 relative z-10">
-                        <div className="max-w-6xl mx-auto text-center">
-                            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 border border-white/20 mb-6">
-                                <div className="w-2 h-2 bg-[#22C55E] rounded-full animate-pulse"></div>
-                                <span className="text-white/90 text-sm font-medium">DÉMO INTERACTIVE</span>
-                            </div>
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#052E16]/90 via-transparent to-transparent"></div>
 
-                            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight">
-                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-[#b2f2bb] to-[#22C55E]">
-                                    Découvrez Smart Agro en Action
-                                </span>
-                            </h1>
+                    {/* Floating elements */}
+                    <div className="absolute top-1/4 left-10 w-4 h-4 bg-[#22C55E] rounded-full animate-pulse"></div>
+                    <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-[#22C55E] rounded-full animate-pulse delay-300"></div>
+                    <div className="absolute bottom-1/4 right-20 w-2 h-2 bg-[#22C55E] rounded-full animate-pulse delay-700"></div>
 
-                            <p className="text-lg sm:text-xl md:text-2xl text-white/80 font-light max-w-3xl mx-auto mb-8">
-                                Explorez notre plateforme d'agriculture intelligente à travers cette démo interactive
-                            </p>
+                    <div className="relative z-10 text-center px-4 sm:px-6 w-full">
+                        <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 sm:px-6 sm:py-3 border border-white/20 mb-6">
+                            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#22C55E] rounded-full animate-pulse"></div>
+                            <span className="text-white/90 text-sm sm:text-base font-medium">DÉMO INTERACTIVE</span>
                         </div>
+
+                        <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white mb-6 md:mb-8 leading-tight tracking-tight">
+                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-[#b2f2bb] to-[#22C55E]">
+                                Découvrez Smart Agro en Action
+                            </span>
+                        </h1>
+
+                        <p className="text-lg sm:text-xl md:text-2xl text-white/90 font-light max-w-3xl mx-auto mb-8 px-4">
+                            Explorez notre plateforme d'agriculture intelligente à travers cette démo interactive
+                        </p>
                     </div>
                 </section>
 
                 {/* Demo Video Section */}
-                <section className="py-12 sm:py-16 md:py-20 bg-white">
+                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#F0FDF4] via-[#DCFCE7] to-[#BBF7D0]">
                     <div className="container mx-auto px-4 sm:px-6">
                         <div className="max-w-6xl mx-auto">
-                            <div className="mb-10 text-center">
-                                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-agro-dark mb-4">
+                            <div className="text-center mb-12 sm:mb-16">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#166534] mb-4 sm:mb-6">
                                     Démonstration Interactive
                                 </h2>
-                                <p className="text-gray-600 max-w-2xl mx-auto">
+                                <p className="text-lg sm:text-xl text-[#15803D] max-w-2xl mx-auto">
                                     Regardez comment notre plateforme transforme la gestion de votre exploitation agricole
                                 </p>
                             </div>
 
-                            {/* Video Player */}
-                            <div className="relative bg-gradient-to-br from-gray-900 to-agro-dark rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl mb-10">
-                                {/* Video Placeholder */}
+                            {/* Video Player - Style amélioré */}
+                            <div className="relative bg-gradient-to-br from-[#052E16] to-[#14532D] rounded-3xl overflow-hidden shadow-2xl mb-12 sm:mb-16">
+                                {/* Video Placeholder avec interface Smart Agro */}
                                 <div
                                     ref={videoRef as any}
-                                    className="relative aspect-video bg-gradient-to-br from-gray-800 to-agro-dark flex items-center justify-center"
+                                    className="relative aspect-video bg-gradient-to-br from-[#052E16] to-[#1A4D2E] flex items-center justify-center"
                                 >
                                     {/* Simulation de l'interface Smart Agro */}
-                                    <div className="absolute inset-0 flex items-center justify-center">
-                                        <div className="text-center">
-                                            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-[#22C55E] to-agro-primary rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
-                                                <Play className="w-10 h-10 sm:w-12 sm:h-12 text-white" />
+                                    <div className="absolute inset-0">
+                                        {/* Header de l'interface */}
+                                        <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#22C55E]/20 to-[#16A34A]/20 backdrop-blur-sm border-b border-white/10 p-4">
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-lg flex items-center justify-center">
+                                                        <Leaf className="w-4 h-4 text-white" />
+                                                    </div>
+                                                    <span className="text-white font-bold">Smart Agro Dashboard</span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-2 h-2 bg-[#22C55E] rounded-full animate-pulse"></div>
+                                                    <span className="text-white/80 text-sm">EN TEMPS RÉEL</span>
+                                                </div>
                                             </div>
-                                            <h3 className="text-white text-xl sm:text-2xl font-bold mb-2">Smart Agro Platform</h3>
-                                            <p className="text-white/70">Démo interactive en cours de chargement...</p>
+                                        </div>
+
+                                        {/* Contenu principal */}
+                                        <div className="absolute inset-0 top-16 flex items-center justify-center">
+                                            <div className="text-center">
+                                                <div className="relative inline-block">
+                                                    <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
+                                                        <Play className="w-12 h-12 sm:w-16 sm:h-16 text-white" />
+                                                    </div>
+                                                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-[#84CC16] to-[#65A30D] rounded-full flex items-center justify-center">
+                                                        <div className="w-4 h-4 bg-white rounded-full"></div>
+                                                    </div>
+                                                </div>
+                                                <h3 className="text-white text-2xl sm:text-3xl font-bold mb-3">Smart Agro Platform</h3>
+                                                <p className="text-white/70 text-lg">Démo interactive en cours de chargement...</p>
+                                            </div>
+                                        </div>
+
+                                        {/* Widgets de démo */}
+                                        <div className="absolute bottom-4 left-4 right-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                            {demoFeatures.map((feature, idx) => (
+                                                <div
+                                                    key={idx}
+                                                    className={`bg-gradient-to-br ${feature.color} backdrop-blur-sm rounded-xl p-3 border border-white/20 transition-all duration-300 ${activeFeature === idx ? 'scale-105 shadow-lg' : 'opacity-80'}`}
+                                                >
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                                                            {feature.icon}
+                                                        </div>
+                                                        <span className="text-white text-sm font-medium truncate">{feature.title}</span>
+                                                    </div>
+                                                </div>
+                                            ))}
                                         </div>
                                     </div>
 
                                     {/* Overlay UI Elements */}
                                     <div className="absolute top-4 left-4">
-                                        <div className="bg-black/50 backdrop-blur-sm rounded-lg px-3 py-2">
-                                            <span className="text-white text-sm font-semibold">EN DIRECT</span>
+                                        <div className="bg-black/50 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/10">
+                                            <span className="text-white text-sm font-semibold">DÉMO EN DIRECT</span>
                                         </div>
                                     </div>
 
                                     <div className="absolute top-4 right-4">
                                         <div className="flex gap-2">
-                                            <button className="bg-black/50 backdrop-blur-sm rounded-lg p-2 hover:bg-black/70 transition-colors">
+                                            <button className="bg-black/50 backdrop-blur-sm rounded-xl p-3 hover:bg-black/70 transition-colors border border-white/10">
                                                 <Settings className="w-5 h-5 text-white" />
                                             </button>
                                             <button
                                                 onClick={handleFullscreen}
-                                                className="bg-black/50 backdrop-blur-sm rounded-lg p-2 hover:bg-black/70 transition-colors"
+                                                className="bg-black/50 backdrop-blur-sm rounded-xl p-3 hover:bg-black/70 transition-colors border border-white/10"
                                             >
                                                 <Maximize2 className="w-5 h-5 text-white" />
                                             </button>
                                         </div>
                                     </div>
 
-                                    {/* Progress Bar Simulation */}
-                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-4">
-                                        <div className="mb-2">
+                                    {/* Progress Bar */}
+                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
+                                        <div className="mb-3">
                                             <input
                                                 type="range"
                                                 min="0"
                                                 max="100"
                                                 value={currentTime}
                                                 onChange={handleSeek}
-                                                className="w-full h-1.5 bg-white/20 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#22C55E] [&::-webkit-slider-thumb]:cursor-pointer"
+                                                className="w-full h-2 bg-white/20 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#22C55E] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg"
                                             />
                                         </div>
 
@@ -287,34 +378,34 @@ export default function DemoPage() {
                                             <div className="flex items-center gap-4">
                                                 <button
                                                     onClick={handlePlayPause}
-                                                    className="bg-white hover:bg-gray-100 text-agro-dark rounded-full p-3 shadow-lg hover:shadow-xl transition-all"
+                                                    className="bg-gradient-to-br from-[#22C55E] to-[#16A34A] hover:from-[#16A34A] hover:to-[#15803D] text-white rounded-full p-4 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
                                                 >
                                                     {isPlaying ? (
-                                                        <Pause className="w-5 h-5" />
+                                                        <Pause className="w-6 h-6" />
                                                     ) : (
-                                                        <Play className="w-5 h-5" />
+                                                        <Play className="w-6 h-6" />
                                                     )}
                                                 </button>
 
-                                                <div className="hidden sm:flex items-center gap-2">
-                                                    <button className="text-white/70 hover:text-white transition-colors">
+                                                <div className="hidden sm:flex items-center gap-3">
+                                                    <button className="text-white/70 hover:text-white transition-colors hover:bg-white/10 p-2 rounded-lg">
                                                         <SkipBack className="w-5 h-5" />
                                                     </button>
-                                                    <button className="text-white/70 hover:text-white transition-colors">
+                                                    <button className="text-white/70 hover:text-white transition-colors hover:bg-white/10 p-2 rounded-lg">
                                                         <SkipForward className="w-5 h-5" />
                                                     </button>
                                                 </div>
 
-                                                <div className="text-white text-sm font-medium">
+                                                <div className="text-white text-lg font-medium">
                                                     {formatTime(currentTime)} / 3:00
                                                 </div>
                                             </div>
 
                                             <div className="flex items-center gap-3">
-                                                <button className="text-white/70 hover:text-white transition-colors hidden sm:block">
+                                                <button className="text-white/70 hover:text-white transition-colors hover:bg-white/10 p-3 rounded-xl hidden sm:block">
                                                     <Download className="w-5 h-5" />
                                                 </button>
-                                                <button className="text-white/70 hover:text-white transition-colors">
+                                                <button className="text-white/70 hover:text-white transition-colors hover:bg-white/10 p-3 rounded-xl">
                                                     <Share2 className="w-5 h-5" />
                                                 </button>
                                             </div>
@@ -323,38 +414,63 @@ export default function DemoPage() {
                                 </div>
                             </div>
 
-                            {/* Features Overview */}
+                            {/* Features Overview - Style harmonisé */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                                 {demoFeatures.map((feature, index) => (
                                     <div
                                         key={index}
-                                        className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
+                                        className="group bg-white/95 backdrop-blur-sm p-8 rounded-3xl border-2 border-[#22C55E]/30 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
                                     >
-                                        <div className="flex items-start gap-4">
-                                            <div className="w-12 h-12 bg-gradient-to-br from-[#22C55E] to-agro-primary rounded-xl flex items-center justify-center text-white flex-shrink-0">
+                                        <div className="flex items-start gap-6">
+                                            <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center text-white flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
                                                 {feature.icon}
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-agro-dark text-lg mb-2">{feature.title}</h3>
-                                                <p className="text-gray-600">{feature.description}</p>
+                                                <h3 className="font-bold text-[#166534] text-xl mb-3">{feature.title}</h3>
+                                                <p className="text-[#15803D] text-lg">{feature.description}</p>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
+
+                            {/* Process Steps */}
+                            <div className="bg-gradient-to-r from-[#22C55E]/15 to-[#16A34A]/15 rounded-3xl p-8 border-2 border-[#22C55E]/30 backdrop-blur-sm mb-12">
+                                <h3 className="text-2xl font-bold text-[#166534] mb-8 text-center">
+                                    Comment ça marche ?
+                                </h3>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    {demoSteps.map((step, idx) => (
+                                        <div key={idx} className="relative">
+                                            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 border-2 border-[#22C55E]/30 text-center">
+                                                <div className="w-12 h-12 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl flex items-center justify-center text-white mx-auto mb-4">
+                                                    {step.icon}
+                                                </div>
+                                                <h4 className="font-bold text-[#166534] text-lg mb-2">{step.title}</h4>
+                                                <p className="text-[#15803D]">{step.description}</p>
+                                            </div>
+                                            {idx < demoSteps.length - 1 && (
+                                                <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2">
+                                                    <ChevronRight className="w-6 h-6 text-[#22C55E]/50" />
+                                                </div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
 
-                {/* Benefits Section */}
-                <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-b from-agro-bg-gray to-white">
+                {/* Benefits Section - Style harmonisé */}
+                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#F7FEE7] via-[#ECFCCB] to-[#D9F99D]">
                     <div className="container mx-auto px-4 sm:px-6">
                         <div className="max-w-6xl mx-auto">
-                            <div className="text-center mb-12">
-                                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-agro-dark mb-4">
+                            <div className="text-center mb-12 sm:mb-16">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#713F12] mb-4 sm:mb-6">
                                     Avantages Concrets
                                 </h2>
-                                <p className="text-gray-600 max-w-2xl mx-auto">
+                                <p className="text-lg sm:text-xl text-[#854D0E] max-w-2xl mx-auto">
                                     Découvrez comment Smart Agro peut transformer votre exploitation
                                 </p>
                             </div>
@@ -363,146 +479,85 @@ export default function DemoPage() {
                                 {benefits.map((benefit, index) => (
                                     <div
                                         key={index}
-                                        className="group bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300"
+                                        className="group bg-white/95 backdrop-blur-sm p-6 rounded-2xl border-2 border-[#CA8A04]/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                                     >
                                         <div className="flex items-start gap-3">
-                                            <CheckCircle className="w-6 h-6 text-[#22C55E] flex-shrink-0 mt-0.5" />
-                                            <p className="text-gray-800 font-medium">{benefit}</p>
+                                            <CheckCircle className="w-6 h-6 text-[#CA8A04] flex-shrink-0 mt-0.5" />
+                                            <p className="text-[#854D0E] font-medium text-lg">{benefit}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
-
-                            {/* Stats */}
-                            <div className="bg-gradient-to-r from-[#22C55E]/5 to-agro-primary/5 rounded-2xl p-8 border border-[#22C55E]/20">
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                                    <div className="text-center">
-                                        <div className="text-3xl sm:text-4xl font-black text-agro-dark mb-2">+40%</div>
-                                        <div className="text-gray-600 text-sm font-medium">Productivité</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-3xl sm:text-4xl font-black text-agro-dark mb-2">-30%</div>
-                                        <div className="text-gray-600 text-sm font-medium">Consommation d'eau</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-3xl sm:text-4xl font-black text-agro-dark mb-2">24/7</div>
-                                        <div className="text-gray-600 text-sm font-medium">Surveillance</div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-3xl sm:text-4xl font-black text-agro-dark mb-2">99.8%</div>
-                                        <div className="text-gray-600 text-sm font-medium">Précision</div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </section>
 
-                {/* CTA Section */}
-                <section className="py-12 sm:py-16 md:py-20 bg-gradient-to-br from-agro-dark via-[#1A4D2E] to-agro-primary">
-                    <div className="container mx-auto px-4 sm:px-6">
-                        <div className="max-w-4xl mx-auto text-center">
-                            <div className="bg-white/10 backdrop-blur-sm rounded-3xl p-8 sm:p-10 md:p-12 border border-white/20">
-                                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-6">
-                                    Prêt à Essayer par Vous-Même ?
-                                </h2>
-
-                                <p className="text-lg sm:text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-                                    Inscrivez-vous pour un essai gratuit de 14 jours et découvrez comment Smart Agro peut révolutionner votre agriculture.
-                                </p>
-
-                                <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-                                    <Link
-                                        href="/register"
-                                        className="group bg-white hover:bg-gray-50 text-agro-dark px-8 py-4 rounded-xl sm:rounded-2xl text-lg font-bold transition-all duration-300 shadow-2xl hover:shadow-[0_20px_60px_-15px_rgba(255,255,255,0.5)] hover:-translate-y-1 active:scale-95 flex items-center gap-3 min-w-[200px] justify-center"
-                                    >
-                                        <span>Commencer l'essai gratuit</span>
-                                        <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                                    </Link>
-
-                                    <Link
-                                        href="/contact"
-                                        className="px-8 py-4 rounded-xl sm:rounded-2xl text-lg font-semibold transition-all duration-300 border-2 border-white/30 hover:border-white/60 text-white hover:bg-white/5 backdrop-blur-sm min-w-[200px] text-center"
-                                    >
-                                        Contactez-nous
-                                    </Link>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-white/60">
-                                    <div className="flex items-center justify-center gap-2">
-                                        <div className="w-2 h-2 bg-[#22C55E] rounded-full"></div>
-                                        <span>Aucun engagement</span>
-                                    </div>
-                                    <div className="flex items-center justify-center gap-2">
-                                        <div className="w-2 h-2 bg-[#22C55E] rounded-full"></div>
-                                        <span>Support dédié</span>
-                                    </div>
-                                    <div className="flex items-center justify-center gap-2">
-                                        <div className="w-2 h-2 bg-[#22C55E] rounded-full"></div>
-                                        <span>Configuration assistée</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* FAQ Section */}
-                <section className="py-12 sm:py-16 md:py-20 bg-white">
+                {/* FAQ Section - Style harmonisé */}
+                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#ECFDF5] via-[#D1FAE5] to-[#A7F3D0]">
                     <div className="container mx-auto px-4 sm:px-6">
                         <div className="max-w-4xl mx-auto">
-                            <div className="text-center mb-12">
-                                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-agro-dark mb-4">
+                            <div className="text-center mb-12 sm:mb-16">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#065F46] mb-4 sm:mb-6">
                                     Questions Fréquentes
                                 </h2>
-                                <p className="text-gray-600 max-w-2xl mx-auto">
+                                <p className="text-lg sm:text-xl text-[#047857] max-w-2xl mx-auto">
                                     Tout ce que vous devez savoir sur notre démo et notre plateforme
                                 </p>
                             </div>
 
                             <div className="space-y-6">
-                                <div className="bg-gray-50 rounded-2xl p-6">
-                                    <h3 className="font-bold text-agro-dark text-lg mb-3">
-                                        Combien de temps dure l'essai gratuit ?
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        L'essai gratuit dure 14 jours. Pendant cette période, vous avez accès à toutes les fonctionnalités de la plateforme sans aucune limitation.
-                                    </p>
-                                </div>
-
-                                <div className="bg-gray-50 rounded-2xl p-6">
-                                    <h3 className="font-bold text-agro-dark text-lg mb-3">
-                                        Ai-je besoin de matériel spécifique ?
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        Notre solution est compatible avec la plupart des capteurs IoT standards du marché. Nous pouvons vous conseiller sur le matériel adapté à votre exploitation.
-                                    </p>
-                                </div>
-
-                                <div className="bg-gray-50 rounded-2xl p-6">
-                                    <h3 className="font-bold text-agro-dark text-lg mb-3">
-                                        Puis-je annuler à tout moment ?
-                                    </h3>
-                                    <p className="text-gray-600">
-                                        Oui, vous pouvez annuler votre abonnement à tout moment. Aucun engagement à long terme n'est requis.
-                                    </p>
-                                </div>
+                                {[
+                                    {
+                                        question: "Combien de temps dure l'essai gratuit ?",
+                                        answer: "L'essai gratuit dure 14 jours. Pendant cette période, vous avez accès à toutes les fonctionnalités de la plateforme sans aucune limitation."
+                                    },
+                                    {
+                                        question: "Ai-je besoin de matériel spécifique ?",
+                                        answer: "Notre solution est compatible avec la plupart des capteurs IoT standards du marché. Nous pouvons vous conseiller sur le matériel adapté à votre exploitation."
+                                    },
+                                    {
+                                        question: "Puis-je annuler à tout moment ?",
+                                        answer: "Oui, vous pouvez annuler votre abonnement à tout moment. Aucun engagement à long terme n'est requis."
+                                    }
+                                ].map((faq, idx) => (
+                                    <div
+                                        key={idx}
+                                        className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 border-2 border-[#10B981]/30 shadow-lg hover:shadow-xl transition-all duration-300"
+                                    >
+                                        <h3 className="font-bold text-[#065F46] text-xl mb-4">{faq.question}</h3>
+                                        <p className="text-[#047857] text-lg leading-relaxed">{faq.answer}</p>
+                                    </div>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </section>
             </main>
 
-            <Footer />
 
             {/* Animation keyframes */}
             <style jsx>{`
+                @keyframes blob {
+                    0% { transform: translate(0px, 0px) scale(1); }
+                    33% { transform: translate(30px, -50px) scale(1.1); }
+                    66% { transform: translate(-20px, 20px) scale(0.9); }
+                    100% { transform: translate(0px, 0px) scale(1); }
+                }
                 @keyframes fadeIn {
                     from { opacity: 0; transform: translateY(-10px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
+                .animate-blob {
+                    animation: blob 7s infinite;
+                }
                 .animate-fadeIn {
                     animation: fadeIn 0.2s ease-out;
+                }
+                .animation-delay-2000 {
+                    animation-delay: 2s;
+                }
+                .animation-delay-4000 {
+                    animation-delay: 4s;
                 }
             `}</style>
         </div>
