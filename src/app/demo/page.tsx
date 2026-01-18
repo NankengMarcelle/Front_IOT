@@ -29,25 +29,33 @@ export default function DemoPage() {
             icon: <BarChart3 className="w-6 h-6" />,
             title: "Tableau de Bord Intuitif",
             description: "Visualisez toutes vos données en temps réel sur une interface unique.",
-            color: "from-[#22C55E] to-[#16A34A]"
+            color: "from-[#22C55E] to-[#16A34A]",
+            bgColor: "bg-white/95",
+            borderColor: "border-[#22C55E]/20"
         },
         {
             icon: <Cpu className="w-6 h-6" />,
             title: "Contrôle IoT",
             description: "Gérez vos capteurs et équipements à distance en un clic.",
-            color: "from-[#84CC16] to-[#65A30D]"
+            color: "from-[#84CC16] to-[#65A30D]",
+            bgColor: "bg-[#F0FDF4]/95",
+            borderColor: "border-[#84CC16]/20"
         },
         {
             icon: <Brain className="w-6 h-6" />,
             title: "Analyse IA",
             description: "Recevez des recommandations personnalisées pour vos cultures.",
-            color: "from-[#10B981] to-[#059669]"
+            color: "from-[#10B981] to-[#059669]",
+            bgColor: "bg-white/95",
+            borderColor: "border-[#10B981]/20"
         },
         {
             icon: <Zap className="w-6 h-6" />,
             title: "Alertes Intelligentes",
             description: "Soyez averti des anomalies et des actions nécessaires.",
-            color: "from-[#CA8A04] to-[#A16207]"
+            color: "from-[#CA8A04] to-[#A16207]",
+            bgColor: "bg-[#FEFCE8]/95",
+            borderColor: "border-[#CA8A04]/20"
         }
     ];
 
@@ -64,22 +72,30 @@ export default function DemoPage() {
         {
             title: "Collecte des Données",
             description: "Les capteurs IoT mesurent en temps réel les paramètres du sol",
-            icon: <Radio className="w-6 h-6" />
+            icon: <Radio className="w-6 h-6" />,
+            bgColor: "bg-white/95",
+            borderColor: "border-[#22C55E]/20"
         },
         {
             title: "Analyse IA",
             description: "Le modèle Random Forest analyse les données collectées",
-            icon: <Brain className="w-6 h-6" />
+            icon: <Brain className="w-6 h-6" />,
+            bgColor: "bg-[#F0FDF4]/95",
+            borderColor: "border-[#16A34A]/20"
         },
         {
             title: "Recommandations",
             description: "Génération de recommandations personnalisées",
-            icon: <FileText className="w-6 h-6" />
+            icon: <FileText className="w-6 h-6" />,
+            bgColor: "bg-white/95",
+            borderColor: "border-[#84CC16]/20"
         },
         {
             title: "Visualisation",
             description: "Accès aux résultats sur le dashboard intuitif",
-            icon: <Smartphone className="w-6 h-6" />
+            icon: <Smartphone className="w-6 h-6" />,
+            bgColor: "bg-[#F0FDF4]/95",
+            borderColor: "border-[#10B981]/20"
         }
     ];
 
@@ -90,7 +106,6 @@ export default function DemoPage() {
     };
 
     useEffect(() => {
-        // Simuler une lecture vidéo
         let interval: NodeJS.Timeout;
         if (isPlaying) {
             interval = setInterval(() => {
@@ -107,7 +122,6 @@ export default function DemoPage() {
     }, [isPlaying]);
 
     useEffect(() => {
-        // Animation automatique des features
         const interval = setInterval(() => {
             setActiveFeature((prev) => (prev + 1) % demoFeatures.length);
         }, 3000);
@@ -135,7 +149,7 @@ export default function DemoPage() {
     };
 
     const formatTime = (percent: number) => {
-        const totalSeconds = 180; // 3 minutes
+        const totalSeconds = 180;
         const seconds = Math.floor((percent / 100) * totalSeconds);
         const mins = Math.floor(seconds / 60);
         const secs = seconds % 60;
@@ -144,7 +158,7 @@ export default function DemoPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#F0FDF4] to-[#DCFCE7]">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-[#F0FDF4]">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-[#22C55E] border-t-transparent rounded-full animate-spin"></div>
                     <p className="text-[#166534] font-medium">Chargement...</p>
@@ -162,8 +176,8 @@ export default function DemoPage() {
             </div>
 
             <main className="flex-grow relative z-10">
-                {/* Hero Section - Plein écran avec logo et toggle */}
-                <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+                {/* SECTION 1: HERO - Vert foncé avec blanc */}
+                <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#052E16] via-[#14532D] to-[#166534]">
                     <div className="absolute inset-0">
                         <img
                             src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2832&auto=format&fit=crop&crop=focalpoint&fp-y=.35"
@@ -180,7 +194,7 @@ export default function DemoPage() {
                     <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-[#22C55E] rounded-full animate-pulse delay-300"></div>
                     <div className="absolute bottom-1/4 right-20 w-2 h-2 bg-[#22C55E] rounded-full animate-pulse delay-700"></div>
 
-                    {/* Logo Smart Agro en haut à gauche - BLANC */}
+                    {/* Logo Smart Agro */}
                     <div className="absolute top-4 sm:top-6 left-3 sm:left-6 z-50 max-w-[50%]">
                         <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
                             <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-all duration-300 flex-shrink-0">
@@ -194,7 +208,7 @@ export default function DemoPage() {
                         </Link>
                     </div>
 
-                    {/* Language Toggle en haut à droite */}
+                    {/* Language Toggle */}
                     <div className="absolute top-4 sm:top-6 right-3 sm:right-6 z-50">
                         <div className="relative">
                             <button
@@ -261,7 +275,6 @@ export default function DemoPage() {
                             Explorez notre plateforme d'agriculture intelligente à travers cette démo interactive
                         </p>
 
-                        {/* Bouton pour retourner à la landing page */}
                         <Link
                             href="/"
                             className="inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm border border-white/30 hover:border-white/50 text-white rounded-xl sm:rounded-2xl font-medium hover:bg-white/15 transition-all duration-300 group"
@@ -271,7 +284,6 @@ export default function DemoPage() {
                         </Link>
                     </div>
 
-                    {/* SCROLL INDICATOR - Centre en bas */}
                     <button
                         onClick={scrollToDemo}
                         className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer z-20"
@@ -282,29 +294,25 @@ export default function DemoPage() {
                     </button>
                 </section>
 
-                {/* Demo Video Section */}
-                <section ref={demoRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#F0FDF4] via-[#DCFCE7] to-[#BBF7D0]">
+                {/* SECTION 2: DÉMO VIDÉO - Blanc dominant avec touches vertes */}
+                <section ref={demoRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-[#FAFAFA] to-[#F5F5F5]">
                     <div className="container mx-auto px-4 sm:px-6">
                         <div className="max-w-6xl mx-auto">
                             <div className="text-center mb-12 sm:mb-16">
-                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#166534] mb-4 sm:mb-6">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#052E16] mb-4 sm:mb-6">
                                     Démonstration Interactive
                                 </h2>
-                                <p className="text-lg sm:text-xl text-[#15803D] max-w-2xl mx-auto">
+                                <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
                                     Regardez comment notre plateforme transforme la gestion de votre exploitation agricole
                                 </p>
                             </div>
 
-                            {/* Video Player - Style amélioré */}
-                            <div className="relative bg-gradient-to-br from-[#052E16] to-[#14532D] rounded-3xl overflow-hidden shadow-2xl mb-12 sm:mb-16">
-                                {/* Video Placeholder avec interface Smart Agro */}
+                            <div className="relative bg-white rounded-3xl overflow-hidden shadow-2xl mb-12 sm:mb-16 border border-gray-100">
                                 <div
                                     ref={videoRef as any}
                                     className="relative aspect-video bg-gradient-to-br from-[#052E16] to-[#1A4D2E] flex items-center justify-center"
                                 >
-                                    {/* Simulation de l'interface Smart Agro */}
                                     <div className="absolute inset-0">
-                                        {/* Header de l'interface */}
                                         <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#22C55E]/20 to-[#16A34A]/20 backdrop-blur-sm border-b border-white/10 p-4">
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-3">
@@ -320,7 +328,6 @@ export default function DemoPage() {
                                             </div>
                                         </div>
 
-                                        {/* Contenu principal */}
                                         <div className="absolute inset-0 top-16 flex items-center justify-center">
                                             <div className="text-center">
                                                 <div className="relative inline-block">
@@ -336,25 +343,23 @@ export default function DemoPage() {
                                             </div>
                                         </div>
 
-                                        {/* Widgets de démo */}
                                         <div className="absolute bottom-4 left-4 right-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
                                             {demoFeatures.map((feature, idx) => (
                                                 <div
                                                     key={idx}
-                                                    className={`bg-gradient-to-br ${feature.color} backdrop-blur-sm rounded-xl p-3 border border-white/20 transition-all duration-300 ${activeFeature === idx ? 'scale-105 shadow-lg' : 'opacity-80'}`}
+                                                    className={`bg-white/95 backdrop-blur-sm rounded-xl p-3 border ${feature.borderColor} transition-all duration-300 ${activeFeature === idx ? 'scale-105 shadow-lg' : 'opacity-90'}`}
                                                 >
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
+                                                        <div className={`w-8 h-8 bg-gradient-to-br ${feature.color} rounded-lg flex items-center justify-center`}>
                                                             {feature.icon}
                                                         </div>
-                                                        <span className="text-white text-sm font-medium truncate">{feature.title}</span>
+                                                        <span className="text-gray-800 text-sm font-medium truncate">{feature.title}</span>
                                                     </div>
                                                 </div>
                                             ))}
                                         </div>
                                     </div>
 
-                                    {/* Overlay UI Elements */}
                                     <div className="absolute top-4 left-4">
                                         <div className="bg-black/50 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/10">
                                             <span className="text-white text-sm font-semibold">DÉMO EN DIRECT</span>
@@ -375,7 +380,6 @@ export default function DemoPage() {
                                         </div>
                                     </div>
 
-                                    {/* Progress Bar */}
                                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
                                         <div className="mb-3">
                                             <input
@@ -428,40 +432,38 @@ export default function DemoPage() {
                                 </div>
                             </div>
 
-                            {/* Features Overview - Style harmonisé */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                                 {demoFeatures.map((feature, index) => (
                                     <div
                                         key={index}
-                                        className="group bg-white/95 backdrop-blur-sm p-8 rounded-3xl border-2 border-[#22C55E]/30 shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                                        className={`group ${feature.bgColor} backdrop-blur-sm p-8 rounded-3xl border-2 ${feature.borderColor} shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2`}
                                     >
                                         <div className="flex items-start gap-6">
                                             <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center text-white flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
                                                 {feature.icon}
                                             </div>
                                             <div>
-                                                <h3 className="font-bold text-[#166534] text-xl mb-3">{feature.title}</h3>
-                                                <p className="text-[#15803D] text-lg">{feature.description}</p>
+                                                <h3 className="font-bold text-[#052E16] text-xl mb-3">{feature.title}</h3>
+                                                <p className="text-gray-600 text-lg">{feature.description}</p>
                                             </div>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
-                            {/* Process Steps */}
-                            <div className="bg-gradient-to-r from-[#22C55E]/15 to-[#16A34A]/15 rounded-3xl p-8 border-2 border-[#22C55E]/30 backdrop-blur-sm mb-12">
-                                <h3 className="text-2xl font-bold text-[#166534] mb-8 text-center">
+                            <div className="bg-gradient-to-r from-white to-[#F0FDF4] rounded-3xl p-8 border-2 border-[#22C55E]/20 backdrop-blur-sm mb-12">
+                                <h3 className="text-2xl font-bold text-[#052E16] mb-8 text-center">
                                     Comment ça marche ?
                                 </h3>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                                     {demoSteps.map((step, idx) => (
                                         <div key={idx} className="relative">
-                                            <div className="bg-white/95 backdrop-blur-sm rounded-2xl p-6 border-2 border-[#22C55E]/30 text-center">
+                                            <div className={`${step.bgColor} backdrop-blur-sm rounded-2xl p-6 border-2 ${step.borderColor} text-center`}>
                                                 <div className="w-12 h-12 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl flex items-center justify-center text-white mx-auto mb-4">
                                                     {step.icon}
                                                 </div>
-                                                <h4 className="font-bold text-[#166534] text-lg mb-2">{step.title}</h4>
-                                                <p className="text-[#15803D]">{step.description}</p>
+                                                <h4 className="font-bold text-[#052E16] text-lg mb-2">{step.title}</h4>
+                                                <p className="text-gray-600">{step.description}</p>
                                             </div>
                                             {idx < demoSteps.length - 1 && (
                                                 <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2">
@@ -476,15 +478,15 @@ export default function DemoPage() {
                     </div>
                 </section>
 
-                {/* Benefits Section - Style harmonisé */}
-                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#F7FEE7] via-[#ECFCCB] to-[#D9F99D]">
+                /* SECTION 3: AVANTAGES - Mixte Blanc et Vert */
+                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-[#F0FDF4] to-[#DCFCE7]">
                     <div className="container mx-auto px-4 sm:px-6">
                         <div className="max-w-6xl mx-auto">
                             <div className="text-center mb-12 sm:mb-16">
-                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#713F12] mb-4 sm:mb-6">
+                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#052E16] mb-4 sm:mb-6">
                                     Avantages Concrets
                                 </h2>
-                                <p className="text-lg sm:text-xl text-[#854D0E] max-w-2xl mx-auto">
+                                <p className="text-lg sm:text-xl text-[#15803D] max-w-2xl mx-auto">
                                     Découvrez comment Smart Agro peut transformer votre exploitation
                                 </p>
                             </div>
@@ -493,21 +495,44 @@ export default function DemoPage() {
                                 {benefits.map((benefit, index) => (
                                     <div
                                         key={index}
-                                        className="group bg-white/95 backdrop-blur-sm p-6 rounded-2xl border-2 border-[#CA8A04]/30 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+                                        className="group bg-white/95 backdrop-blur-sm p-6 rounded-2xl border-2 border-[#22C55E]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
                                     >
                                         <div className="flex items-start gap-3">
-                                            <CheckCircle className="w-6 h-6 text-[#CA8A04] flex-shrink-0 mt-0.5" />
-                                            <p className="text-[#854D0E] font-medium text-lg">{benefit}</p>
+                                            <div className="w-6 h-6 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                                                <CheckCircle className="w-4 h-4 text-white" />
+                                            </div>
+                                            <p className="text-gray-800 font-medium text-lg">{benefit}</p>
                                         </div>
                                     </div>
                                 ))}
+                            </div>
+
+                            {/* Statistiques supplémentaires avec style vert-blanc */}
+                            <div className="bg-gradient-to-r from-white to-[#F0FDF4] rounded-3xl p-8 border-2 border-[#22C55E]/20 shadow-lg">
+                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                                    <div className="text-center">
+                                        <div className="text-4xl font-black text-[#22C55E] mb-2">40%</div>
+                                        <div className="text-gray-700 font-medium">Augmentation de rendement</div>
+                                        <div className="mt-2 w-16 h-1 bg-gradient-to-r from-[#22C55E] to-[#84CC16] mx-auto rounded-full"></div>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-4xl font-black text-[#16A34A] mb-2">30%</div>
+                                        <div className="text-gray-700 font-medium">Économie d'eau</div>
+                                        <div className="mt-2 w-16 h-1 bg-gradient-to-r from-[#16A34A] to-[#22C55E] mx-auto rounded-full"></div>
+                                    </div>
+                                    <div className="text-center">
+                                        <div className="text-4xl font-black text-[#84CC16] mb-2">99.8%</div>
+                                        <div className="text-gray-700 font-medium">Précision des prédictions</div>
+                                        <div className="mt-2 w-16 h-1 bg-gradient-to-r from-[#84CC16] to-[#16A34A] mx-auto rounded-full"></div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* FAQ Section - Style harmonisé */}
-                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#ECFDF5] via-[#D1FAE5] to-[#A7F3D0]">
+                {/* SECTION 4: FAQ - Blanc glacier avec vert émeraude */}
+                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-[#ECFDF5] to-[#D1FAE5]">
                     <div className="container mx-auto px-4 sm:px-6">
                         <div className="max-w-4xl mx-auto">
                             <div className="text-center mb-12 sm:mb-16">
@@ -536,7 +561,7 @@ export default function DemoPage() {
                                 ].map((faq, idx) => (
                                     <div
                                         key={idx}
-                                        className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 border-2 border-[#10B981]/30 shadow-lg hover:shadow-xl transition-all duration-300"
+                                        className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 border-2 border-[#10B981]/20 shadow-lg hover:shadow-xl transition-all duration-300"
                                     >
                                         <h3 className="font-bold text-[#065F46] text-xl mb-4">{faq.question}</h3>
                                         <p className="text-[#047857] text-lg leading-relaxed">{faq.answer}</p>
@@ -548,7 +573,6 @@ export default function DemoPage() {
                 </section>
             </main>
 
-            {/* Animation keyframes */}
             <style jsx>{`
                 @keyframes blob {
                     0% { transform: translate(0px, 0px) scale(1); }
