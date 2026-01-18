@@ -106,10 +106,10 @@ export default function LandingPage() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-agro-bg-gray">
+            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-[#F0FDF4]">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-agro-primary border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-agro-dark font-medium">Chargement...</p>
+                    <div className="w-12 h-12 border-4 border-[#22C55E] border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[#166534] font-medium">Chargement...</p>
                 </div>
             </div>
         );
@@ -121,8 +121,8 @@ export default function LandingPage() {
         <div className="min-h-screen flex flex-col relative overflow-hidden">
             {/* Background decorative elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-agro-primary/5 rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#22C55E]/5 rounded-full blur-3xl"></div>
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#22C55E]/5 rounded-full blur-3xl"></div>
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#16A34A]/5 rounded-full blur-3xl"></div>
             </div>
 
             {/* Logo Smart Agro en haut à gauche */}
@@ -156,7 +156,7 @@ export default function LandingPage() {
                     </button>
 
                     {showLanguageDropdown && (
-                        <div className="absolute top-full right-0 mt-2 w-40 sm:w-48 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-fadeIn">
+                        <div className="absolute top-full right-0 mt-2 w-40 sm:w-48 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-[#E5E7EB] overflow-hidden animate-fadeIn">
                             <div className="py-2">
                                 {languages.map((lang) => (
                                     <button
@@ -165,10 +165,10 @@ export default function LandingPage() {
                                             setLanguage(lang.code);
                                             setShowLanguageDropdown(false);
                                         }}
-                                        className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 hover:bg-agro-bg-gray transition-all duration-200 ${language === lang.code ? 'bg-agro-bg-gray' : ''}`}
+                                        className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 hover:bg-[#F0FDF4] transition-all duration-200 ${language === lang.code ? 'bg-[#F0FDF4]' : ''}`}
                                     >
-                                        <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-agro-dark flex-shrink-0" />
-                                        <span className={`text-sm sm:text-base font-medium ${language === lang.code ? 'text-agro-primary' : 'text-gray-700'} flex-shrink-0`}>
+                                        <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-[#374151] flex-shrink-0" />
+                                        <span className={`text-sm sm:text-base font-medium ${language === lang.code ? 'text-[#22C55E]' : 'text-[#374151]'} flex-shrink-0`}>
                                             {lang.flag} {lang.name}
                                         </span>
                                         {language === lang.code && (
@@ -191,7 +191,7 @@ export default function LandingPage() {
             )}
 
             <main className="flex-grow relative z-10">
-                {/* SECTION 1: HERO - Vert très foncé */}
+                {/* SECTION 1: HERO - Vert foncé avec blanc */}
                 <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#052E16] via-[#14532D] to-[#166534]">
                     <div
                         className="absolute inset-0"
@@ -242,8 +242,8 @@ export default function LandingPage() {
                     </button>
                 </section>
 
-                {/* SECTION 2: STATISTIQUES - Vert clair citron */}
-                <section ref={statsRef} className="py-16 sm:py-20 bg-gradient-to-b from-[#F7FEE7] via-[#ECFCCB] to-[#D9F99D]">
+                {/* SECTION 2: STATISTIQUES - Blanc et vert clair */}
+                <section ref={statsRef} className="py-16 sm:py-20 bg-gradient-to-b from-white via-[#F7FEE7] to-[#ECFCCB]">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
                             {stats.map((stat, index) => (
@@ -262,7 +262,7 @@ export default function LandingPage() {
                                     >
                                         {stat.value}
                                     </div>
-                                    <div className="text-gray-800 text-base sm:text-lg font-bold mb-2">
+                                    <div className="text-[#166534] text-base sm:text-lg font-bold mb-2">
                                         {stat.label}
                                     </div>
                                     <div className="mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 border-t border-[#84CC16]/30">
@@ -275,13 +275,14 @@ export default function LandingPage() {
                         </div>
                     </div>
                 </section>
-                {/* SECTION 3: DÉFI - Jaune ambré */}
-                <section ref={solutionRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#FEFCE8] via-[#FEF9C3] to-[#FEF08A]">
+
+                {/* SECTION 3: DÉFI - Blanc et vert olive */}
+                <section ref={solutionRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-[#FEFCE8] to-[#F7FEE7]">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 sm:gap-12 md:gap-16 items-center">
                             {/* Image à gauche - Agriculture traditionnelle */}
                             <div className="relative">
-                                <div className="rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-[#CA8A04]/20">
+                                <div className="rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl border-2 border-[#84CC16]/20">
                                     <img
                                         src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=2070&auto=format&fit=crop"
                                         alt="Agriculture traditionnelle"
@@ -289,54 +290,54 @@ export default function LandingPage() {
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
                                     <div className="absolute bottom-6 left-6 right-6">
-                                        <span className="inline-block px-4 py-2 bg-gradient-to-r from-[#CA8A04] to-[#A16207] backdrop-blur-sm text-white rounded-full text-sm font-semibold">
+                                        <span className="inline-block px-4 py-2 bg-gradient-to-r from-[#84CC16] to-[#65A30D] backdrop-blur-sm text-white rounded-full text-sm font-semibold">
                                             Problématique Actuelle
                                         </span>
                                     </div>
                                 </div>
-                                <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-[#CA8A04] to-[#A16207] rounded-full -z-10 blur-xl opacity-20"></div>
+                                <div className="absolute -top-4 -right-4 w-20 h-20 bg-gradient-to-br from-[#84CC16] to-[#65A30D] rounded-full -z-10 blur-xl opacity-20"></div>
                             </div>
 
                             {/* Solution à droite */}
                             <div>
                                 <div className="mb-6 sm:mb-8">
-                                    <h2 className="text-3xl sm:text-4xl font-black text-[#713F12] mb-4 sm:mb-6 leading-tight">
+                                    <h2 className="text-3xl sm:text-4xl font-black text-[#166534] mb-4 sm:mb-6 leading-tight">
                                         Défi de l'Agriculture Traditionnelle
                                     </h2>
                                 </div>
 
                                 <div className="space-y-4 sm:space-y-6">
-                                    <div className="flex items-start gap-3 sm:gap-4 p-4 bg-white/90 backdrop-blur-sm rounded-xl border border-[#CA8A04]/30">
-                                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#CA8A04] to-[#A16207] flex items-center justify-center flex-shrink-0">
+                                    <div className="flex items-start gap-3 sm:gap-4 p-4 bg-white/90 backdrop-blur-sm rounded-xl border border-[#84CC16]/30">
+                                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#84CC16] to-[#65A30D] flex items-center justify-center flex-shrink-0">
                                             <div className="w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full"></div>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-[#713F12] text-base sm:text-lg mb-1">Décisions Empiriques</h4>
-                                            <p className="text-[#854D0E] text-sm sm:text-base">
+                                            <h4 className="font-bold text-[#166534] text-base sm:text-lg mb-1">Décisions Empiriques</h4>
+                                            <p className="text-[#15803D] text-sm sm:text-base">
                                                 Choix des cultures basés sur l'expérience plutôt que sur des données scientifiques
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-start gap-3 sm:gap-4 p-4 bg-white/90 backdrop-blur-sm rounded-xl border border-[#CA8A04]/30">
-                                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#CA8A04] to-[#A16207] flex items-center justify-center flex-shrink-0">
+                                    <div className="flex items-start gap-3 sm:gap-4 p-4 bg-white/90 backdrop-blur-sm rounded-xl border border-[#84CC16]/30">
+                                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#84CC16] to-[#65A30D] flex items-center justify-center flex-shrink-0">
                                             <div className="w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full"></div>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-[#713F12] text-base sm:text-lg mb-1">Gaspillage des Ressources</h4>
-                                            <p className="text-[#854D0E] text-sm sm:text-base">
+                                            <h4 className="font-bold text-[#166534] text-base sm:text-lg mb-1">Gaspillage des Ressources</h4>
+                                            <p className="text-[#15803D] text-sm sm:text-base">
                                                 Irrigation et fertilisation non optimisées entraînant des pertes économiques
                                             </p>
                                         </div>
                                     </div>
 
-                                    <div className="flex items-start gap-3 sm:gap-4 p-4 bg-white/90 backdrop-blur-sm rounded-xl border border-[#CA8A04]/30">
-                                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#CA8A04] to-[#A16207] flex items-center justify-center flex-shrink-0">
+                                    <div className="flex items-start gap-3 sm:gap-4 p-4 bg-white/90 backdrop-blur-sm rounded-xl border border-[#84CC16]/30">
+                                        <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-[#84CC16] to-[#65A30D] flex items-center justify-center flex-shrink-0">
                                             <div className="w-3 h-3 sm:w-4 sm:h-4 bg-white rounded-full"></div>
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-[#713F12] text-base sm:text-lg mb-1">Connectivité Limitée</h4>
-                                            <p className="text-[#854D0E] text-sm sm:text-base">
+                                            <h4 className="font-bold text-[#166534] text-base sm:text-lg mb-1">Connectivité Limitée</h4>
+                                            <p className="text-[#15803D] text-sm sm:text-base">
                                                 Absence de monitoring en temps réel dans les zones rurales isolées
                                             </p>
                                         </div>
@@ -346,53 +347,70 @@ export default function LandingPage() {
                         </div>
                     </div>
                 </section>
-                {/* NOUVELLE SECTION: IMAGE AGRICULTEUR IoT/IA - Image complètement visible */}
-                <section className="relative w-full bg-gradient-to-b from-[#F7FEE7] to-[#D9F99D]">
-                    {/* Conteneur pour l'image avec ratio et centrage */}
-                    <div className="relative max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12 sm:py-16">
-                        {/* Conteneur image avec ratio carré 1:1 */}
-                        <div className="relative w-full pb-[100%] overflow-hidden rounded-2xl sm:rounded-3xl shadow-2xl border-2 border-[#84CC16]/30">
-                            {/* Image qui couvre tout le conteneur */}
-                            <img
-                                src="/fond.jpg"  // Votre image carrée 1280x1280
-                                alt="Agriculture du futur avec IoT et IA"
-                                className="absolute inset-0 w-full h-full object-cover"
-                            />
 
-                            {/* Overlay léger au bas de l'image */}
-                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-32 sm:h-48">
-                                {/* Éléments IoT/IA au centre */}
-                                <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center">
-                                    <div className="flex items-center gap-4 mb-3">
-                                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-                                            <Brain className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                                        </div>
-                                        <div className="text-xl sm:text-2xl font-bold text-white">
-                                            +
-                                        </div>
-                                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
-                                            <Wifi className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                                        </div>
-                                        <div className="text-xl sm:text-2xl font-bold text-white">
-                                            =
-                                        </div>
-                                        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl flex items-center justify-center">
-                                            <Leaf className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-                                        </div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-white/95 text-sm sm:text-base font-medium">
-                                            L'agriculture du futur commence ici
-                                        </div>
-                                    </div>
+                <section className="relative w-full h-[40vh] sm:h-[50vh] md:h-[60vh] overflow-hidden">
+                    <div className="absolute inset-0">
+                        <img
+                            src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?q=80&w=2070&auto=format&fit=crop&crop=center"
+                            alt="Agriculteur utilisant la technologie IoT et IA dans son champ"
+                            className="w-full h-full object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#052E16]/80 via-[#052E16]/60 to-transparent"></div>
+                    </div>
+
+                    {/* Overlay visuel avec éléments IoT/IA */}
+                    <div className="absolute inset-0">
+                        {/* Éléments flottants IoT */}
+                        <div className="absolute top-1/4 left-1/4 w-12 h-12 sm:w-16 sm:h-16 bg-white/20 backdrop-blur-sm rounded-full border-2 border-[#22C55E] animate-pulse">
+                            <div className="absolute inset-2 bg-[#22C55E]/30 rounded-full"></div>
+                        </div>
+                        <div className="absolute top-1/3 right-1/3 w-10 h-10 sm:w-14 sm:h-14 bg-white/20 backdrop-blur-sm rounded-full border-2 border-[#3B82F6] animate-pulse delay-300">
+                            <div className="absolute inset-2 bg-[#3B82F6]/30 rounded-full"></div>
+                        </div>
+                        <div className="absolute bottom-1/4 left-1/3 w-8 h-8 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-full border-2 border-[#8B5CF6] animate-pulse delay-700">
+                            <div className="absolute inset-2 bg-[#8B5CF6]/30 rounded-full"></div>
+                        </div>
+
+                        {/* Réseau de connexion */}
+                        <div className="absolute top-0 left-0 right-0 bottom-0">
+                            <svg className="w-full h-full">
+                                {/* Lignes de connexion entre les éléments IoT */}
+                                <line x1="25%" y1="25%" x2="33%" y2="33%" stroke="#22C55E" strokeWidth="2" strokeDasharray="5,5" opacity="0.5" />
+                                <line x1="33%" y1="33%" x2="67%" y2="33%" stroke="#3B82F6" strokeWidth="2" strokeDasharray="5,5" opacity="0.5" />
+                                <line x1="33%" y1="33%" x2="33%" y2="67%" stroke="#8B5CF6" strokeWidth="2" strokeDasharray="5,5" opacity="0.5" />
+                            </svg>
+                        </div>
+
+                        {/* Texte minimal avec icônes */}
+                        <div className="absolute bottom-10 left-10 right-10 flex flex-col items-center">
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                                    <Brain className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                                </div>
+                                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                                    +
+                                </div>
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center border border-white/30">
+                                    <Wifi className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                                </div>
+                                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">
+                                    =
+                                </div>
+                                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl flex items-center justify-center">
+                                    <Leaf className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                                </div>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-white/90 text-sm sm:text-base font-light">
+                                    L'agriculture du futur commence ici
                                 </div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* SECTION 4: SOLUTION COMPLÈTE - Vert forêt */}
-                <section ref={featuresRef} id="features" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#F0FDF4] via-[#DCFCE7] to-[#BBF7D0]">
+                {/* SECTION 4: SOLUTION COMPLÈTE - Blanc et vert moyen */}
+                <section ref={featuresRef} id="features" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-[#F0FDF4] to-[#DCFCE7]">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div className="text-center mb-12 sm:mb-16">
                             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#166534] mb-4 sm:mb-6">
@@ -479,8 +497,8 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* SECTION 5: TECHNOLOGIES - Vert émeraude */}
-                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#ECFDF5] via-[#D1FAE5] to-[#A7F3D0]">
+                {/* SECTION 5: TECHNOLOGIES - Blanc et vert émeraude */}
+                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-[#ECFDF5] to-[#D1FAE5]">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                         <div className="text-center mb-12 sm:mb-16">
                             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#065F46] mb-4 sm:mb-6">
@@ -563,41 +581,52 @@ export default function LandingPage() {
                     </div>
                 </section>
 
-                {/* SECTION 6: MISSION - Vert doré */}
-                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-[#FEFCE8] via-[#FEF9C3] to-[#FEF08A]">
+                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-white to-[#F0FDF4]">
                     <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 relative">
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 items-center">
                             <div>
                                 <div className="mb-6 sm:mb-8">
-                                    <span className="inline-block px-3 py-1 sm:px-4 sm:py-2 bg-gradient-to-r from-[#CA8A04]/20 to-[#A16207]/20 text-[#854D0E] rounded-full text-xs sm:text-sm font-semibold mb-3 sm:mb-4 border border-[#CA8A04]/30">
+                                    <span className="inline-block px-3 py-1 sm:px-4 sm:py-2 bg-gradient-to-r from-white to-[#F0FDF4] text-[#166534] rounded-full text-xs sm:text-sm font-semibold mb-3 sm:mb-4 border border-[#22C55E]/30 shadow-sm">
                                         Notre Mission
                                     </span>
-                                    <h2 className="text-3xl sm:text-4xl font-black text-[#713F12] mb-4 sm:mb-6 leading-tight">
+                                    <h2 className="text-3xl sm:text-4xl font-black text-[#052E16] mb-4 sm:mb-6 leading-tight">
                                         Objectif du Projet
                                     </h2>
                                 </div>
 
                                 <div className="space-y-4 sm:space-y-6">
-                                    <p className="text-[#854D0E] leading-relaxed text-base sm:text-lg">
+                                    <p className="text-gray-700 leading-relaxed text-base sm:text-lg bg-white/80 p-4 rounded-xl border border-[#22C55E]/20">
                                         Conception d'un système IoT intelligent capable de recommander la culture la plus adaptée à un sol donné, basé sur l'analyse des paramètres du sol et les prévisions météorologiques.
                                     </p>
-                                    <p className="text-[#854D0E] leading-relaxed text-base sm:text-lg">
+                                    <p className="text-gray-700 leading-relaxed text-base sm:text-lg bg-white/80 p-4 rounded-xl border border-[#22C55E]/20">
                                         Aider les agriculteurs à prendre de meilleures décisions de sélection des cultures en optimisant la production tout en préservant les ressources naturelles.
                                     </p>
                                 </div>
 
-                                <div className="mt-8 sm:mt-10 p-4 sm:p-6 bg-gradient-to-r from-[#CA8A04]/20 to-[#A16207]/20 rounded-xl sm:rounded-2xl border border-[#CA8A04]/30 backdrop-blur-sm">
+                                <div className="mt-8 sm:mt-10 p-4 sm:p-6 bg-gradient-to-r from-white to-[#F0FDF4] rounded-xl sm:rounded-2xl border border-[#22C55E]/30 shadow-lg">
                                     <div className="flex items-start sm:items-center gap-3 sm:gap-4">
-                                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-[#CA8A04] to-[#A16207] flex items-center justify-center flex-shrink-0">
-                                            <Target className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+                                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-white to-[#22C55E] flex items-center justify-center flex-shrink-0 border border-[#22C55E]/30">
+                                            <Target className="w-5 h-5 sm:w-6 sm:h-6 text-[#166534]" />
                                         </div>
                                         <div>
-                                            <h4 className="font-bold text-[#713F12] text-base sm:text-lg mb-1">Fonctions Clés</h4>
-                                            <ul className="text-[#854D0E] text-xs sm:text-sm space-y-1">
-                                                <li>• Prédiction de la meilleure culture adaptée (Random Forest)</li>
-                                                <li>• Prise en compte des prévisions météorologiques sur 7 jours</li>
-                                                <li>• Recommandations d'actions préventives en temps réel</li>
-                                                <li>• Communication longue distance via LoRaWAN</li>
+                                            <h4 className="font-bold text-[#052E16] text-base sm:text-lg mb-1">Fonctions Clés</h4>
+                                            <ul className="text-gray-600 text-xs sm:text-sm space-y-1">
+                                                <li className="flex items-start gap-1">
+                                                    <span className="text-[#22C55E] mt-0.5">•</span>
+                                                    <span>Prédiction de la meilleure culture adaptée (Random Forest)</span>
+                                                </li>
+                                                <li className="flex items-start gap-1">
+                                                    <span className="text-[#22C55E] mt-0.5">•</span>
+                                                    <span>Prise en compte des prévisions météorologiques sur 7 jours</span>
+                                                </li>
+                                                <li className="flex items-start gap-1">
+                                                    <span className="text-[#22C55E] mt-0.5">•</span>
+                                                    <span>Recommandations d'actions préventives en temps réel</span>
+                                                </li>
+                                                <li className="flex items-start gap-1">
+                                                    <span className="text-[#22C55E] mt-0.5">•</span>
+                                                    <span>Communication longue distance via LoRaWAN</span>
+                                                </li>
                                             </ul>
                                         </div>
                                     </div>
@@ -605,43 +634,43 @@ export default function LandingPage() {
                             </div>
 
                             <div className="relative">
-                                <div className="bg-white/95 backdrop-blur-sm rounded-2xl sm:rounded-3xl md:rounded-[40px] shadow-xl sm:shadow-2xl border border-[#CA8A04]/30 p-6 sm:p-8 md:p-10 transition-all duration-500 hover:shadow-2xl sm:hover:shadow-3xl">
+                                <div className="bg-white rounded-2xl sm:rounded-3xl md:rounded-[40px] shadow-xl sm:shadow-2xl border border-[#22C55E]/30 p-6 sm:p-8 md:p-10 transition-all duration-500 hover:shadow-2xl sm:hover:shadow-3xl">
                                     <div className="space-y-6 sm:space-y-8">
                                         <div className="flex items-start gap-4 sm:gap-6">
-                                            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-[#CA8A04] to-[#A16207] rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
+                                            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-white to-[#22C55E] rounded-xl sm:rounded-2xl flex items-center justify-center text-[#166534] flex-shrink-0 border border-[#22C55E]/30">
                                                 <Brain className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-[#713F12] text-base sm:text-lg md:text-xl">
+                                                <h4 className="font-bold text-[#052E16] text-base sm:text-lg md:text-xl">
                                                     Modèle Random Forest
                                                 </h4>
-                                                <p className="text-[#854D0E] mt-1 sm:mt-2 text-sm sm:text-base">
+                                                <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
                                                     Haute précision pour la prédiction des cultures optimales
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="flex items-start gap-4 sm:gap-6">
-                                            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-[#84CC16] to-[#65A30D] rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
+                                            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-white to-[#22C55E] rounded-xl sm:rounded-2xl flex items-center justify-center text-[#166534] flex-shrink-0 border border-[#22C55E]/30">
                                                 <WifiIcon className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-[#713F12] text-base sm:text-lg md:text-xl">
+                                                <h4 className="font-bold text-[#052E16] text-base sm:text-lg md:text-xl">
                                                     Connectivité LoRaWAN
                                                 </h4>
-                                                <p className="text-[#854D0E] mt-1 sm:mt-2 text-sm sm:text-base">
+                                                <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
                                                     Portée étendue pour zones rurales, faible consommation
                                                 </p>
                                             </div>
                                         </div>
                                         <div className="flex items-start gap-4 sm:gap-6">
-                                            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
+                                            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-white to-[#16A34A] rounded-xl sm:rounded-2xl flex items-center justify-center text-[#166534] flex-shrink-0 border border-[#16A34A]/30">
                                                 <FileText className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
                                             </div>
                                             <div>
-                                                <h4 className="font-bold text-[#713F12] text-base sm:text-lg md:text-xl">
+                                                <h4 className="font-bold text-[#052E16] text-base sm:text-lg md:text-xl">
                                                     Dashboard Complet
                                                 </h4>
-                                                <p className="text-[#854D0E] mt-1 sm:mt-2 text-sm sm:text-base">
+                                                <p className="text-gray-600 mt-1 sm:mt-2 text-sm sm:text-base">
                                                     Gestion des utilisateurs, parcelles, capteurs et recommandations
                                                 </p>
                                             </div>
@@ -650,14 +679,14 @@ export default function LandingPage() {
                                 </div>
 
                                 {/* Decorative elements */}
-                                <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-[#CA8A04] to-[#A16207] rounded-2xl -z-10 blur-xl opacity-20"></div>
-                                <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-gradient-to-br from-[#84CC16] to-[#65A30D] rounded-2xl -z-10 blur-xl opacity-20"></div>
+                                <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-white to-[#22C55E]/30 rounded-2xl -z-10 blur-xl opacity-40"></div>
+                                <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-gradient-to-br from-white to-[#16A34A]/30 rounded-2xl -z-10 blur-xl opacity-40"></div>
                             </div>
                         </div>
                     </div>
                 </section>
 
-                {/* SECTION 7: CTA - Vert foncé principal */}
+                {/* SECTION 7: CTA - Vert foncé avec blanc */}
                 <section ref={ctaRef} className="py-16 sm:py-20 md:py-24 relative overflow-hidden bg-gradient-to-br from-[#052E16] via-[#14532D] to-[#166534]">
                     <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2832')] opacity-10 bg-cover bg-center"></div>
 
