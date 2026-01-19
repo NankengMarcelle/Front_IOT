@@ -17,14 +17,13 @@ import {
   Shield,
   Bell,
   Calendar,
+  Zap,
+  Loader2
 } from "lucide-react";
-import DashboardHeader from '@/components/layout/Header';
-import DashboardFooter from '@/components/layout/Footer';
 import { useLanguageStore } from '@/store/useUserStore';
 import { useTranslation } from '@/providers/TranslationProvider';
 import Link from "next/link";
 
-// Définir le type pour le rôle utilisateur
 type UserRole = "ADMIN" | "FARMER" | "AGENT" | "MANAGER" | string;
 
 interface UserProfile {
@@ -85,20 +84,24 @@ export default function ProfilPage() {
   });
 
   useEffect(() => {
-    // Simulation du chargement du profil depuis le localStorage ou un mock
     const savedUser = localStorage.getItem('smartagro_user');
     if (savedUser) {
-      const user = JSON.parse(savedUser);
-      setUserData(prev => ({
-        ...prev,
-        id: user.id || prev.id,
-        email: user.email || prev.email,
-        nom: user.name?.split(' ')[1] || prev.nom,
-        prenom: user.name?.split(' ')[0] || prev.prenom,
-        role: user.role || prev.role,
-      }));
+      try {
+        const user = JSON.parse(savedUser);
+        const nameParts = user.name ? user.name.split(' ') : [];
+        setUserData(prev => ({
+          ...prev,
+          id: user.id || prev.id,
+          email: user.email || prev.email,
+          nom: nameParts.length > 1 ? nameParts.slice(1).join(' ') : (user.nom || prev.nom),
+          prenom: nameParts.length > 0 ? nameParts[0] : (user.prenom || prev.prenom),
+          role: user.role || prev.role,
+        }));
+      } catch (e) {
+        console.error("Failed to parse saved user", e);
+      }
     }
-  }, [lang]);
+  }, []);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -112,63 +115,34 @@ export default function ProfilPage() {
   };
 
   const validateForm = () => {
-    const errors = {
-      nom: "",
-      prenom: "",
-      phone: "",
-      password: "",
-      confirmPassword: ""
-    };
+    const errors = { nom: "", prenom: "", phone: "", password: "", confirmPassword: "" };
     let isValid = true;
-
-    if (!userData.nom.trim()) {
-      errors.nom = "Le nom est requis";
-      isValid = false;
-    }
-
-    if (!userData.prenom.trim()) {
-      errors.prenom = "Le prénom est requis";
-      isValid = false;
-    }
-
-    if (userData.phone && !/^[+]?[\d\s-]{10,}$/.test(userData.phone)) {
-      errors.phone = "Numéro de téléphone invalide";
-      isValid = false;
-    }
-
+    if (!userData.nom.trim()) { errors.nom = "Le nom est requis"; isValid = false; }
+    if (!userData.prenom.trim()) { errors.prenom = "Le prénom est requis"; isValid = false; }
+    if (userData.phone && !/^[+]?[\d\s-]{10,}$/.test(userData.phone)) { errors.phone = "Format invalide"; isValid = false; }
     if (userData.password) {
-      if (userData.password.length < 8) {
-        errors.password = "Le mot de passe doit contenir au moins 8 caractères";
-        isValid = false;
-      }
-      if (userData.password !== userData.confirmPassword) {
-        errors.confirmPassword = "Les mots de passe ne correspondent pas";
-        isValid = false;
-      }
+      if (userData.password.length < 8) { errors.password = "8+ caractères requis"; isValid = false; }
+      if (userData.password !== userData.confirmPassword) { errors.confirmPassword = "Les mots de passe ne correspondent pas"; isValid = false; }
     }
-
     setFormErrors(errors);
     return isValid;
   };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (!validateForm()) {
-      return;
-    }
-
+    if (!validateForm()) return;
     setLoading(true);
 
-    // Simulation de sauvegarde
+    // Simuler un appel API
     setTimeout(() => {
       setIsEditing(false);
       setShowSuccess(true);
       setLoading(false);
-      setTimeout(() => setShowSuccess(false), 3000);
+
+      // Réinitialiser les mots de passe après sauvegarde
       setUserData(prev => ({ ...prev, password: "", confirmPassword: "" }));
 
-      // Mettre à jour le localStorage pour simuler la persistence
+      // Mettre à jour le stockage local
       const updatedUser = {
         id: userData.id,
         email: userData.email,
@@ -177,405 +151,179 @@ export default function ProfilPage() {
         isActive: true
       };
       localStorage.setItem('smartagro_user', JSON.stringify(updatedUser));
+
+      setTimeout(() => setShowSuccess(false), 3000);
     }, 1000);
   };
 
-  const handleLanguageChange = (newLang: "fr" | "en") => {
-    setLang(newLang);
-    setUserData(prev => ({ ...prev, langue: newLang }));
-  };
-
-  const ProfileField = ({
-    label,
-    value,
-    icon: Icon,
-    type = "text",
-    required = false,
-    error = "",
-    ...props
-  }: any) => (
-    <div className="space-y-2">
-      <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
-        <Icon className="w-4 h-4" />
+  const ProfileField = ({ label, value, icon: Icon, type = "text", error = "", ...props }: any) => (
+    <div className="space-y-3">
+      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#052E16]/30 px-2 flex items-center gap-2">
+        <Icon className="w-3 h-3" />
         {label}
-        {required && <span className="text-red-500">*</span>}
       </label>
       <input
         type={type}
         value={value}
-        className={`w-full px-4 py-3 rounded-xl border ${error ? 'border-red-300' : 'border-gray-300'} 
-          focus:ring-2 focus:ring-[#1B831B]/30 focus:border-[#1B831B] outline-none transition-all
-          ${!isEditing && 'bg-gray-50 text-gray-600'}`}
+        className={`w-full px-8 py-5 rounded-[24px] border ${error ? 'border-rose-300 bg-rose-50 text-rose-900' : 'border-emerald-50 bg-white/50 text-[#052E16]'} 
+          focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold tracking-tight
+          ${!isEditing && 'bg-emerald-50/20 text-[#052E16]/40 cursor-not-allowed'}`}
         {...props}
       />
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-[9px] font-black uppercase tracking-widest text-rose-500 px-2">{error}</p>}
     </div>
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white">
-      <DashboardHeader />
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-emerald-50/50 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 opacity-60"></div>
+        <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-lime-50/50 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 opacity-60"></div>
+      </div>
 
-      <main className="flex-grow py-6 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto">
-          {/* Notification de succès */}
-          {showSuccess && (
-            <div className="fixed top-20 right-4 bg-gradient-to-r from-[#1B831B] to-[#146314] text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-2 z-50 animate-in fade-in slide-in-from-right-5">
-              <CheckCircle2 className="w-5 h-5" />
-              <span className="font-medium">Profil mis à jour avec succès !</span>
-            </div>
-          )}
-
-          <div className="mb-8">
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-              <div className="p-2 bg-[#1B831B]/10 rounded-lg">
-                <User className="w-6 h-6 text-[#1B831B]" />
+      <main className="relative z-10 pt-8 md:pt-12 pb-16 md:pb-24">
+        <div className="px-4 md:px-12 max-w-7xl mx-auto w-full">
+          {/* Header Section */}
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-10 md:mb-16">
+            <div>
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-50 rounded-xl md:rounded-2xl flex items-center justify-center text-emerald-600">
+                  <User className="w-6 h-6 md:w-7 h-7" />
+                </div>
+                <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[#052E16]/40">Configuration</p>
               </div>
-              <span>Mon Profil</span>
-            </h1>
-            <p className="text-gray-600 ml-14">Gérez vos informations personnelles et vos préférences</p>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#052E16] tracking-tighter leading-[0.9]">
+                Votre <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Identité.</span>
+              </h1>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Colonne de gauche - Vue d'ensemble */}
-            <div className="space-y-6">
-              {/* Carte profil */}
-              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-200">
-                <div className="relative mb-6">
-                  <div className="w-24 h-24 mx-auto rounded-full border-4 border-white shadow-lg bg-gradient-to-br from-[#1B831B] to-[#146314] flex items-center justify-center text-3xl font-bold text-white">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+            {/* Sidebar Stats */}
+            <div className="lg:col-span-4 space-y-6 md:space-y-8">
+              <div className="bg-white/60 backdrop-blur-3xl rounded-[32px] md:rounded-[48px] p-8 md:p-10 border border-white shadow-2xl shadow-emerald-900/5 text-center">
+                <div className="relative mb-6 md:mb-8 inline-block">
+                  <div className="w-24 h-24 md:w-32 md:h-32 rounded-[32px] md:rounded-[40px] bg-[#052E16] flex items-center justify-center text-3xl md:text-4xl font-black text-white shadow-2xl relative overflow-hidden group">
                     {avatarPreview ? (
-                      <img
-                        src={avatarPreview}
-                        alt="Avatar"
-                        className="w-full h-full rounded-full object-cover"
-                      />
+                      <img src={avatarPreview} className="w-full h-full object-cover" />
                     ) : (
-                      (userData.nom?.charAt(0) || userData.prenom?.charAt(0) || "U").toUpperCase()
+                      (userData.prenom?.charAt(0) || "U").toUpperCase()
+                    )}
+                    {isEditing && (
+                      <label className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer">
+                        <Camera className="w-7 h-7 md:w-8 md:h-8 text-white" />
+                        <input type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
+                      </label>
                     )}
                   </div>
-                  {isEditing && (
-                    <label className="absolute bottom-0 right-1/2 translate-x-1/2 bg-white p-2 rounded-full border-2 border-[#1B831B] cursor-pointer shadow-md hover:bg-gray-50 transition-colors">
-                      <Camera className="w-4 h-4 text-[#1B831B]" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="hidden"
-                        onChange={handleAvatarChange}
-                      />
-                    </label>
-                  )}
                 </div>
 
-                <div className="text-center space-y-3">
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">
-                      {userData.prenom} {userData.nom}
-                    </h2>
-                    <p className="text-[#1B831B] text-sm font-medium">
-                      {userData.role || "Utilisateur"}
-                    </p>
-                  </div>
+                <h2 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter mb-1">{userData.prenom} {userData.nom}</h2>
+                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-emerald-600 mb-6 md:mb-8">{userData.role || "Expert Agrosystème"}</p>
 
-                  <div className="flex items-center justify-center gap-2 text-gray-600">
-                    <Mail className="w-4 h-4" />
-                    <span className="text-sm">{userData.email}</span>
+                <div className="space-y-4 pt-6 md:pt-8 border-t border-emerald-50">
+                  <div className="flex items-center justify-between text-left px-4 py-3 bg-emerald-50 rounded-2xl">
+                    <p className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#052E16]/40">Membre Depuis</p>
+                    <p className="text-[10px] md:text-xs font-bold text-[#052E16]">{userData.joinDate}</p>
                   </div>
-
-                  {userData.phone && (
-                    <div className="flex items-center justify-center gap-2 text-gray-600">
-                      <Phone className="w-4 h-4" />
-                      <span className="text-sm">{userData.phone}</span>
+                  <div className="flex items-center justify-between text-left px-4 py-3 bg-emerald-50 rounded-2xl">
+                    <p className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#052E16]/40">Status</p>
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 bg-lime-400 text-[#052E16] rounded-md">
+                      <Zap size={10} className="fill-current" />
+                      <span className="text-[8px] font-black uppercase">Elite</span>
                     </div>
-                  )}
+                  </div>
                 </div>
 
-                <div className="mt-6 space-y-3">
+                <div className="mt-8 md:mt-10 pt-8 md:pt-10 border-t border-emerald-50">
                   {isEditing ? (
-                    <>
-                      <button
-                        onClick={handleSave}
-                        disabled={loading}
-                        className="w-full bg-gradient-to-r from-[#1B831B] to-[#146314] hover:from-[#146314] hover:to-[#1B831B] text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-                      >
-                        {loading ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                            Sauvegarde...
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-4 h-4" />
-                            Sauvegarder les modifications
-                          </>
-                        )}
+                    <div className="space-y-3">
+                      <button onClick={handleSave} disabled={loading} className="w-full bg-[#052E16] text-white py-4 md:py-5 rounded-xl md:rounded-[24px] font-black text-[10px] md:text-xs uppercase tracking-widest shadow-xl hover:bg-emerald-800 transition-all flex items-center justify-center gap-2">
+                        {loading ? <Loader2 className="animate-spin w-4 h-4" /> : "Enregistrer"}
                       </button>
-                      <button
-                        onClick={() => {
-                          setIsEditing(false);
-                          setFormErrors({ nom: "", prenom: "", phone: "", password: "", confirmPassword: "" });
-                        }}
-                        className="w-full border border-gray-300 text-gray-700 py-3 rounded-xl font-medium hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-                      >
-                        <X className="w-4 h-4" />
+                      <button onClick={() => setIsEditing(false)} className="w-full bg-rose-50 text-rose-600 py-4 md:py-5 rounded-xl md:rounded-[24px] font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-rose-100 transition-all">
                         Annuler
                       </button>
-                    </>
+                    </div>
                   ) : (
-                    <button
-                      onClick={() => setIsEditing(true)}
-                      className="w-full bg-gradient-to-r from-[#1B831B] to-[#146314] hover:from-[#146314] hover:to-[#1B831B] text-white py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
-                    >
-                      <User className="w-4 h-4" />
-                      Modifier le profil
+                    <button onClick={() => setIsEditing(true)} className="w-full bg-[#052E16] text-white py-4 md:py-5 rounded-xl md:rounded-[24px] font-black text-[10px] md:text-xs uppercase tracking-widest shadow-xl shadow-emerald-900/20 hover:scale-[1.02] active:scale-95 transition-all">
+                      Modifier mon Profil
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* Statistiques rapides */}
-              <div className="bg-gradient-to-br from-[#1B831B] to-[#146314] rounded-2xl p-6 text-white">
-                <h3 className="font-semibold mb-4 flex items-center gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Informations
-                </h3>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-green-100 text-sm">Membre depuis</p>
-                    <p className="font-medium">{userData.joinDate || "Date non disponible"}</p>
-                  </div>
+              <div className="bg-gradient-to-br from-emerald-600 to-lime-500 rounded-[32px] md:rounded-[40px] p-6 md:p-8 text-white shadow-2xl shadow-emerald-900/10">
+                <div className="flex items-center gap-3 mb-4 md:mb-6">
+                  <Shield className="w-5 h-5 md:w-6 md:h-6 opacity-60" />
+                  <h3 className="text-lg md:text-xl font-black tracking-tighter">Plan SmartAgro Pro</h3>
                 </div>
+                <p className="text-xs md:text-sm font-medium leading-relaxed opacity-90 mb-4 md:mb-6">Accédez à toutes les prédictions avancées et au support prioritaire 24/7.</p>
+                <button className="w-full py-3.5 md:py-4 bg-white/20 backdrop-blur-md rounded-xl md:rounded-2xl font-black text-[9px] md:text-[10px] uppercase tracking-widest hover:bg-white/30 transition-all">Détails de l'abonnement</button>
               </div>
-
-              {/* Lien vers paramètres de notification */}
-              <Link
-                href="/dashboard/parametres"
-                className="block bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:border-[#1B831B]/30 hover:shadow-md transition-all duration-200 group"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-[#1B831B]/10 rounded-lg group-hover:bg-[#1B831B]/20 transition-colors">
-                    <Bell className="w-5 h-5 text-[#1B831B]" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Paramètres de notification</h3>
-                    <p className="text-sm text-gray-600">Configurez SMS, Email, WhatsApp</p>
-                  </div>
-                </div>
-              </Link>
             </div>
 
-            {/* Colonne principale - Formulaire */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-                {/* En-tête avec onglets */}
-                <div className="border-b border-gray-200">
-                  <div className="flex">
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('profile')}
-                      className={`flex-1 py-4 px-6 text-center font-medium ${activeTab === 'profile'
-                        ? 'border-b-2 border-[#1B831B] text-[#1B831B] bg-[#1B831B]/10'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                        } transition-colors`}
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <User className="w-4 h-4" />
-                        Informations personnelles
-                      </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveTab('security')}
-                      className={`flex-1 py-4 px-6 text-center font-medium ${activeTab === 'security'
-                        ? 'border-b-2 border-[#1B831B] text-[#1B831B] bg-[#1B831B]/10'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                        } transition-colors`}
-                    >
-                      <div className="flex items-center justify-center gap-2">
-                        <Shield className="w-4 h-4" />
-                        Sécurité
-                      </div>
-                    </button>
-                  </div>
+            {/* Main Fields Form */}
+            <div className="lg:col-span-8 space-y-6 md:space-y-8">
+              <div className="bg-white/40 backdrop-blur-3xl rounded-[32px] md:rounded-[48px] border border-emerald-50 shadow-2xl shadow-emerald-900/5 overflow-hidden">
+                <div className="flex border-b border-emerald-50">
+                  <button type="button" onClick={() => setActiveTab('profile')} className={`flex-1 py-8 md:py-10 font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.3em] transition-all relative ${activeTab === 'profile' ? 'text-[#052E16] bg-white/60' : 'text-[#052E16]/20 hover:text-[#052E16]/40 hover:bg-white/20'}`}>
+                    Profil
+                    {activeTab === 'profile' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-600 to-lime-500"></div>}
+                  </button>
+                  <button type="button" onClick={() => setActiveTab('security')} className={`flex-1 py-8 md:py-10 font-black text-[10px] md:text-[11px] uppercase tracking-[0.2em] md:tracking-[0.3em] transition-all relative ${activeTab === 'security' ? 'text-[#052E16] bg-white/60' : 'text-[#052E16]/20 hover:text-[#052E16]/40 hover:bg-white/20'}`}>
+                    Sécurité
+                    {activeTab === 'security' && <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-600 to-lime-500"></div>}
+                  </button>
                 </div>
 
-                {/* Contenu des onglets */}
-                <div className="p-6 lg:p-8">
-                  {activeTab === 'profile' && (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                          <div className="p-2 bg-[#1B831B]/10 rounded-lg">
-                            <User className="w-4 h-4 text-[#1B831B]" />
-                          </div>
-                          Détails du compte
-                        </h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                          <ProfileField
-                            label="Nom"
-                            value={userData.nom}
-                            icon={User}
-                            required
-                            disabled={!isEditing}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                              setUserData({ ...userData, nom: e.target.value })
-                            }
-                            error={formErrors.nom}
-                          />
-                          <ProfileField
-                            label="Prénom"
-                            value={userData.prenom}
-                            icon={User}
-                            required
-                            disabled={!isEditing}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                              setUserData({ ...userData, prenom: e.target.value })
-                            }
-                            error={formErrors.prenom}
-                          />
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                          <ProfileField
-                            label="Email"
-                            value={userData.email}
-                            icon={Mail}
-                            disabled
-                            readOnly
-                          />
-                          <ProfileField
-                            label="Téléphone"
-                            value={userData.phone}
-                            icon={Phone}
-                            disabled={!isEditing}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                              setUserData({ ...userData, phone: e.target.value })
-                            }
-                            placeholder="+237 600 00 00 00"
-                            error={formErrors.phone}
-                          />
-                        </div>
+                <div className="p-8 md:p-12 lg:p-16">
+                  {activeTab === 'profile' ? (
+                    <div className="space-y-8 md:space-y-12">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                        <ProfileField label="Nom" value={userData.nom} icon={User} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, nom: e.target.value })} error={formErrors.nom} />
+                        <ProfileField label="Prénom" value={userData.prenom} icon={User} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, prenom: e.target.value })} error={formErrors.prenom} />
                       </div>
-
-                      <div className="pt-6 border-t border-gray-100">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                          <Globe className="w-5 h-5 text-[#1B831B]" />
-                          Langue
-                        </h3>
-                        <div className="flex flex-wrap gap-3">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                        <ProfileField label="Email" value={userData.email} icon={Mail} disabled={true} />
+                        <ProfileField label="Téléphone" value={userData.phone} icon={Phone} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, phone: e.target.value })} error={formErrors.phone} />
+                      </div>
+                      <div className="pt-8 md:pt-12 border-t border-emerald-50">
+                        <h3 className="text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[#052E16]/30 mb-6 md:mb-8 flex items-center gap-3"><Globe className="w-3.5 h-3.5" /> Préférences de Langue</h3>
+                        <div className="flex flex-col sm:flex-row gap-4">
                           {[
-                            { value: 'fr', label: 'Français', flag: '🇫🇷' },
-                            { value: 'en', label: 'English', flag: '🇺🇸' }
-                          ].map((option) => (
-                            <button
-                              key={option.value}
-                              type="button"
-                              onClick={() => handleLanguageChange(option.value as "fr" | "en")}
-                              className={`flex items-center gap-2 px-4 py-3 rounded-lg border ${lang === option.value
-                                ? 'border-[#1B831B] bg-[#1B831B]/10 text-[#1B831B]'
-                                : 'border-gray-300 hover:border-[#1B831B]/30 hover:bg-gray-50'
-                                } transition-colors`}
-                            >
-                              <span className="text-lg">{option.flag}</span>
-                              <span className="font-medium">{option.label}</span>
-                              {lang === option.value && (
-                                <Check className="w-4 h-4 text-[#1B831B]" />
-                              )}
+                            { val: 'fr', label: 'Français', flag: '🇫🇷' },
+                            { val: 'en', label: 'English', flag: '🇺🇸' }
+                          ].map(opt => (
+                            <button type="button" key={opt.val} onClick={() => setLang(opt.val as any)} disabled={!isEditing} className={`flex-1 px-6 md:px-8 py-4 md:py-5 rounded-xl md:rounded-[24px] border-2 transition-all flex items-center justify-center sm:justify-start gap-3 font-bold tracking-tight ${lang === opt.val ? 'border-emerald-600 bg-emerald-50 text-[#052E16]' : 'border-emerald-50/50 hover:border-emerald-100 text-[#052E16]/40'} ${!isEditing && 'opacity-50 cursor-not-allowed'}`}>
+                              <span className="text-xl">{opt.flag}</span>
+                              {opt.label}
+                              {lang === opt.val && <Check size={16} className="text-emerald-500" />}
                             </button>
                           ))}
                         </div>
                       </div>
                     </div>
-                  )}
-
-                  {activeTab === 'security' && (
-                    <div className="space-y-6">
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                          <div className="p-2 bg-[#1B831B]/10 rounded-lg">
-                            <Shield className="w-4 h-4 text-[#1B831B]" />
-                          </div>
-                          Changer le mot de passe
-                        </h3>
-                        <p className="text-gray-600 mb-6 ml-9">
-                          Assurez-vous d'utiliser un mot de passe long et aléatoire pour rester en sécurité.
-                        </p>
-
-                        <div className="space-y-4">
-                          <div className="relative">
-                            <ProfileField
-                              label="Nouveau mot de passe"
-                              value={userData.password}
-                              icon={Lock}
-                              type={showPass ? "text" : "password"}
-                              disabled={!isEditing}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                setUserData({ ...userData, password: e.target.value })
-                              }
-                              error={formErrors.password}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setShowPass(!showPass)}
-                              className="absolute right-3 top-9 text-gray-400 hover:text-gray-600"
-                            >
-                              {showPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  ) : (
+                    <div className="space-y-8 md:space-y-12">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                        <div className="relative">
+                          <ProfileField label="Nouveau Mot de Passe" value={userData.password} type={showPass ? "text" : "password"} icon={Lock} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, password: e.target.value })} error={formErrors.password} />
+                          {isEditing && (
+                            <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-6 top-14 text-emerald-200 hover:text-emerald-500 transition-colors">
+                              {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
-                          </div>
-
-                          <div>
-                            <ProfileField
-                              label="Confirmer le mot de passe"
-                              value={userData.confirmPassword}
-                              icon={Lock}
-                              type={showPass ? "text" : "password"}
-                              disabled={!isEditing}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                                setUserData({ ...userData, confirmPassword: e.target.value })
-                              }
-                              error={formErrors.confirmPassword}
-                            />
-                          </div>
-
-                          {userData.password && (
-                            <div className="mt-2">
-                              <div className="flex items-center gap-2 mb-1">
-                                <div className={`h-1 flex-1 rounded-full ${userData.password.length >= 8 ? 'bg-[#1B831B]' : 'bg-gray-200'}`}></div>
-                                <div className={`h-1 flex-1 rounded-full ${/[A-Z]/.test(userData.password) ? 'bg-[#1B831B]' : 'bg-gray-200'}`}></div>
-                                <div className={`h-1 flex-1 rounded-full ${/[0-9]/.test(userData.password) ? 'bg-[#1B831B]' : 'bg-gray-200'}`}></div>
-                                <div className={`h-1 flex-1 rounded-full ${/[^A-Za-z0-9]/.test(userData.password) ? 'bg-[#1B831B]' : 'bg-gray-200'}`}></div>
-                              </div>
-                              <p className="text-xs text-gray-500">
-                                Le mot de passe doit contenir au moins 8 caractères, une majuscule, un chiffre et un caractère spécial
-                              </p>
-                            </div>
                           )}
                         </div>
+                        <ProfileField label="Confirmation" value={userData.confirmPassword} type={showPass ? "text" : "password"} icon={Lock} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, confirmPassword: e.target.value })} error={formErrors.confirmPassword} />
                       </div>
-
-                      <div className="pt-6 border-t border-gray-100">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                          <Shield className="w-5 h-5 text-[#1B831B]" />
-                          Sécurité du compte
-                        </h3>
-                        <div className="space-y-3">
-                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                            <div>
-                              <p className="font-medium text-gray-900">Sessions actives</p>
-                              <p className="text-sm text-gray-600">Gérez vos sessions connectées</p>
-                            </div>
-                            <button type="button" className="text-sm text-[#1B831B] hover:text-[#146314] font-medium">
-                              Voir toutes
-                            </button>
-                          </div>
-
-                          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                            <div>
-                              <p className="font-medium text-gray-900">Authentification à deux facteurs</p>
-                              <p className="text-sm text-gray-600">Ajoutez une couche de sécurité supplémentaire</p>
-                            </div>
-                            <button type="button" className="text-sm text-[#1B831B] hover:text-[#146314] font-medium">
-                              Activer
-                            </button>
+                      <div className="p-6 md:p-8 bg-emerald-50/50 rounded-[28px] md:rounded-[32px] border border-emerald-50">
+                        <div className="flex items-start gap-4">
+                          <Shield className="w-5 h-5 md:w-6 md:h-6 text-emerald-600 mt-1" />
+                          <div>
+                            <p className="font-black text-[#052E16] mb-2 text-sm md:text-base">Sécurité Critique</p>
+                            <p className="text-xs md:text-sm font-medium text-[#052E16]/60 leading-relaxed">Votre mot de passe doit comporter au moins 12 caractères pour un niveau de protection Elite SmartAgro.</p>
                           </div>
                         </div>
                       </div>
@@ -584,19 +332,14 @@ export default function ProfilPage() {
                 </div>
               </div>
 
-              {/* Conseils de sécurité */}
-              {isEditing && (
-                <div className="mt-6 p-4 bg-blue-50 rounded-xl border border-blue-200">
-                  <div className="flex items-start gap-3">
-                    <Shield className="w-5 h-5 text-blue-600 mt-0.5" />
-                    <div>
-                      <p className="font-medium text-blue-800 mb-1">Conseils de sécurité</p>
-                      <ul className="text-sm text-blue-700 space-y-1">
-                        <li>• Votre mot de passe doit être unique et différent des autres comptes</li>
-                        <li>• Évitez d'utiliser des informations personnelles facilement devinables</li>
-                        <li>• Changez régulièrement votre mot de passe</li>
-                      </ul>
-                    </div>
+              {showSuccess && (
+                <div className="p-6 md:p-8 bg-emerald-600 text-white rounded-[32px] md:rounded-[40px] shadow-2xl flex items-center gap-4 animate-fadeIn">
+                  <div className="w-12 h-12 md:w-14 md:h-14 bg-white/20 rounded-xl md:rounded-2xl flex items-center justify-center">
+                    <CheckCircle2 className="w-7 h-7 md:w-8 md:h-8" />
+                  </div>
+                  <div>
+                    <h4 className="text-lg md:text-xl font-black tracking-tighter leading-none mb-1">Succès!</h4>
+                    <p className="text-xs md:text-sm font-medium opacity-90">Vos réglages ont été synchronisés instantanément.</p>
                   </div>
                 </div>
               )}
@@ -604,8 +347,6 @@ export default function ProfilPage() {
           </div>
         </div>
       </main>
-
-      <DashboardFooter />
     </div>
   );
 }

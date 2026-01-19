@@ -1,14 +1,12 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import DashboardHeader from '@/components/layout/Header';
-import DashboardFooter from '@/components/layout/Footer';
 import { parcelService } from "@/features/parcels/services/parcelService";
 import { terrainService } from "@/features/terrains/services/terrainService";
 import { recommendationService } from "@/features/recommendations/services/recommendationService";
 import { sensorDataService } from "@/features/sensors/services/sensorDataService";
 import { useTranslation } from "@/providers/TranslationProvider";
-import { Bot, User, Loader2, Send, Sparkles, AlertCircle, MapPin, ChevronRight } from "lucide-react";
+import { Bot, User, Loader2, Send, Sparkles, MapPin, ChevronRight, MessageSquare } from "lucide-react";
 
 export default function RecommandationsPage() {
   const { t } = useTranslation();
@@ -19,6 +17,7 @@ export default function RecommandationsPage() {
   const [loading, setLoading] = useState(false);
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -28,7 +27,6 @@ export default function RecommandationsPage() {
   useEffect(() => {
     const loadParcelles = async () => {
       try {
-        const terrains: any = await terrainService.getTerrains();
         const parcellesData = await parcelService.getParcelles();
         setParcelles(parcellesData);
       } catch (e) {
@@ -41,14 +39,17 @@ export default function RecommandationsPage() {
   const handleParcelSelect = async (id: string) => {
     if (!id) { setSelectedParcel(null); setMessages([]); return; }
     const parcel = parcelles.find(p => String(p.id) === String(id));
-    if (selectedParcel?.id === parcel?.id) return;
+    if (selectedParcel?.id === parcel?.id) {
+      if (window.innerWidth < 1024) setIsSidebarOpen(false);
+      return;
+    }
 
     setSelectedParcel(parcel);
     setMessages([]);
     setLoading(true);
+    if (window.innerWidth < 1024) setIsSidebarOpen(false);
 
     try {
-      // Get latest soil data for the parcel using mock service
       const measurements = await sensorDataService.getMeasurementsByParcelle(parcel.id);
       const latest = measurements[0];
 
@@ -97,7 +98,6 @@ export default function RecommandationsPage() {
 
     try {
       const res: any = await recommendationService.askQuestion(selectedParcel.id, userText);
-
       setMessages(prev => [...prev, {
         agent: res.agent,
         message: res.message || "Je n'ai pas pu générer de réponse spécifique.",
@@ -111,146 +111,172 @@ export default function RecommandationsPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
-      <DashboardHeader />
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-emerald-50/50 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 opacity-60"></div>
+        <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-lime-50/50 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 opacity-60"></div>
+      </div>
 
-      <div className="flex flex-1">
-        {/* SIDEBAR */}
-        <aside className="w-80 bg-white border-r border-slate-100 flex flex-col hidden md:flex sticky top-[64px] h-[calc(100vh-64px)]">
-          <div className="p-6 border-b border-slate-50">
-            <h2 className="text-lg font-black text-slate-900">{t('recommandations.select_parcel')}</h2>
-            <p className="text-xs text-slate-400 font-medium uppercase tracking-wider mt-1">{parcelles.length} {t('nav.parcelles').toLowerCase()}</p>
+      <div className="flex relative z-10 pt-0 h-[calc(100vh-96px)]">
+        {/* SIDEBAR - Elite Glassmorphism */}
+        <aside className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} fixed lg:relative z-[60] lg:z-10 w-full max-w-[320px] md:max-w-96 bg-white/70 lg:bg-white/40 backdrop-blur-3xl border-r border-emerald-50 flex flex-col h-full shadow-2xl transition-transform duration-500`}>
+          <div className="p-8 md:p-10 pb-6 border-b border-emerald-50/50 flex items-center justify-between">
+            <div>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#052E16]/30 mb-2">Choisir une</h2>
+              <h1 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter leading-none">Parcelle.</h1>
+            </div>
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-3 bg-emerald-50 rounded-2xl text-emerald-600">
+              <ChevronRight className="w-6 h-6 rotate-180" />
+            </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-2">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 custom-scrollbar">
             {parcelles.length > 0 ? (
               parcelles.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => handleParcelSelect(p.id)}
-                  className={`w-full text-left p-4 rounded-2xl transition-all flex items-center gap-3 group ${selectedParcel?.id === p.id
-                    ? "bg-green-50 border-2 border-green-500/20"
-                    : "hover:bg-slate-50 border-2 border-transparent"
+                  className={`w-full text-left p-4 md:p-6 rounded-[24px] md:rounded-[32px] transition-all flex items-center gap-4 group ${selectedParcel?.id === p.id
+                    ? "bg-[#052E16] text-white shadow-2xl shadow-emerald-900/40"
+                    : "hover:bg-white/60 border border-transparent hover:border-emerald-50"
                     }`}
                 >
-                  <div className={`p-2 rounded-xl transition-colors ${selectedParcel?.id === p.id ? "bg-green-500 text-white" : "bg-slate-100 text-slate-400 group-hover:bg-slate-200"
+                  <div className={`p-3 rounded-2xl transition-colors ${selectedParcel?.id === p.id ? "bg-lime-400 text-[#052E16]" : "bg-emerald-50 text-emerald-600 group-hover:bg-emerald-100"
                     }`}>
-                    <MapPin className="w-4 h-4" />
+                    <MapPin className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className={`font-bold truncate ${selectedParcel?.id === p.id ? "text-green-700" : "text-slate-700"}`}>
+                    <p className={`font-black tracking-tight truncate ${selectedParcel?.id === p.id ? "text-white" : "text-[#052E16]"}`}>
                       {p.nom}
                     </p>
                     {p.culturePredite && (
-                      <p className="text-[10px] text-slate-400 font-medium truncate uppercase">
-                        {t('recommandations.culture_label')}: {p.culturePredite}
+                      <p className={`text-[9px] font-black uppercase tracking-widest mt-1 ${selectedParcel?.id === p.id ? "text-lime-400/70" : "text-[#052E16]/30"}`}>
+                        {p.culturePredite}
                       </p>
                     )}
                   </div>
-                  <ChevronRight className={`w-4 h-4 transition-transform ${selectedParcel?.id === p.id ? "text-green-500 translate-x-0" : "text-slate-300 -translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0"}`} />
+                  <ChevronRight className={`w-5 h-5 transition-transform ${selectedParcel?.id === p.id ? "text-lime-400 translate-x-0" : "text-[#052E16]/10 -translate-x-2 opacity-0 group-hover:opacity-100 group-hover:translate-x-0"}`} />
                 </button>
               ))
             ) : (
-              <p className="text-center py-10 text-slate-400 text-sm">{t('predictions.no_parcels')}</p>
+              <div className="py-20 text-center space-y-4">
+                <Loader2 className="w-8 h-8 text-emerald-200 animate-spin mx-auto" />
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#052E16]/20">Initialisation...</p>
+              </div>
             )}
           </div>
         </aside>
 
+        {/* MOBILE OVERLAY */}
+        {isSidebarOpen && (
+          <div className="fixed inset-0 z-[55] bg-emerald-950/20 backdrop-blur-sm lg:hidden" onClick={() => setIsSidebarOpen(false)}></div>
+        )}
+
         {/* MAIN CHAT AREA */}
-        <main className="flex-1 flex flex-col p-2 md:p-3 lg:p-4">
-          <div className="w-full flex-1 flex flex-col min-h-0">
-            {/* Header */}
-            <div className="sticky top-[64px] bg-[#F8FAFC] z-10 flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 py-2">
+        <main className="flex-1 flex flex-col min-h-0 bg-transparent">
+          {/* Elite Chat Header */}
+          <div className="px-6 md:px-10 py-6 md:py-8 bg-white/20 backdrop-blur-md border-b border-emerald-50/50 flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div className="flex items-center gap-4 md:gap-5">
+              <button
+                onClick={() => setIsSidebarOpen(true)}
+                className="lg:hidden w-12 h-12 bg-white rounded-xl shadow-lg flex items-center justify-center text-[#052E16] border border-emerald-50"
+              >
+                <MessageSquare className="w-5 h-5" />
+              </button>
+              <div className="w-12 h-12 md:w-16 md:h-16 bg-white rounded-xl md:rounded-[24px] shadow-xl flex items-center justify-center text-emerald-600 border border-emerald-50">
+                <Bot className="w-6 h-6 md:w-8 md:h-8" />
+              </div>
               <div>
-                <h1 className="text-3xl font-black text-slate-900 tracking-tight flex items-center gap-3">
-                  <Bot className="text-[#22C55E]" /> {t('recommandations.title')}
+                <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-[#052E16] tracking-tighter leading-none">
+                  AI <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Expert.</span>
                 </h1>
-                <p className="text-slate-500 font-medium italic">{t('recommandations.subtitle')}</p>
+                <p className="text-[#052E16]/40 text-[10px] md:text-xs font-medium italic mt-1">Intelligence conversationnelle agronomique.</p>
               </div>
-              {selectedParcel?.culturePredite && (
-                <div className="bg-green-100 text-green-700 px-4 py-2 rounded-2xl text-xs font-black uppercase">
-                  {t('recommandations.culture_label')} : {selectedParcel.culturePredite}
-                </div>
-              )}
             </div>
+            {selectedParcel && (
+              <div className="px-4 md:px-6 py-2 md:py-3 bg-[#052E16] rounded-xl md:rounded-2xl flex items-center gap-2 md:gap-3 shadow-xl self-start md:self-auto">
+                <Sparkles className="w-3 h-3 md:w-4 md:h-4 text-lime-400 animate-pulse" />
+                <span className="text-[8px] md:text-[10px] font-black text-white uppercase tracking-widest truncate max-w-[150px]">Active: {selectedParcel.nom}</span>
+              </div>
+            )}
+          </div>
 
-            {/* MOBILE SELECTOR (Fallback) */}
-            <div className="md:hidden bg-white rounded-3xl p-4 shadow-sm border border-slate-100 mb-8">
-              <select
-                onChange={(e) => handleParcelSelect(e.target.value)}
-                value={selectedParcel?.id || ""}
-                className="w-full p-4 bg-slate-50 border-none rounded-2xl font-bold text-slate-800 outline-none focus:ring-2 focus:ring-[#22C55E] transition-all"
-              >
-                <option value="">{t('recommandations.select_parcel_prompt')}</option>
-                {parcelles.map(p => <option key={p.id} value={p.id}>{p.nom}</option>)}
-              </select>
-            </div>
-
-            {/* Zone de Chat */}
-            <div className="flex-1 flex flex-col bg-white rounded-[40px] shadow-sm border border-slate-100 overflow-hidden relative min-h-[600px] mb-4">
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
-                {!selectedParcel ? (
-                  <div className="h-full flex flex-col items-center justify-center text-slate-300 opacity-50">
-                    <Sparkles size={48} className="mb-4" />
-                    <p className="font-bold text-center px-10">{t('recommandations.start_consultation')}</p>
+          {/* Chat Bubble Zone */}
+          <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 md:space-y-8 custom-scrollbar relative">
+            {!selectedParcel ? (
+              <div className="h-full flex flex-col items-center justify-center text-[#052E16]/10 px-6 text-center">
+                <MessageSquare size={window?.innerWidth < 768 ? 80 : 120} strokeWidth={0.5} className="mb-6 md:mb-8" />
+                <h3 className="text-xl md:text-2xl font-black tracking-tighter">Sélectionnez une zone</h3>
+                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest mt-2 px-10">Pour démarrer le diagnostic intelligent et recevoir vos recommandations personnalisées.</p>
+              </div>
+            ) : loading ? (
+              <div className="h-full flex flex-col items-center justify-center">
+                <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-emerald-500 animate-spin" />
+                <p className="mt-4 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]/40 animate-pulse">Chargement de l'expertise...</p>
+              </div>
+            ) : (
+              <>
+                {messages.map((msg, idx) => (
+                  <div key={idx} className={`flex gap-3 md:gap-6 ${msg.type === 'user' ? 'flex-row-reverse' : ''} animate-fadeIn`}>
+                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-[20px] flex items-center justify-center shrink-0 shadow-lg border border-white ${msg.type === 'user' ? 'bg-[#052E16] text-white' : 'bg-white text-emerald-600'}`}>
+                      {msg.type === 'user' ? <User size={24} /> : <Bot size={24} />}
+                    </div>
+                    <div className={`p-5 md:p-8 rounded-[24px] md:rounded-[40px] max-w-[85%] md:max-w-[70%] shadow-2xl relative ${msg.type === 'user'
+                      ? 'bg-[#052E16] text-white rounded-tr-none shadow-emerald-900/10'
+                      : 'bg-white/80 backdrop-blur-xl text-[#052E16] rounded-tl-none border border-emerald-50 shadow-emerald-900/5'
+                      }`}>
+                      <div className={`flex items-center gap-2 mb-2 md:mb-3 opacity-30 ${msg.type === 'user' ? 'justify-end' : ''}`}>
+                        <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em]">{msg.agent}</span>
+                      </div>
+                      <p className="text-sm md:text-base font-medium leading-relaxed tracking-tight">{msg.message}</p>
+                    </div>
                   </div>
-                ) : loading ? (
-                  <div className="h-full flex items-center justify-center"><Loader2 className="animate-spin text-green-500" size={32} /></div>
-                ) : (
-                  <>
-                    {messages.map((msg, idx) => (
-                      <div key={idx} className={`flex gap-3 ${msg.type === 'user' ? 'flex-row-reverse' : ''}`}>
-                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm ${msg.type === 'user' ? 'bg-slate-900 text-white' : 'bg-green-100 text-green-600'}`}>
-                          {msg.type === 'user' ? <User size={18} /> : <Bot size={18} />}
-                        </div>
-                        <div className={`p-4 rounded-[24px] max-w-[85%] shadow-sm ${msg.type === 'user' ? 'bg-slate-900 text-white rounded-tr-none' : 'bg-slate-50 text-slate-700 rounded-tl-none border border-slate-100'}`}>
-                          <div className="flex items-center gap-2 mb-1 opacity-60">
-                            <span className="text-[10px] font-black uppercase tracking-widest">{msg.agent}</span>
-                          </div>
-                          <p className="text-sm font-medium leading-relaxed">{msg.message}</p>
-                        </div>
-                      </div>
-                    ))}
+                ))}
 
-                    {isTyping && (
-                      <div className="flex gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-green-100 text-green-600 flex items-center justify-center animate-pulse"><Bot size={18} /></div>
-                        <div className="bg-slate-50 p-4 rounded-[24px] rounded-tl-none flex gap-1">
-                          <div className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce"></div>
-                          <div className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce [animation-delay:0.2s]"></div>
-                          <div className="w-1.5 h-1.5 bg-slate-300 rounded-full animate-bounce [animation-delay:0.4s]"></div>
-                        </div>
-                      </div>
-                    )}
-                    <div ref={chatEndRef} />
-                  </>
+                {isTyping && (
+                  <div className="flex gap-4 md:gap-6 animate-fadeIn">
+                    <div className="w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-[20px] bg-white text-emerald-600 flex items-center justify-center shadow-lg border border-emerald-50 animate-pulse">
+                      <Bot size={24} />
+                    </div>
+                    <div className="bg-white/60 backdrop-blur-md p-4 md:p-6 rounded-[24px] md:rounded-[32px] rounded-tl-none flex gap-1.5 md:gap-2 border border-emerald-50 items-center">
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                    </div>
+                  </div>
                 )}
-              </div>
+                <div ref={chatEndRef} className="h-4 md:h-10" />
+              </>
+            )}
+          </div>
 
-              {/* Formulaire d'envoi - rendu collant */}
-              <form
-                onSubmit={handleSendMessage}
-                className="sticky bottom-0 p-4 bg-white border-t border-slate-100 flex gap-3 z-10 shadow-[0_-4px_12px_rgba(0,0,0,0.03)]"
-              >
+          {/* Elite Input Area */}
+          <div className="p-4 md:p-10 bg-white/40 backdrop-blur-2xl border-t border-emerald-50/50">
+            <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex gap-3 md:gap-4">
+              <div className="relative flex-grow group">
+                <div className="absolute inset-y-0 left-4 md:left-6 flex items-center pointer-events-none text-emerald-400 group-focus-within:text-emerald-600 transition-colors">
+                  <Sparkles size={20} />
+                </div>
                 <input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
                   disabled={!selectedParcel}
-                  placeholder={t('recommandations.input_placeholder')}
-                  className="flex-grow bg-slate-50 px-6 py-4 rounded-2xl outline-none border border-slate-200 focus:border-[#22C55E] focus:bg-white font-medium disabled:opacity-50 transition-all shadow-inner"
+                  placeholder={window.innerWidth < 768 ? "Message..." : t('recommandations.input_placeholder')}
+                  className="w-full bg-white/80 backdrop-blur-xl pl-12 md:pl-16 pr-6 md:pr-8 py-4 md:py-6 rounded-[20px] md:rounded-[32px] outline-none border border-emerald-100 focus:border-emerald-500 focus:ring-4 focus:ring-emerald-500/10 font-bold text-sm md:text-base text-[#052E16] disabled:opacity-50 transition-all shadow-xl shadow-emerald-900/5 placeholder:text-emerald-100"
                 />
-                <button
-                  type="submit"
-                  disabled={!inputMessage.trim() || isTyping}
-                  className="bg-[#22C55E] text-white p-4 rounded-2xl hover:bg-[#1a9e4b] active:scale-95 transition-all disabled:opacity-30 shadow-lg shadow-green-100"
-                >
-                  <Send size={20} />
-                </button>
-              </form>
-            </div>
+              </div>
+              <button
+                type="submit"
+                disabled={!inputMessage.trim() || isTyping || !selectedParcel}
+                className="bg-[#052E16] text-white w-14 h-14 md:w-20 md:h-20 rounded-[20px] md:rounded-[32px] flex items-center justify-center hover:bg-emerald-800 active:scale-95 transition-all disabled:opacity-30 shadow-2xl shadow-emerald-900/40 group overflow-hidden relative"
+              >
+                <div className="absolute inset-0 bg-gradient-to-tr from-emerald-600 to-lime-400 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <Send size={28} className="relative z-10" />
+              </button>
+            </form>
           </div>
         </main>
       </div>
-      <DashboardFooter />
     </div>
   );
 }

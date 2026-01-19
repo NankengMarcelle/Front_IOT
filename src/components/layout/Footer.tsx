@@ -1,201 +1,117 @@
 import Link from 'next/link';
 import { useTranslation } from '@/providers/TranslationProvider';
-import { 
-  Leaf, 
-  Map, 
-  RadioTower, 
-  Grid3x3, 
-  Brain, 
-  Sprout,
-  HelpCircle,
-  FileText,
-  MessageSquare,
-  Activity,
-  Mail,
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Shield,
-  FileCheck,
-  Scale
+import {
+    Leaf,
+    Zap,
+    Layout,
+    Map,
+    Grid3x3,
+    Brain,
+    ShieldCheck,
+    MessageSquare,
+    Globe
 } from 'lucide-react';
 
 export default function DashboardFooter() {
-  const { t } = useTranslation();
-  
-  const navLinks = [
-    { href: "/dashboard/farmer/terrains", label: t('footer.my_terrains'), icon: Map },
-    { href: "/dashboard/parcelles", label: t('footer.my_parcels'), icon: Grid3x3 },
-    { href: "/dashboard/predictions", label: t('footer.ai_prediction'), icon: Brain },
-    { href: "/dashboard/farmer/parcelles", label: t('footer.recommendation'), icon: Sprout }
-  ];
+    const { t } = useTranslation();
 
-  const supportLinks = [
-    { href: "#", label: t('footer.help_center'), icon: HelpCircle },
-    { href: "#", label: t('footer.documentation'), icon: FileText },
-    { href: "#", label: t('footer.contact_agronomist'), icon: MessageSquare },
-    { href: "#", label: t('footer.service_status'), icon: Activity },
-  ];
+    const navLinks = [
+        { name: t('nav.dashboard'), href: '/dashboard/farmer', icon: Layout },
+        { name: t('nav.terrains'), href: '/dashboard/terrains', icon: Map },
+        { name: t('nav.parcelles'), href: '/dashboard/parcelles', icon: Grid3x3 },
+        { name: "IA Chat", href: '/dashboard/recommandations', icon: Brain },
+    ];
 
-  const legalLinks = [
-    { href: "#", label: t('footer.terms'), icon: FileCheck },
-    { href: "#", label: t('footer.privacy'), icon: Shield },
-    { href: "#", label: t('footer.legal'), icon: Scale },
-  ];
+    const legalLinks = [
+        { name: "Politique de Confidentialité", href: "#" },
+        { name: "Conditions d'Utilisation", href: "#" },
+        { name: "Support Technique", href: "#" },
+    ];
 
-  const socialLinks = [
-    { href: "#", icon: Facebook, label: "Facebook" },
-    { href: "#", icon: Twitter, label: "Twitter" },
-    { href: "#", icon: Instagram, label: "Instagram" },
-    { href: "#", icon: Linkedin, label: "LinkedIn" },
-  ];
+    return (
+        <footer className="relative pb-8 md:pb-12 px-4 md:px-6">
+            <div className="max-w-7xl mx-auto">
+                <div className="bg-[#052E16] rounded-[32px] md:rounded-[48px] p-8 md:p-12 lg:p-16 shadow-2xl shadow-emerald-950/20 border border-white/5 relative overflow-hidden">
+                    {/* Subtle Glows */}
+                    <div className="absolute top-0 right-0 w-64 md:w-96 h-64 md:h-96 bg-emerald-500/10 rounded-full blur-[80px] md:blur-[100px] -translate-y-1/2 translate-x-1/2"></div>
+                    <div className="absolute bottom-0 left-0 w-48 md:w-64 h-48 md:h-64 bg-lime-500/5 rounded-full blur-[60px] md:blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
 
-  return (
-    <footer className="bg-gradient-to-b from-[#1B831B] to-[#146314] text-white pt-8 pb-6 px-4 sm:px-6 mt-auto w-full">
-      <div className="max-w-7xl mx-auto">
-        {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mb-8 sm:mb-10">
-          {/* Brand Column */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white/10 rounded-lg">
-                <Leaf className="w-6 h-6 sm:w-8 sm:h-8 text-white" />
-              </div>
-              <div>
-                <h3 className="font-bold text-lg sm:text-xl">Smart Agro</h3>
-                <p className="text-xs text-green-100/80">Precision Farming Solutions</p>
-              </div>
+                    <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 md:gap-12 lg:gap-8">
+
+                        {/* Column 1: Brand */}
+                        <div className="space-y-4 md:space-y-6">
+                            <div className="flex items-center gap-3 md:gap-4">
+                                <div className="w-12 h-12 md:w-14 md:h-14 bg-white/10 backdrop-blur-xl rounded-xl md:rounded-2xl flex items-center justify-center text-white border border-white/10 shadow-xl">
+                                    <Leaf className="w-6 h-6 md:w-7 md:h-7 text-lime-400" />
+                                </div>
+                                <div>
+                                    <h3 className="text-xl md:text-2xl font-black tracking-tighter text-white">SmartAgro</h3>
+                                    <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-emerald-400/40 italic">Elite Systems</p>
+                                </div>
+                            </div>
+                            <p className="text-emerald-50/40 text-[11px] md:text-xs font-medium leading-relaxed max-w-[240px]">
+                                Intelligence artificielle et IoT connectés pour une agriculture durable et haute performance.
+                            </p>
+                            <div className="pt-2 md:pt-4">
+                                <p className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#84CC16]/40">© 2026 SmartAgro International</p>
+                            </div>
+                        </div>
+
+                        {/* Column 2: Navigation */}
+                        <div className="space-y-4 md:space-y-6">
+                            <h4 className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/30">Navigation Rapide</h4>
+                            <nav className="flex flex-col gap-3 md:gap-4">
+                                {navLinks.map((link, idx) => (
+                                    <Link key={idx} href={link.href} className="flex items-center gap-3 text-[11px] md:text-xs font-bold text-emerald-50/60 hover:text-lime-400 transition-all group">
+                                        <link.icon className="w-3.5 h-3.5 md:w-4 md:h-4 text-emerald-500 group-hover:scale-110 group-hover:text-lime-400 transition-all" />
+                                        {link.name}
+                                    </Link>
+                                ))}
+                            </nav>
+                        </div>
+
+                        {/* Column 3: Legal & Support */}
+                        <div className="space-y-4 md:space-y-6">
+                            <h4 className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/30">Ressources</h4>
+                            <nav className="flex flex-col gap-3 md:gap-4">
+                                {legalLinks.map((link, idx) => (
+                                    <Link key={idx} href={link.href} className="text-[11px] md:text-xs font-bold text-emerald-50/40 hover:text-white transition-all">
+                                        {link.name}
+                                    </Link>
+                                ))}
+                            </nav>
+                            <div className="pt-2 md:pt-4 flex items-center gap-3 text-emerald-400/20">
+                                <Globe size={14} className="md:w-4 md:h-4" />
+                                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-tighter">Global Service 24/7</span>
+                            </div>
+                        </div>
+
+                        {/* Column 4: Elite Status Card */}
+                        <div className="sm:col-span-2 lg:col-span-1 lg:pl-4">
+                            <div className="bg-white/5 backdrop-blur-xl rounded-[24px] md:rounded-[32px] p-6 md:p-8 border border-white/10 space-y-3 md:space-y-4">
+                                <div className="flex items-center gap-2 md:gap-3">
+                                    <ShieldCheck className="text-lime-400 w-4 h-4 md:w-5 md:h-5" />
+                                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-white">Noeud Sécurisé</span>
+                                </div>
+                                <p className="text-[10px] md:text-[10px] font-medium text-emerald-50/40 leading-relaxed">
+                                    Votre connexion est cryptée par le protocole SmartAgro Secure v2.
+                                </p>
+                                <div className="flex items-center gap-2 pt-1 md:pt-2">
+                                    <div className="w-1 h-1 md:w-1.5 md:h-1.5 bg-lime-500 rounded-full animate-pulse"></div>
+                                    <span className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-lime-400/60">Système Opérationnel</span>
+                                </div>
+                            </div>
+
+                            <div className="mt-6 md:mt-8 flex justify-end">
+                                <p className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] text-emerald-400/20 flex items-center gap-2">
+                                    <Zap className="w-2.5 h-2.5 md:w-3 md:h-3 text-lime-500" /> SmartAgro Dev-Elite
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
             </div>
-            <p className="text-sm text-green-100/80 leading-relaxed">
-              {t('footer.desc')}
-            </p>
-            
-            {/* Social Links */}
-            <div className="flex gap-2 sm:gap-3 pt-2">
-              {socialLinks.map((social, index) => {
-                const Icon = social.icon;
-                return (
-                  <Link
-                    key={index}
-                    href={social.href}
-                    className="p-1.5 sm:p-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors group"
-                    aria-label={social.label}
-                  >
-                    <Icon className="w-3 h-3 sm:w-4 sm:h-4 text-white group-hover:scale-110 transition-transform" />
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Navigation Column */}
-          <div>
-            <h4 className="font-bold mb-3 sm:mb-4 text-base sm:text-lg text-white underline decoration-white-4">
-              {t('footer.nav_title')}
-            </h4>
-            <ul className="space-y-2 sm:space-y-3">
-              {navLinks.map((link, index) => {
-                const Icon = link.icon;
-                return (
-                  <li key={index}>
-                    <Link 
-                      href={link.href} 
-                      className="flex items-center gap-2 sm:gap-3 text-green-100/80 hover:text-white transition-colors group text-sm"
-                    >
-                      <Icon className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-1 transition-transform" />
-                      <span className="text-xs sm:text-sm">{link.label}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          {/* Support Column */}
-          <div>
-            <h4 className="font-bold mb-3 sm:mb-4 text-base sm:text-lg text-white underline decoration-white-4">
-              {t('footer.support_title')}
-            </h4>
-            <ul className="space-y-2 sm:space-y-3">
-              {supportLinks.map((link, index) => {
-                const Icon = link.icon;
-                return (
-                  <li key={index}>
-                    <Link 
-                      href={link.href} 
-                      className="flex items-center gap-2 sm:gap-3 text-green-100/80 hover:text-white transition-colors group text-sm"
-                    >
-                      <Icon className="w-3 h-3 sm:w-4 sm:h-4 group-hover:scale-110 transition-transform" />
-                      <span className="text-xs sm:text-sm">{link.label}</span>
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-
-          {/* Newsletter Column */}
-          <div className="space-y-3 sm:space-y-4">
-            <div>
-              <h4 className="font-bold mb-2 sm:mb-3 text-base sm:text-lg text-white flex items-center gap-2">
-                <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
-                {t('footer.stay_informed')}
-              </h4>
-              <p className="text-sm text-green-100/80 mb-3 sm:mb-4 leading-relaxed">
-                {t('footer.newsletter_desc')}
-              </p>
-            </div>
-
-            <form className="space-y-2 sm:space-y-3">
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-3 h-3 sm:w-4 sm:h-4 text-gray-400" />
-                <input
-                  type="email"
-                  placeholder={t('footer.email_placeholder')}
-                  className="w-full bg-white text-gray-800 px-8 sm:px-10 py-2 sm:py-3 rounded-lg outline-none text-xs sm:text-sm placeholder:text-gray-400 border border-green-200 focus:border-[#22C55E] transition-colors"
-                />
-              </div>
-              <button 
-                type="submit"
-                className="w-full bg-gradient-to-r from-[#22C55E] to-emerald-500 hover:from-[#1B831B] hover:to-[#22C55E] text-white py-2 sm:py-3 rounded-lg text-xs sm:text-sm font-bold transition-all shadow-lg hover:shadow-xl active:scale-[0.98] flex items-center justify-center gap-1 sm:gap-2"
-              >
-                <Mail className="w-3 h-3 sm:w-4 sm:h-4" />
-                {t('footer.subscribe')}
-              </button>
-            </form>
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-white/10 pt-4 sm:pt-6">
-          <div className="flex flex-col sm:flex-row justify-between items-center gap-3 sm:gap-4">
-            {/* Copyright */}
-            <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm text-green-100/70">
-              <span>© {new Date().getFullYear()} Smart Agro</span>
-              <span className="hidden sm:inline">•</span>
-              <span>{t('footer.rights')}</span>
-            </div>
-
-            {/* Legal Links */}
-            <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4">
-              {legalLinks.map((link, index) => {
-                const Icon = link.icon;
-                return (
-                  <Link
-                    key={index}
-                    href={link.href}
-                    className="flex items-center gap-1 sm:gap-2 text-xs sm:text-sm text-green-100/70 hover:text-white transition-colors group"
-                  >
-                    <Icon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                    {link.label}
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      </div>
-    </footer>
-  );
+        </footer>
+    );
 }

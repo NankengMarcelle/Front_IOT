@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import DashboardHeader from '@/components/layout/Header';
-import DashboardFooter from '@/components/layout/Footer';
 import ParcelCard from "@/features/parcels/components/ParcelCard";
 import ParcelForm from "@/features/parcels/components/ParcelForm";
 import { parcelService } from "@/features/parcels/services/parcelService";
@@ -10,7 +8,7 @@ import { terrainService } from "@/features/terrains/services/terrainService";
 import { sensorService } from "@/features/sensors/services/sensorService";
 import { sensorDataService } from "@/features/sensors/services/sensorDataService";
 import { useTranslation } from "@/providers/TranslationProvider";
-import { Plus, Grid3x3, Search, Filter } from "lucide-react";
+import { Plus, Grid3x3, Search, Layout, ChevronRight } from "lucide-react";
 
 export default function ParcellesPage() {
   const { t } = useTranslation();
@@ -19,6 +17,7 @@ export default function ParcellesPage() {
   const [terrains, setTerrains] = useState<any[]>([]);
   const [selectedParcel, setSelectedParcel] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const loadData = async () => {
     try {
@@ -74,69 +73,105 @@ export default function ParcellesPage() {
     return terrain ? terrain.nom : "Terrain inconnu";
   };
 
+  const filteredParcelles = parcelles.filter(p =>
+    p.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    getTerrainName(p.terrain_id || p.terrainId).toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#F9FBFA]">
-      <DashboardHeader />
+    <div className="min-h-screen bg-white relative overflow-hidden">
+      {/* Premium Background Glows */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-emerald-50/50 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 opacity-60"></div>
+        <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-lime-50/50 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 opacity-60"></div>
+      </div>
 
-      <main className="flex-grow p-6 sm:p-10 max-w-7xl mx-auto w-full">
-        {view === "form" ? (
-          <div className="max-w-3xl mx-auto">
-            <ParcelForm initialData={selectedParcel} onSuccess={loadData} onCancel={() => setView("list")} />
-          </div>
-        ) : (
-          <>
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
-              <div>
-                <h1 className="text-4xl font-black text-[#1A4D2E] tracking-tight">{t('parcelles_list.title')}</h1>
-                <p className="text-slate-500 mt-2 font-medium">Gérez le découpage de vos exploitations et leurs cultures.</p>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <button
-                  onClick={() => { setSelectedParcel(null); setView("form"); }}
-                  className="bg-[#1A4D2E] text-white px-8 py-3.5 rounded-2xl font-bold hover:bg-[#133a23] shadow-lg shadow-emerald-900/10 transition-all flex items-center gap-2"
-                >
-                  <Plus className="w-5 h-5" />
-                  {t('parcelles_list.add_button')}
+      <main className="relative z-10 pt-0">
+        <div className="px-4 md:px-12 py-8 md:py-12 max-w-7xl mx-auto w-full">
+          {view === "form" ? (
+            <div className="max-w-3xl mx-auto animate-fadeIn">
+              <div className="mb-6 md:mb-10 flex items-center gap-4">
+                <button onClick={() => setView("list")} className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl md:rounded-2xl border border-emerald-50 flex items-center justify-center hover:bg-emerald-50 transition-all text-[#052E16]">
+                  <ChevronRight className="w-5 h-5 md:w-6 md:h-6 rotate-180" />
                 </button>
+                <h2 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter">
+                  {selectedParcel ? "Éditer la Parcelle" : "Nouvelle Parcelle"}
+                </h2>
               </div>
+              <ParcelForm initialData={selectedParcel} onSuccess={loadData} onCancel={() => setView("list")} />
             </div>
-
-            {loading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {[1, 2, 3].map(i => <div key={i} className="bg-white h-[300px] rounded-[40px] animate-pulse border border-slate-100" />)}
-              </div>
-            ) : parcelles.length === 0 ? (
-              <div className="bg-white rounded-[48px] border-2 border-dashed border-slate-200 py-32 flex flex-col items-center justify-center text-center px-6">
-                <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
-                  <Grid3x3 className="w-10 h-10 text-slate-300" />
+          ) : (
+            <>
+              {/* Page Header */}
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-10 md:mb-16">
+                <div>
+                  <div className="inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full mb-4 border border-emerald-100">
+                    <Layout className="w-3.5 h-3.5 text-emerald-600" />
+                    <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">Segmentation Agricole</span>
+                  </div>
+                  <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-[0.9]">
+                    Vos<br />
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Unités de Culture.</span>
+                  </h1>
                 </div>
-                <h3 className="text-2xl font-black text-slate-800 mb-2">{t('parcelles_list.no_parcelles')}</h3>
-                <p className="text-slate-500 max-w-sm font-medium">Divisez vos terrains en parcelles pour un suivi précis de chaque culture.</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {parcelles.map(p => (
-                  <ParcelCard
-                    key={p.id}
-                    parcel={p}
-                    terrainName={getTerrainName(p.terrain_id || p.terrainId)}
-                    onEdit={() => { setSelectedParcel(p); setView("form"); }}
-                    onDelete={async () => {
-                      if (confirm(t('parcelles_list.delete_confirm'))) {
-                        await parcelService.deleteParcelle(p.id);
-                        loadData();
-                      }
-                    }}
-                  />
-                ))}
-              </div>
-            )}
-          </>
-        )}
-      </main>
 
-      <DashboardFooter />
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+                  <div className="relative group flex-grow sm:flex-grow-0">
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
+                    <input
+                      type="text"
+                      placeholder="Chercher une unité..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="bg-white border border-emerald-50 rounded-xl md:rounded-[20px] pl-12 pr-6 py-3.5 md:py-4 text-sm font-medium outline-none focus:border-emerald-500 focus:shadow-xl transition-all w-full sm:w-64"
+                    />
+                  </div>
+                  <button
+                    onClick={() => { setSelectedParcel(null); setView("form"); }}
+                    className="bg-[#052E16] text-white px-8 md:px-10 py-4 md:py-5 rounded-xl md:rounded-[24px] font-black uppercase tracking-widest text-[9px] md:text-[10px] hover:scale-105 transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-3"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Nouvelle Parcelle
+                  </button>
+                </div>
+              </div>
+
+              {loading ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="bg-white h-[400px] md:h-[450px] rounded-[32px] md:rounded-[48px] animate-pulse border border-emerald-50 shadow-sm" />
+                  ))}
+                </div>
+              ) : parcelles.length === 0 ? (
+                <div className="bg-white/50 backdrop-blur-xl rounded-[32px] md:rounded-[64px] border-2 border-dashed border-emerald-100 py-16 md:py-32 flex flex-col items-center justify-center text-center px-6 shadow-sm">
+                  <div className="w-16 h-16 md:w-24 md:h-24 bg-emerald-50 rounded-2xl md:rounded-[32px] flex items-center justify-center mb-6 md:mb-8 shadow-inner">
+                    <Grid3x3 className="w-8 h-8 md:w-10 md:h-10 text-emerald-200" />
+                  </div>
+                  <h3 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter mb-4 px-4 text-balance">Aucune parcelle définie</h3>
+                  <p className="text-[#052E16]/40 max-w-sm font-medium text-sm md:text-base px-6">Divisez vos terrains pour une gestion ultra-précise et commencez à recevoir vos premiers rapports IA.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
+                  {filteredParcelles.map(p => (
+                    <ParcelCard
+                      key={p.id}
+                      parcel={p}
+                      terrainName={getTerrainName(p.terrain_id || p.terrainId)}
+                      onEdit={() => { setSelectedParcel(p); setView("form"); }}
+                      onDelete={async () => {
+                        if (confirm(t('parcelles_list.delete_confirm'))) {
+                          await parcelService.deleteParcelle(p.id);
+                          loadData();
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      </main>
     </div>
   );
 }
