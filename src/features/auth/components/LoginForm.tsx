@@ -2,10 +2,8 @@
 
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
-import { AuthenticationService } from "@/lib/services/AuthenticationService";
-import { Leaf } from 'lucide-react';
+import { Leaf, Mail, Lock, ShieldCheck, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
 
 interface LoginFormProps {
   role: string | null;
@@ -39,110 +37,154 @@ export default function LoginForm({ role }: LoginFormProps) {
       }
     }
 
-    // 2. Logique d'authentification réelle
-    try {
-      const response = await AuthenticationService.loginApiV1AuthLoginPost({
-        email,
-        password,
-      });
+    // 2. Logique d'authentification simulée
+    setTimeout(() => {
+      // Stockage de données fictives
+      const mockUser = {
+        id: "mock-id",
+        email: email,
+        name: isAdmin ? "Admin User" : "Farmer User",
+        role: isAdmin ? "ADMIN" : "AGRICULTEUR",
+        isActive: true
+      };
 
-      // Stockage du token et des infos utilisateur
-      localStorage.setItem('smartagro_token', response.access_token);
-      localStorage.setItem('smartagro_user', JSON.stringify(response.user));
+      localStorage.setItem('smartagro_token', 'mock-token-' + Date.now());
+      localStorage.setItem('smartagro_user', JSON.stringify(mockUser));
 
-      // Redirection selon le rôle
-      // Note: On pourrait aussi vérifier response.user.role si disponible
-      router.push(isAdmin ? '/dashboard/admin' : '/dashboard/farmer');
-    } catch (err: any) {
-      console.error("Login error:", err);
-      setError(err.body?.message || "Une erreur est survenue lors de la connexion. Vérifiez vos identifiants.");
-    } finally {
       setLoading(false);
-    }
+      // Redirection selon le rôle
+      router.push(isAdmin ? '/dashboard/admin' : '/dashboard/farmer');
+    }, 1500);
   };
 
   return (
-    <div className="bg-white rounded-[2.5rem] shadow-2xl p-8 md:p-10 w-full max-w-md flex flex-col items-center border-3 border-[#1B831B] animate-in fade-in zoom-in duration-500">
-      {/* Logo Smart Agro */}
-      <div className="mb-4">
-         <div className="p-2 bg-[#1B831B]/10 rounded-lg"><Leaf className="w-6 h-6 sm:w-8 sm:h-8 text-[#1B831B]" /></div>
-        
-      </div>
+    <div className="w-full max-w-md animate-in fade-in zoom-in duration-700">
+      <div className="bg-white/40 backdrop-blur-2xl rounded-[48px] shadow-[0_32px_64px_-16px_rgba(0,0,0,0.1)] p-8 md:p-12 flex flex-col items-center border border-white/40 relative overflow-hidden group">
+        {/* Decorative Glow */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-emerald-500/20 transition-colors duration-1000"></div>
 
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Connexion</h1>
-
-      {/* Affichage des erreurs de validation */}
-      {error && (
-        <div className="w-full bg-red-50 text-red-600 border border-red-200 p-3 rounded-xl text-sm mb-6 text-center font-medium animate-shake">
-          {error}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
-        {/* Champ Email */}
-        <div className="flex flex-col gap-1">
-          <label className="text-agro-primary font-bold ml-1 text-sm">Email</label>
-          <input
-            name="email"
-            type="email"
-            required
-            placeholder="votre adresse email"
-            className="w-full border-2 border-gray-100 rounded-2xl px-4 py-3 focus:border-agro-bright outline-none transition-all bg-gray-50/50 placeholder:text-gray-300"
-          />
+        {/* Header Section */}
+        <div className="w-full text-center mb-10 relative z-10">
+          <div className="inline-flex p-3 bg-white rounded-2xl shadow-sm mb-6 border border-emerald-50">
+            <Leaf className="w-8 h-8 text-emerald-600" />
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-black text-[#052E16] tracking-tighter mb-2">
+            Bon retour
+          </h1>
+          <p className="text-emerald-900/40 text-sm font-medium">Connectez-vous à votre écosystème</p>
         </div>
 
-        {/* Champ Mot de Passe */}
-        <div className="flex flex-col gap-1">
-          <label className="text-agro-primary font-bold ml-1 text-sm">Mot de Passe</label>
-          <input
-            name="password"
-            type="password"
-            required
-            placeholder="........"
-            className="w-full border-2 border-gray-100 rounded-2xl px-4 py-3 focus:border-agro-bright outline-none transition-all bg-gray-50/50 placeholder:text-gray-300"
-          />
-        </div>
-
-        {/* Champ Code Fixe Administrateur - Conditionnel */}
-        {isAdmin && (
-          <div className="flex flex-col gap-1 animate-in slide-in-from-top-2 duration-300">
-            <label className="text-red-600 font-bold ml-1 text-sm">Code de Sécurité Administrateur</label>
-            <input
-              name="adminCode"
-              type="password"
-              required
-              placeholder="Code secret"
-              className="w-full border-2 border-red-50 rounded-2xl px-4 py-3 focus:border-red-500 outline-none transition-all bg-red-50/30 placeholder:text-red-200"
-            />
+        {/* Error Message */}
+        {error && (
+          <div className="w-full bg-red-50/80 backdrop-blur-sm text-red-600 border border-red-100 p-4 rounded-2xl text-xs mb-8 text-center font-bold animate-shake">
+            {error}
           </div>
         )}
 
-        {/* Bouton Se Connecter */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-agro-bright hover:bg-agro-primary text-white font-bold py-4 rounded-full shadow-lg transition-all mt-4 text-lg active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed"
-        >
-          {loading ? "Connexion..." : "Se connecter"}
-        </button>
-      </form>
+        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6 relative z-10">
+          {/* Email Input */}
+          <div className="space-y-2">
+            <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Email</label>
+            <div className="relative group/input">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
+                <Mail className="w-5 h-5" />
+              </div>
+              <input
+                name="email"
+                type="email"
+                required
+                placeholder="votre@email.com"
+                className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-6 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
+              />
+            </div>
+          </div>
 
-      {/* Liens de bas de page */}
-      <div className="w-full flex justify-between mt-8 text-xs text-agro-primary/60 font-semibold px-2">
-        {/* LIEN MODIFIÉ : On passe le rôle actuel dans l'URL */}
+          {/* Password Input */}
+          <div className="space-y-2">
+            <div className="flex justify-between items-center px-1">
+              <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest">Mot de passe</label>
+            </div>
+            <div className="relative group/input">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
+                <Lock className="w-5 h-5" />
+              </div>
+              <input
+                name="password"
+                type="password"
+                required
+                placeholder="••••••••"
+                className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-6 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
+              />
+            </div>
+          </div>
+
+          {/* Admin Code Input (Conditional) */}
+          {isAdmin && (
+            <div className="space-y-2 animate-in slide-in-from-top-4 duration-500">
+              <label className="text-emerald-600 font-black text-[10px] uppercase tracking-widest ml-1">Code Administrateur</label>
+              <div className="relative group/input">
+                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600/30 group-focus-within/input:text-emerald-600 transition-colors">
+                  <ShieldCheck className="w-5 h-5" />
+                </div>
+                <input
+                  name="adminCode"
+                  type="password"
+                  required
+                  placeholder="SA-XXXX-XXXX"
+                  className="w-full bg-emerald-50/30 border border-emerald-100 rounded-[20px] pl-12 pr-6 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-emerald-900 placeholder:text-emerald-900/20"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Submit Button */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="group relative w-full bg-[#052E16] text-white font-black py-4 rounded-[20px] shadow-[0_20px_40px_-10px_rgba(5,46,22,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-70 disabled:cursor-not-allowed mt-4 text-xs uppercase tracking-[0.2em] overflow-hidden"
+          >
+            <span className="relative z-10 flex items-center justify-center gap-3">
+              {loading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  Authentification...
+                </>
+              ) : (
+                <>
+                  Se connecter
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </>
+              )}
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-lime-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+          </button>
+        </form>
+
+        {/* Footer Links */}
+        <div className="w-full flex justify-between mt-10 text-[10px] font-black uppercase tracking-widest relative z-10 px-2">
+          <Link
+            href={`/forgot-password?role=${role}`}
+            className="text-[#052E16]/40 hover:text-emerald-600 transition-colors"
+          >
+            Mot de passe oublié ?
+          </Link>
+          <Link
+            href={`/register?role=${role}`}
+            className="text-[#052E16]/40 hover:text-emerald-600 transition-colors"
+          >
+            Créer un compte
+          </Link>
+        </div>
+      </div>
+
+      {/* Social Login / Back to home hint */}
+      <div className="mt-8 text-center">
         <Link
-          href={`/forgot-password?role=${role}`}
-          title="Récupérer mon compte"
-          className="hover:text-agro-primary transition-colors"
+          href="/"
+          className="inline-flex items-center gap-2 text-[#052E16]/40 hover:text-[#052E16] text-[10px] font-black uppercase tracking-[0.2em] transition-all"
         >
-          Mot de passe oublié ?
-        </Link>
-        <Link
-          href={`/register?role=${role}`}
-          title="Créer un compte"
-          className="hover:text-agro-primary transition-colors"
-        >
-          Créer un compte
+          <ArrowLeft className="w-3 h-3" />
+          Retour à l'accueil
         </Link>
       </div>
     </div>

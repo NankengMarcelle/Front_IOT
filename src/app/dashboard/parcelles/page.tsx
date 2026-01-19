@@ -1,15 +1,16 @@
 "use client";
+
 import { useState, useEffect } from "react";
 import DashboardHeader from '@/components/layout/Header';
 import DashboardFooter from '@/components/layout/Footer';
 import ParcelCard from "@/features/parcels/components/ParcelCard";
 import ParcelForm from "@/features/parcels/components/ParcelForm";
-import { StatutParcelle } from "@/lib/models/StatutParcelle";
-import { ParcellesService } from "@/lib/services/ParcellesService";
-import { TerrainsService } from "@/lib/services/TerrainsService";
-import { CapteursService } from "@/lib/services/CapteursService";
-import { DonnEsDeCapteursService } from "@/lib/services/DonnEsDeCapteursService";
+import { parcelService } from "@/features/parcels/services/parcelService";
+import { terrainService } from "@/features/terrains/services/terrainService";
+import { sensorService } from "@/features/sensors/services/sensorService";
+import { sensorDataService } from "@/features/sensors/services/sensorDataService";
 import { useTranslation } from "@/providers/TranslationProvider";
+import { Plus, Grid3x3, Search, Filter } from "lucide-react";
 
 export default function ParcellesPage() {
   const { t } = useTranslation();
@@ -17,38 +18,28 @@ export default function ParcellesPage() {
   const [parcelles, setParcelles] = useState<any[]>([]);
   const [terrains, setTerrains] = useState<any[]>([]);
   const [selectedParcel, setSelectedParcel] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
     try {
-      const terrainsData = await TerrainsService.getAllTerrainsApiV1TerrainsTerrainsGet();
+      setLoading(true);
+      const terrainsData: any = await terrainService.getTerrains();
       setTerrains(terrainsData);
 
-      const allParcellesPromises = terrainsData.map(t =>
-        ParcellesService.getParcellesByTerrainApiV1ParcellesParcellesTerrainTerrainIdGet(t.id)
-      );
+      const flattenedParcelles: any = await parcelService.getParcelles();
+      const sensors: any = await sensorService.getSensors();
 
-      const allParcellesResults = await Promise.all(allParcellesPromises);
-      const flattenedParcelles = allParcellesResults.flat();
+      const parcellesWithExtras = await Promise.all(flattenedParcelles.map(async (p: any) => {
+        const parcelSensors = sensors.filter((s: any) => String(s.parcelleId || s.parcelle_id) === String(p.id));
+        const capteursListe = parcelSensors.map((s: any) => s.nom || s.code).join(', ');
 
-      const sensors = await CapteursService.readCapteursApiV1CapteursGet();
-
-      const parcellesWithExtras = await Promise.all(flattenedParcelles.map(async (p) => {
-        // Find sensors
-        const parcelSensors = sensors.filter(s => String(s.parcelle_id) === String(p.id));
-        const capteursListe = parcelSensors.map(s => s.nom || s.code).join(', ');
-
-        // Fetch latest measurement
         let measurements = {
-          azote: 0,
-          phosphore: 0,
-          potassium: 0,
-          humidite: 0,
-          temperature: 0,
-          ph: 0
+          azote: 0, phosphore: 0, potassium: 0,
+          humidite: 0, temperature: 0, ph: 0
         };
 
         try {
-          const parcelMeasurements = await DonnEsDeCapteursService.getMeasurementsByParcelleApiV1SensorDataSensorDataParcelleParcelleIdGet(p.id, 0, 1);
+          const parcelMeasurements = await sensorDataService.getMeasurementsByParcelle(p.id);
           if (parcelMeasurements && parcelMeasurements.length > 0) {
             const latest = parcelMeasurements[0];
             measurements = {
@@ -64,23 +55,19 @@ export default function ParcellesPage() {
           console.error(`Error fetching measurements for parcel ${p.id}:`, e);
         }
 
-        return {
-          ...p,
-          ...measurements,
-          capteursListe
-        };
+        return { ...p, ...measurements, capteursListe };
       }));
 
       setParcelles(parcellesWithExtras);
       setView("list");
     } catch (error) {
       console.error("Error loading parcelles data:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    loadData();
-  }, []);
+  useEffect(() => { loadData(); }, []);
 
   const getTerrainName = (id: string | number) => {
     const terrain = terrains.find(tr => String(tr.id) === String(id));
@@ -88,26 +75,44 @@ export default function ParcellesPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F1F8F4]">
+    <div className="min-h-screen flex flex-col bg-[#F9FBFA]">
       <DashboardHeader />
-      <main className="flex-grow p-8 max-w-7xl mx-auto w-full">
+
+      <main className="flex-grow p-6 sm:p-10 max-w-7xl mx-auto w-full">
         {view === "form" ? (
-          <ParcelForm initialData={selectedParcel} onSuccess={loadData} onCancel={() => setView("list")} />
+          <div className="max-w-3xl mx-auto">
+            <ParcelForm initialData={selectedParcel} onSuccess={loadData} onCancel={() => setView("list")} />
+          </div>
         ) : (
           <>
-            <div className="flex justify-between items-center mb-10">
-              <h1 className="text-3xl font-extrabold text-green-900">{t('parcelles_list.title')}</h1>
-              <button
-                onClick={() => { setSelectedParcel(null); setView("form"); }}
-                className="bg-[#22C55E] text-white px-8 py-3 rounded-2xl font-bold shadow-lg hover:bg-[#16A34A] transition-all transform active:scale-95"
-              >
-                + {t('parcelles_list.add_button')}
-              </button>
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
+              <div>
+                <h1 className="text-4xl font-black text-[#1A4D2E] tracking-tight">{t('parcelles_list.title')}</h1>
+                <p className="text-slate-500 mt-2 font-medium">Gérez le découpage de vos exploitations et leurs cultures.</p>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <button
+                  onClick={() => { setSelectedParcel(null); setView("form"); }}
+                  className="bg-[#1A4D2E] text-white px-8 py-3.5 rounded-2xl font-bold hover:bg-[#133a23] shadow-lg shadow-emerald-900/10 transition-all flex items-center gap-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  {t('parcelles_list.add_button')}
+                </button>
+              </div>
             </div>
 
-            {parcelles.length === 0 ? (
-              <div className="bg-white rounded-[40px] border-2 border-dashed h-[400px] flex items-center justify-center">
-                <p className="text-gray-400 text-xl font-semibold">{t('parcelles_list.no_parcelles')}</p>
+            {loading ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {[1, 2, 3].map(i => <div key={i} className="bg-white h-[300px] rounded-[40px] animate-pulse border border-slate-100" />)}
+              </div>
+            ) : parcelles.length === 0 ? (
+              <div className="bg-white rounded-[48px] border-2 border-dashed border-slate-200 py-32 flex flex-col items-center justify-center text-center px-6">
+                <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+                  <Grid3x3 className="w-10 h-10 text-slate-300" />
+                </div>
+                <h3 className="text-2xl font-black text-slate-800 mb-2">{t('parcelles_list.no_parcelles')}</h3>
+                <p className="text-slate-500 max-w-sm font-medium">Divisez vos terrains en parcelles pour un suivi précis de chaque culture.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -115,11 +120,11 @@ export default function ParcellesPage() {
                   <ParcelCard
                     key={p.id}
                     parcel={p}
-                    terrainName={getTerrainName(p.terrain_id)}
+                    terrainName={getTerrainName(p.terrain_id || p.terrainId)}
                     onEdit={() => { setSelectedParcel(p); setView("form"); }}
                     onDelete={async () => {
                       if (confirm(t('parcelles_list.delete_confirm'))) {
-                        await ParcellesService.deleteParcelleApiV1ParcellesParcellesParcelleIdDelete(p.id);
+                        await parcelService.deleteParcelle(p.id);
                         loadData();
                       }
                     }}
@@ -130,6 +135,7 @@ export default function ParcellesPage() {
           </>
         )}
       </main>
+
       <DashboardFooter />
     </div>
   );

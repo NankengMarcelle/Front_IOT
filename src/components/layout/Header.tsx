@@ -2,20 +2,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslation } from '@/providers/TranslationProvider';
-import { 
-  User, 
-  LogOut, 
-  Home, 
-  Map, 
-  Grid3x3, 
-  RadioTower, 
+import {
+  User,
+  LogOut,
+  Home,
+  Map,
+  Grid3x3,
+  RadioTower,
   Leaf,
   Menu,
   ChevronDown,
   Settings
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
-import { UsersService } from "@/lib/services/UsersService";
 
 export default function DashboardHeader() {
   const { t } = useTranslation();
@@ -25,14 +24,23 @@ export default function DashboardHeader() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
+    const fetchUserInfo = () => {
       try {
         setLoading(true);
-        const profile = await UsersService.getMyProfileApiV1UsersMeGet();
-        setUserInfo(profile);
+        const savedUser = localStorage.getItem('smartagro_user');
+        if (savedUser && savedUser !== "undefined") {
+          try {
+            setUserInfo(JSON.parse(savedUser));
+          } catch (e) {
+            console.error("Invalid user data in localStorage");
+            router.push('/login');
+          }
+        } else {
+          // Fallback or redirect if no user info
+          router.push('/login');
+        }
       } catch (error) {
         console.error("Error fetching user info:", error);
-        router.push('/login');
       } finally {
         setLoading(false);
       }
@@ -41,7 +49,8 @@ export default function DashboardHeader() {
   }, [router]);
 
   const handleLogout = () => {
-    localStorage.removeItem('auth_token');
+    localStorage.removeItem('smartagro_token');
+    localStorage.removeItem('smartagro_user');
     router.push('/login');
   };
 
@@ -109,25 +118,25 @@ export default function DashboardHeader() {
             </div>
             <ChevronDown className="w-4 h-4 text-gray-400 hidden md:block" />
           </button>
-          
+
           {/* Dropdown Menu */}
           <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-100 invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-200 z-50">
-            <Link 
-              href="/dashboard/profil" 
+            <Link
+              href="/dashboard/profil"
               className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 transition-colors"
             >
               <User className="w-4 h-4" />
               <span className="text-sm">{t('nav.profile')}</span>
             </Link>
             {/* Nouveau lien pour les paramètres */}
-            <Link 
-              href="/dashboard/parametres" 
+            <Link
+              href="/dashboard/parametres"
               className="flex items-center gap-3 px-4 py-3 hover:bg-green-50 text-gray-700 transition-colors"
             >
               <Settings className="w-4 h-4" />
               <span className="text-sm">Paramètres</span>
             </Link>
-            <button 
+            <button
               onClick={handleLogout}
               className="flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 w-full transition-colors"
             >
@@ -138,7 +147,7 @@ export default function DashboardHeader() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button 
+        <button
           onClick={() => setIsMenuOpen(!isMenuOpen)}
           className="lg:hidden p-1.5 sm:p-2 rounded-lg hover:bg-green-50 transition-colors"
         >

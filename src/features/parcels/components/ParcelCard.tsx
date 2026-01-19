@@ -1,5 +1,16 @@
 "use client";
 
+import {
+  Edit3,
+  Trash2,
+  Thermometer,
+  Droplets,
+  Wind,
+  FlaskConical,
+  Activity,
+  Cpu
+} from "lucide-react";
+
 export default function ParcelCard({ parcel, terrainName, onEdit, onDelete }: any) {
   const stats = {
     azote: parcel.azote || 0,
@@ -15,110 +26,146 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete }: an
   };
 
   return (
-    <div className="bg-white rounded-[32px] shadow-sm border border-gray-100 overflow-hidden flex flex-col">
-      <div className="bg-[#1A8D44] p-5 text-white">
-        <div className="flex justify-between items-center">
-          <div>
-            <h3 className="text-xl font-bold leading-tight">{parcel.nom}</h3>
-            <p className="text-xs font-medium opacity-90">
-              ID : {parcel.code || 'PK-01'} • {parcel.superficie} ha
-            </p>
-          </div>
-          <div className="text-right">
-            <p className="text-sm font-bold">{terrainName}</p>
-          </div>
+    <div className="bg-white rounded-[40px] shadow-sm border border-slate-100 overflow-hidden flex flex-col group hover:shadow-2xl hover:shadow-emerald-900/5 transition-all duration-500">
+      {/* Header with Background Gradient */}
+      <div className="bg-gradient-to-br from-[#1A4D2E] to-[#0d2a19] p-7 text-white relative h-32 flex flex-col justify-end">
+        <div className="absolute top-4 right-4 flex gap-2">
+          <button
+            onClick={onEdit}
+            className="p-2 bg-white/10 hover:bg-white/20 rounded-xl transition-all backdrop-blur-md border border-white/5"
+            title="Modifier"
+          >
+            <Edit3 className="w-4 h-4" />
+          </button>
+          <button
+            onClick={onDelete}
+            className="p-2 bg-white/10 hover:bg-rose-500 rounded-xl transition-all backdrop-blur-md border border-white/5"
+            title="Supprimer"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+
+        <div>
+          <h3 className="text-2xl font-black tracking-tight leading-none mb-1">{parcel.nom}</h3>
+          <p className="text-[10px] font-bold text-white/60 uppercase tracking-widest flex items-center gap-2">
+            <span className="px-1.5 py-0.5 bg-emerald-500/20 rounded-md border border-white/10">{parcel.code || 'PK-01'}</span>
+            <span>•</span>
+            <span>{parcel.superficie} ha</span>
+            <span>•</span>
+            <span className="truncate">{terrainName}</span>
+          </p>
         </div>
       </div>
 
-      <div className="p-8 space-y-6">
-        {/* Grille NPK et Humidité */}
-        <div className="grid grid-cols-2 gap-x-12 gap-y-6">
-          <div>
-            <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Azote (N)</p>
-            <p className="text-sm font-black mb-1">{stats.azote} mg/kg</p>
-            <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-              <div className="bg-[#4CAF50] h-full transition-all duration-700" style={{ width: getProgress(stats.azote) }}></div>
+      <div className="p-8 space-y-8">
+        {/* NPK Grid with refined bars */}
+        <div className="grid grid-cols-2 gap-x-10 gap-y-6">
+          <div className="space-y-2">
+            <div className="flex justify-between items-end">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-serif">N • Azote</span>
+              <span className="text-xs font-black text-slate-700">{stats.azote} <span className="text-[10px] text-slate-300">mg/kg</span></span>
+            </div>
+            <div className="w-full bg-slate-50 h-1.5 rounded-full overflow-hidden">
+              <div className="bg-emerald-500 h-full transition-all duration-1000 shadow-[0_0_8px_rgba(16,185,129,0.3)]" style={{ width: getProgress(stats.azote) }}></div>
             </div>
           </div>
-          <div>
-            <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Phosphore (P)</p>
-            <p className="text-sm font-black mb-1">{stats.phosphore} mg/kg</p>
-            <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-              <div className="bg-[#FF9800] h-full transition-all duration-700" style={{ width: getProgress(stats.phosphore) }}></div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-end">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-serif">P • Phos.</span>
+              <span className="text-xs font-black text-slate-700">{stats.phosphore} <span className="text-[10px] text-slate-300">mg/kg</span></span>
+            </div>
+            <div className="w-full bg-slate-50 h-1.5 rounded-full overflow-hidden">
+              <div className="bg-orange-500 h-full transition-all duration-1000 shadow-[0_0_8px_rgba(249,115,22,0.3)]" style={{ width: getProgress(stats.phosphore) }}></div>
             </div>
           </div>
-          <div>
-            <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Potassium (K)</p>
-            <p className="text-sm font-black mb-1">{stats.potassium} mg/kg</p>
-            <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-              <div className="bg-[#9C27B0] h-full transition-all duration-700" style={{ width: getProgress(stats.potassium) }}></div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-end">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest italic font-serif">K • Potass.</span>
+              <span className="text-xs font-black text-slate-700">{stats.potassium} <span className="text-[10px] text-slate-300">mg/kg</span></span>
+            </div>
+            <div className="w-full bg-slate-50 h-1.5 rounded-full overflow-hidden">
+              <div className="bg-purple-500 h-full transition-all duration-1000 shadow-[0_0_8px_rgba(168,85,247,0.3)]" style={{ width: getProgress(stats.potassium) }}></div>
             </div>
           </div>
-          <div>
-            <p className="text-gray-500 text-xs font-bold uppercase tracking-wider">Humidité</p>
-            <p className="text-sm font-black mb-1">{stats.humidite} %</p>
-            <div className="w-full bg-gray-100 h-2 rounded-full overflow-hidden">
-              <div className="bg-[#2196F3] h-full transition-all duration-700" style={{ width: `${Math.min(stats.humidite, 100)}%` }}></div>
+
+          <div className="space-y-2">
+            <div className="flex justify-between items-end">
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Humidité</span>
+              <span className="text-xs font-black text-slate-700">{stats.humidite} <span className="text-[10px] text-slate-300">%</span></span>
+            </div>
+            <div className="w-full bg-slate-50 h-1.5 rounded-full overflow-hidden">
+              <div className="bg-sky-500 h-full transition-all duration-1000 shadow-[0_0_8px_rgba(14,165,233,0.3)]" style={{ width: `${Math.min(stats.humidite, 100)}%` }}></div>
             </div>
           </div>
         </div>
 
-        {/* Température et pH */}
-        <div className="grid grid-cols-2 gap-4 border-b border-gray-50 pb-4">
-          <div>
-            <p className="text-gray-400 text-xs font-bold uppercase">Température</p>
-            <p className="text-lg font-black text-gray-800">{stats.temperature}°C</p>
+        {/* Temperature & pH with Icons */}
+        <div className="flex gap-4 p-4 bg-slate-50/50 rounded-3xl border border-slate-100">
+          <div className="flex-1 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center text-rose-500">
+              <Thermometer className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-[9px] text-slate-400 font-black uppercase tracking-wider">Temp.</p>
+              <p className="text-sm font-black text-slate-800">{stats.temperature}°C</p>
+            </div>
           </div>
-          <div>
-            <p className="text-gray-400 text-xs font-bold uppercase">pH sol</p>
-            <p className="text-lg font-black text-gray-800">{stats.ph}</p>
+          <div className="w-px h-8 bg-slate-200 self-center"></div>
+          <div className="flex-1 flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-white shadow-sm flex items-center justify-center text-teal-500">
+              <FlaskConical className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-[9px] text-slate-400 font-black uppercase tracking-wider">pH Sol</p>
+              <p className="text-sm font-black text-slate-800">{stats.ph}</p>
+            </div>
           </div>
         </div>
 
-        {/* SECTION CORRIGÉE : Culture Prédite avec FOND VERT */}
-        <div className="bg-[#F1F8F4] p-4 rounded-2xl border border-green-100 flex items-center gap-4">
-          <div className="w-1.5 h-12 bg-[#22C55E] rounded-full"></div>
-          <div className="flex-grow text-center">
-            <p className="text-[10px] font-bold text-[#1A8D44] uppercase tracking-widest mb-1">
-              Culture prédite par l'IA
+        {/* Prediction Card */}
+        <div className="relative group/pred p-6 rounded-[32px] bg-emerald-50/50 border border-emerald-100 flex flex-col items-center text-center overflow-hidden">
+          <div className="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover/pred:scale-150 transition-all"></div>
+
+          <div className="relative z-10">
+            <p className="text-[10px] font-black text-[#1A4D2E] uppercase tracking-[0.2em] mb-2 opacity-60">
+              Prédit par Expert IA
             </p>
-            <p className="text-2xl font-black text-[#1A4D2E]">
-              {parcel.culturePredite || "Analyse..."}
+            <p className="text-3xl font-black text-[#1A4D2E] tracking-tight">
+              {parcel.culturePredite || "Maïs"}
             </p>
             {parcel.confiance && (
-              <p className="text-[10px] font-bold text-green-600/70 italic">
-                Confiance : {parcel.confiance}%
-              </p>
+              <div className="inline-flex items-center gap-1.5 mt-2 bg-emerald-500/10 px-2 py-0.5 rounded-full">
+                <Activity className="w-3 h-3 text-emerald-600" />
+                <span className="text-[10px] font-black text-emerald-600">
+                  {parcel.confiance}% Fiabilité
+                </span>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Section Capteurs utilisés */}
-        <div className="pt-2">
-          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">
-            Capteurs utilisés
-          </p>
-          <div className="flex flex-wrap gap-2">
+        {/* Hardware Footer */}
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-slate-100 rounded-lg text-slate-400">
+            <Cpu className="w-3.5 h-3.5" />
+          </div>
+          <div className="flex-grow flex flex-wrap gap-1.5">
             {parcel.capteursListe ? (
               parcel.capteursListe.split(',').map((capteur: string, idx: number) => (
                 <span
                   key={idx}
-                  className="bg-green-50 text-[#1A8D44] text-[10px] font-bold px-3 py-1.5 rounded-full border border-green-100 shadow-sm transition-hover hover:bg-green-100"
+                  className="text-[9px] font-black text-slate-500/70 border border-slate-200 px-2 py-0.5 rounded-md hover:border-emerald-200 hover:text-emerald-700 transition-all cursor-default"
                 >
                   {capteur.trim()}
                 </span>
               ))
             ) : (
-              <span className="text-xs font-medium text-gray-400 italic">
-                Aucun capteur actif
-              </span>
+              <span className="text-[9px] font-bold text-slate-300 italic">Aucun capteur lié</span>
             )}
           </div>
-        </div>
-        {/* Actions */}
-        <div className="flex justify-center gap-10 pt-4 border-t border-gray-50">
-          <button onClick={onEdit} className="text-sm font-bold text-blue-600 hover:text-blue-800 transition-colors">Modifier</button>
-          <button onClick={onDelete} className="text-sm font-bold text-red-500 hover:text-red-700 transition-colors">Supprimer</button>
         </div>
       </div>
     </div>

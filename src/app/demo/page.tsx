@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useTranslation } from '@/providers/TranslationProvider';
 import Footer from '@/components/layout/Footer';
 import { ArrowLeft, Play, Pause, SkipBack, SkipForward, Maximize2, Settings, Download, Share2, BarChart3, Cpu, Leaf, Zap, Target, Shield, Clock, Users, CheckCircle, ChevronRight, Globe, ChevronDown, Radio, Brain, Cloud, WifiIcon, FileText, Smartphone, Database, ArrowRight, ChevronUp } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 export default function DemoPage() {
     const { t, isLoading } = useTranslation();
@@ -29,33 +29,33 @@ export default function DemoPage() {
             icon: <BarChart3 className="w-6 h-6" />,
             title: "Tableau de Bord Intuitif",
             description: "Visualisez toutes vos données en temps réel sur une interface unique.",
-            color: "from-[#22C55E] to-[#16A34A]",
-            bgColor: "bg-white/95",
-            borderColor: "border-[#22C55E]/20"
+            color: "from-emerald-400 to-emerald-600",
+            bgColor: "bg-white/60",
+            borderColor: "border-emerald-200/50"
         },
         {
             icon: <Cpu className="w-6 h-6" />,
             title: "Contrôle IoT",
             description: "Gérez vos capteurs et équipements à distance en un clic.",
-            color: "from-[#84CC16] to-[#65A30D]",
-            bgColor: "bg-[#F0FDF4]/95",
-            borderColor: "border-[#84CC16]/20"
+            color: "from-lime-400 to-lime-600",
+            bgColor: "bg-white/40",
+            borderColor: "border-lime-200/50"
         },
         {
             icon: <Brain className="w-6 h-6" />,
             title: "Analyse IA",
             description: "Recevez des recommandations personnalisées pour vos cultures.",
-            color: "from-[#10B981] to-[#059669]",
-            bgColor: "bg-white/95",
-            borderColor: "border-[#10B981]/20"
+            color: "from-teal-400 to-teal-600",
+            bgColor: "bg-white/60",
+            borderColor: "border-teal-200/50"
         },
         {
             icon: <Zap className="w-6 h-6" />,
             title: "Alertes Intelligentes",
             description: "Soyez averti des anomalies et des actions nécessaires.",
-            color: "from-[#CA8A04] to-[#A16207]",
-            bgColor: "bg-[#FEFCE8]/95",
-            borderColor: "border-[#CA8A04]/20"
+            color: "from-amber-400 to-amber-600",
+            bgColor: "bg-white/40",
+            borderColor: "border-amber-200/50"
         }
     ];
 
@@ -73,29 +73,29 @@ export default function DemoPage() {
             title: "Collecte des Données",
             description: "Les capteurs IoT mesurent en temps réel les paramètres du sol",
             icon: <Radio className="w-6 h-6" />,
-            bgColor: "bg-white/95",
-            borderColor: "border-[#22C55E]/20"
+            bgColor: "bg-white/80",
+            borderColor: "border-emerald-100"
         },
         {
             title: "Analyse IA",
             description: "Le modèle Random Forest analyse les données collectées",
             icon: <Brain className="w-6 h-6" />,
-            bgColor: "bg-[#F0FDF4]/95",
-            borderColor: "border-[#16A34A]/20"
+            bgColor: "bg-emerald-50/50",
+            borderColor: "border-emerald-200"
         },
         {
             title: "Recommandations",
             description: "Génération de recommandations personnalisées",
             icon: <FileText className="w-6 h-6" />,
-            bgColor: "bg-white/95",
-            borderColor: "border-[#84CC16]/20"
+            bgColor: "bg-white/80",
+            borderColor: "border-emerald-100"
         },
         {
             title: "Visualisation",
             description: "Accès aux résultats sur le dashboard intuitif",
             icon: <Smartphone className="w-6 h-6" />,
-            bgColor: "bg-[#F0FDF4]/95",
-            borderColor: "border-[#10B981]/20"
+            bgColor: "bg-emerald-50/50",
+            borderColor: "border-emerald-200"
         }
     ];
 
@@ -168,362 +168,330 @@ export default function DemoPage() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col relative overflow-hidden">
-            {/* Background decorative elements */}
+        <div className="min-h-screen flex flex-col relative overflow-hidden bg-white">
+            {/* Background elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-[#22C55E]/5 rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#16A34A]/5 rounded-full blur-3xl"></div>
+                <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-emerald-50 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 opacity-60"></div>
+                <div className="absolute bottom-0 left-0 w-[600px] h-[600px] bg-lime-50 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 opacity-60"></div>
             </div>
 
-            <main className="flex-grow relative z-10">
-                {/* SECTION 1: HERO - Vert foncé avec blanc */}
-                <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-[#052E16] via-[#14532D] to-[#166534]">
-                    <div className="absolute inset-0">
-                        <img
-                            src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?q=80&w=2832&auto=format&fit=crop&crop=focalpoint&fp-y=.35"
-                            alt="Tableau de bord agricole"
-                            className="w-full h-full object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-br from-[#052E16]/95 via-[#14532D]/90 to-[#166534]/85"></div>
+            {/* Logo Smart Agro */}
+            <div className="absolute top-4 sm:top-6 left-3 sm:left-6 z-50">
+                <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
+                    <div className="w-8 h-8 sm:w-12 sm:h-12 bg-[#052E16] rounded-xl flex items-center justify-center border border-white/10 group-hover:bg-[#1A4D2E] transition-all duration-300">
+                        <Leaf className="w-4 h-4 sm:w-6 sm:h-6 text-emerald-400" />
                     </div>
+                    <span className="text-[#052E16] text-sm sm:text-2xl font-black tracking-tighter">
+                        Smart Agro
+                    </span>
+                </Link>
+            </div>
 
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#052E16]/90 via-transparent to-transparent"></div>
+            {/* Language Toggle */}
+            <div className="absolute top-4 sm:top-6 right-3 sm:right-6 z-50">
+                <div className="relative">
+                    <button
+                        onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+                        className="bg-white/80 backdrop-blur-xl rounded-full p-2 sm:p-3 shadow-sm border border-emerald-100 hover:shadow-md transition-all duration-300 flex items-center gap-2 group"
+                    >
+                        <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-[#052E16] group-hover:text-emerald-600 transition-colors" />
+                        <span className="text-xs sm:text-sm font-black text-[#052E16] whitespace-nowrap hidden xs:inline">
+                            {currentLanguage?.flag} {currentLanguage?.name}
+                        </span>
+                        <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 text-emerald-600/50 transition-transform duration-300 ${showLanguageDropdown ? 'rotate-180' : ''}`} />
+                    </button>
 
-                    {/* Floating elements */}
-                    <div className="absolute top-1/4 left-10 w-4 h-4 bg-[#22C55E] rounded-full animate-pulse"></div>
-                    <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-[#22C55E] rounded-full animate-pulse delay-300"></div>
-                    <div className="absolute bottom-1/4 right-20 w-2 h-2 bg-[#22C55E] rounded-full animate-pulse delay-700"></div>
-
-                    {/* Logo Smart Agro */}
-                    <div className="absolute top-4 sm:top-6 left-3 sm:left-6 z-50 max-w-[50%]">
-                        <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
-                            <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-all duration-300 flex-shrink-0">
-                                <Leaf className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
+                    {showLanguageDropdown && (
+                        <div className="absolute top-full right-0 mt-2 w-48 bg-white/95 backdrop-blur-2xl rounded-2xl shadow-2xl border border-emerald-50 overflow-hidden animate-fadeIn z-50">
+                            <div className="p-2">
+                                {languages.map((lang) => (
+                                    <button
+                                        key={lang.code}
+                                        onClick={() => {
+                                            setLanguage(lang.code);
+                                            setShowLanguageDropdown(false);
+                                        }}
+                                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-50 transition-all duration-200 ${language === lang.code ? 'bg-emerald-50' : ''}`}
+                                    >
+                                        <span className="text-lg">{lang.flag}</span>
+                                        <span className={`text-sm font-bold ${language === lang.code ? 'text-emerald-700' : 'text-gray-700'}`}>
+                                            {lang.name}
+                                        </span>
+                                        {language === lang.code && <div className="ml-auto w-1.5 h-1.5 bg-emerald-500 rounded-full" />}
+                                    </button>
+                                ))}
                             </div>
-                            <div className="flex flex-col overflow-hidden">
-                                <span className="text-white text-sm sm:text-xl font-bold tracking-tight whitespace-nowrap truncate">
-                                    Smart Agro
-                                </span>
-                            </div>
-                        </Link>
-                    </div>
+                        </div>
+                    )}
+                </div>
+            </div>
 
-                    {/* Language Toggle */}
-                    <div className="absolute top-4 sm:top-6 right-3 sm:right-6 z-50">
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-                                className="bg-white/10 backdrop-blur-sm rounded-full p-2 sm:p-3 shadow-lg border border-white/20 hover:shadow-xl hover:border-white/30 transition-all duration-300 flex items-center gap-1 sm:gap-2 group"
-                            >
-                                <div className="flex items-center gap-1 sm:gap-2">
-                                    <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-white group-hover:text-[#b2f2bb] transition-colors" />
-                                    <span className="text-xs sm:text-sm font-semibold text-white group-hover:text-[#b2f2bb] transition-colors whitespace-nowrap">
-                                        {currentLanguage?.flag} <span className="hidden xs:inline">{currentLanguage?.name}</span>
-                                    </span>
+            <main className="flex-grow pt-32">
+                {/* Hero Section Refined */}
+                <section className="relative px-6 pb-20 overflow-hidden">
+                    <div className="max-w-7xl mx-auto">
+                        <div className="grid lg:grid-cols-2 gap-20 items-center">
+                            <div className="relative z-10 text-left">
+                                <div className="inline-flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full mb-8 border border-emerald-100">
+                                    <div className="w-2 h-2 bg-emerald-500 rounded-full animate-ping"></div>
+                                    <span className="text-emerald-800 text-[10px] font-black uppercase tracking-[0.2em]">Expérience Live</span>
                                 </div>
-                                <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 text-white/70 group-hover:text-[#b2f2bb] transition-all duration-300 ${showLanguageDropdown ? 'rotate-180' : ''}`} />
-                            </button>
 
-                            {showLanguageDropdown && (
-                                <div className="absolute top-full right-0 mt-2 w-40 sm:w-48 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-fadeIn">
-                                    <div className="py-2">
-                                        {languages.map((lang) => (
-                                            <button
-                                                key={lang.code}
-                                                onClick={() => {
-                                                    setLanguage(lang.code);
-                                                    setShowLanguageDropdown(false);
-                                                }}
-                                                className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 hover:bg-[#F0FDF4] transition-all duration-200 ${language === lang.code ? 'bg-[#F0FDF4]' : ''}`}
-                                            >
-                                                <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-gray-700 flex-shrink-0" />
-                                                <span className={`text-sm sm:text-base font-medium ${language === lang.code ? 'text-[#22C55E]' : 'text-gray-700'} flex-shrink-0`}>
-                                                    {lang.flag} {lang.name}
-                                                </span>
-                                                {language === lang.code && (
-                                                    <div className="ml-auto w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full flex-shrink-0"></div>
-                                                )}
-                                            </button>
-                                        ))}
+                                <h1 className="text-6xl sm:text-8xl font-black text-[#052E16] mb-8 leading-[0.9] tracking-tighter">
+                                    La Data au<br />
+                                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-emerald-500 to-lime-500">
+                                        Cœur de la Terre.
+                                    </span>
+                                </h1>
+
+                                <p className="text-xl text-emerald-900/70 font-medium max-w-xl mb-12 leading-relaxed">
+                                    Découvrez comment nous fusionnons l'agronomie et le numérique pour transformer chaque parcelle en un écosystème intelligent hautement productif.
+                                </p>
+
+                                <div className="flex flex-col sm:flex-row gap-6">
+                                    <button
+                                        onClick={scrollToDemo}
+                                        className="group relative px-10 py-5 bg-[#052E16] text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_-15px_rgba(5,46,22,0.3)]"
+                                    >
+                                        <span className="relative z-10 flex items-center justify-center gap-3">
+                                            <Play className="w-4 h-4 fill-current" />
+                                            Démarrer le voyage
+                                        </span>
+                                        <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-lime-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                                    </button>
+
+                                    <Link
+                                        href="/register"
+                                        className="px-10 py-5 bg-white border-2 border-emerald-100 text-[#052E16] rounded-[24px] font-black uppercase tracking-widest text-[10px] transition-all hover:border-emerald-500 hover:bg-emerald-50 flex items-center justify-center gap-3"
+                                    >
+                                        Créer un compte
+                                        <ArrowRight className="w-4 h-4" />
+                                    </Link>
+                                </div>
+                            </div>
+
+                            <div className="relative group">
+                                <div className="absolute -inset-10 bg-emerald-100/50 rounded-full blur-[80px] group-hover:bg-emerald-200/50 transition-colors duration-1000"></div>
+                                <div className="relative bg-white p-4 rounded-[48px] shadow-[0_48px_80px_-20px_rgba(0,0,0,0.1)] border border-emerald-50">
+                                    <div className="aspect-[4/5] rounded-[36px] overflow-hidden relative">
+                                        <img
+                                            src="/handful-soil-being-sprinkled-agricultural-land.jpg"
+                                            alt="Soil sprinkling"
+                                            className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-1000"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/60 via-transparent to-transparent"></div>
+                                        <div className="absolute bottom-8 left-8 right-8 p-6 bg-white/20 backdrop-blur-2xl rounded-3xl border border-white/30">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-lg">
+                                                    <BarChart3 className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <p className="text-white text-[10px] font-black uppercase tracking-widest opacity-80">Rendement estimé</p>
+                                                    <p className="text-white text-2xl font-black">+42.5%</p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            )}
+                            </div>
                         </div>
                     </div>
-
-                    {/* Fermer le dropdown en cliquant ailleurs */}
-                    {showLanguageDropdown && (
-                        <div
-                            className="fixed inset-0 z-40"
-                            onClick={() => setShowLanguageDropdown(false)}
-                        />
-                    )}
-
-                    <div className="relative z-10 text-center px-4 sm:px-6 w-full">
-                        <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 sm:px-6 sm:py-3 border border-white/20 mb-6">
-                            <div className="w-2 h-2 sm:w-3 sm:h-3 bg-[#22C55E] rounded-full animate-pulse"></div>
-                            <span className="text-white/90 text-sm sm:text-base font-medium">DÉMO INTERACTIVE</span>
-                        </div>
-
-                        <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white mb-6 md:mb-8 leading-tight tracking-tight">
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-[#b2f2bb] to-[#22C55E]">
-                                Découvrez Smart Agro en Action
-                            </span>
-                        </h1>
-
-                        <p className="text-lg sm:text-xl md:text-2xl text-white/90 font-light max-w-3xl mx-auto mb-8 px-4">
-                            Explorez notre plateforme d'agriculture intelligente à travers cette démo interactive
-                        </p>
-
-                        <Link
-                            href="/"
-                            className="inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4 bg-white/10 backdrop-blur-sm border border-white/30 hover:border-white/50 text-white rounded-xl sm:rounded-2xl font-medium hover:bg-white/15 transition-all duration-300 group"
-                        >
-                            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
-                            <span>Retour à la page d'accueil</span>
-                        </Link>
-                    </div>
-
-                    <button
-                        onClick={scrollToDemo}
-                        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce cursor-pointer z-20"
-                    >
-                        <div className="w-8 h-12 border-2 border-white/60 rounded-full flex justify-center hover:border-white/80 transition-colors">
-                            <div className="w-1.5 h-4 bg-white/90 rounded-full mt-3"></div>
-                        </div>
-                    </button>
                 </section>
 
-                {/* SECTION 2: DÉMO VIDÉO - Blanc dominant avec touches vertes */}
-                <section ref={demoRef} className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-[#FAFAFA] to-[#F5F5F5]">
-                    <div className="container mx-auto px-4 sm:px-6">
-                        <div className="max-w-6xl mx-auto">
-                            <div className="text-center mb-12 sm:mb-16">
-                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#052E16] mb-4 sm:mb-6">
-                                    Démonstration Interactive
-                                </h2>
-                                <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto">
-                                    Regardez comment notre plateforme transforme la gestion de votre exploitation agricole
-                                </p>
-                            </div>
+                {/* Video Demo Overhaul */}
+                <section ref={demoRef} className="py-24 bg-[#052E16] relative overflow-hidden">
+                    <div className="absolute inset-0 opacity-10">
+                        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,#22C55E_0%,transparent_70%)]"></div>
+                    </div>
 
-                            <div className="relative bg-white rounded-3xl overflow-hidden shadow-2xl mb-12 sm:mb-16 border border-gray-100">
-                                <div
-                                    ref={videoRef as any}
-                                    className="relative aspect-video bg-gradient-to-br from-[#052E16] to-[#1A4D2E] flex items-center justify-center"
-                                >
-                                    <div className="absolute inset-0">
-                                        <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-[#22C55E]/20 to-[#16A34A]/20 backdrop-blur-sm border-b border-white/10 p-4">
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-lg flex items-center justify-center">
-                                                        <Leaf className="w-4 h-4 text-white" />
-                                                    </div>
-                                                    <span className="text-white font-bold">Smart Agro Dashboard</span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <div className="w-2 h-2 bg-[#22C55E] rounded-full animate-pulse"></div>
-                                                    <span className="text-white/80 text-sm">EN TEMPS RÉEL</span>
-                                                </div>
+                    <div className="max-w-7xl mx-auto px-6 relative z-10">
+                        <div className="text-center mb-20">
+                            <span className="text-emerald-400 font-black text-xs uppercase tracking-[0.4em] mb-4 block">Interactive Demo</span>
+                            <h2 className="text-5xl sm:text-7xl font-black text-white leading-[0.9] tracking-tighter mb-8">
+                                Redéfinir l'Expérience Agricole.
+                            </h2>
+                        </div>
+
+                        <div className="relative group max-w-5xl mx-auto mb-24">
+                            <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 to-lime-500 rounded-[52px] blur opacity-25 group-hover:opacity-40 transition duration-1000"></div>
+                            <div className="relative bg-black rounded-[48px] overflow-hidden shadow-2xl border border-white/5 aspect-video flex flex-col">
+                                {/* Custom Video Header */}
+                                <div className="p-6 bg-black/40 backdrop-blur-xl border-b border-white/10 flex items-center justify-between z-20">
+                                    <div className="flex items-center gap-4">
+                                        <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center shadow-lg">
+                                            <Leaf className="w-6 h-6 text-white" />
+                                        </div>
+                                        <div>
+                                            <h3 className="text-white font-black text-sm uppercase tracking-wider">Dashboard Smart Agro</h3>
+                                            <p className="text-emerald-400 text-[10px] font-bold">● LIVE SIMULATION</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3">
+                                        <button className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-white transition-all">
+                                            <Settings className="w-5 h-5" />
+                                        </button>
+                                        <button onClick={handleFullscreen} className="p-3 bg-white/5 hover:bg-white/10 rounded-xl text-white transition-all">
+                                            <Maximize2 className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Main Video Content (Simulated) */}
+                                <div className="flex-grow flex items-center justify-center relative overflow-hidden bg-[url('/fond.jpg')] bg-cover bg-center">
+                                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
+
+                                    <div className="text-center z-10 transition-all duration-700" style={{ transform: isPlaying ? 'scale(0.8) translateY(-20px)' : 'scale(1) translateY(0)' }}>
+                                        <button
+                                            onClick={handlePlayPause}
+                                            className="w-24 h-24 bg-white/10 backdrop-blur-3xl border border-white/20 rounded-full flex items-center justify-center group/play hover:bg-white/20 active:scale-90 transition-all shadow-2xl"
+                                        >
+                                            <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl group-hover/play:scale-110 transition-transform">
+                                                {isPlaying ? <Pause className="w-8 h-8 text-[#052E16] fill-current" /> : <Play className="w-8 h-8 text-[#052E16] fill-current ml-1" />}
                                             </div>
-                                        </div>
-
-                                        <div className="absolute inset-0 top-16 flex items-center justify-center">
-                                            <div className="text-center">
-                                                <div className="relative inline-block">
-                                                    <div className="w-24 h-24 sm:w-32 sm:h-32 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl">
-                                                        <Play className="w-12 h-12 sm:w-16 sm:h-16 text-white" />
-                                                    </div>
-                                                    <div className="absolute -top-2 -right-2 w-8 h-8 bg-gradient-to-br from-[#84CC16] to-[#65A30D] rounded-full flex items-center justify-center">
-                                                        <div className="w-4 h-4 bg-white rounded-full"></div>
-                                                    </div>
-                                                </div>
-                                                <h3 className="text-white text-2xl sm:text-3xl font-bold mb-3">Smart Agro Platform</h3>
-                                                <p className="text-white/70 text-lg">Démo interactive en cours de chargement...</p>
-                                            </div>
-                                        </div>
-
-                                        <div className="absolute bottom-4 left-4 right-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                            {demoFeatures.map((feature, idx) => (
-                                                <div
-                                                    key={idx}
-                                                    className={`bg-white/95 backdrop-blur-sm rounded-xl p-3 border ${feature.borderColor} transition-all duration-300 ${activeFeature === idx ? 'scale-105 shadow-lg' : 'opacity-90'}`}
-                                                >
-                                                    <div className="flex items-center gap-2">
-                                                        <div className={`w-8 h-8 bg-gradient-to-br ${feature.color} rounded-lg flex items-center justify-center`}>
-                                                            {feature.icon}
-                                                        </div>
-                                                        <span className="text-gray-800 text-sm font-medium truncate">{feature.title}</span>
-                                                    </div>
-                                                </div>
-                                            ))}
-                                        </div>
+                                        </button>
+                                        <h3 className="text-white text-3xl font-black mt-8 tracking-tighter">Visionnez le Futur</h3>
+                                        <p className="text-white/60 font-medium">180 secondes pour tout changer</p>
                                     </div>
 
-                                    <div className="absolute top-4 left-4">
-                                        <div className="bg-black/50 backdrop-blur-sm rounded-xl px-4 py-2 border border-white/10">
-                                            <span className="text-white text-sm font-semibold">DÉMO EN DIRECT</span>
+                                    {/* Real-time floating badges when playing */}
+                                    <div className={`absolute bottom-28 left-8 space-y-3 transition-all duration-1000 ${isPlaying ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-10'}`}>
+                                        <div className="bg-white/10 backdrop-blur-xl border border-white/20 px-4 py-2 rounded-2xl flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+                                            <span className="text-white text-[10px] font-black tracking-widest">N-P-K: OPTIMAL</span>
+                                        </div>
+                                        <div className="bg-white/10 backdrop-blur-xl border border-white/20 px-4 py-2 rounded-2xl flex items-center gap-3">
+                                            <div className="w-2 h-2 bg-lime-400 rounded-full animate-pulse"></div>
+                                            <span className="text-white text-[10px] font-black tracking-widest">PH: 6.8 (STABLE)</span>
                                         </div>
                                     </div>
+                                </div>
 
-                                    <div className="absolute top-4 right-4">
-                                        <div className="flex gap-2">
-                                            <button className="bg-black/50 backdrop-blur-sm rounded-xl p-3 hover:bg-black/70 transition-colors border border-white/10">
-                                                <Settings className="w-5 h-5 text-white" />
-                                            </button>
-                                            <button
-                                                onClick={handleFullscreen}
-                                                className="bg-black/50 backdrop-blur-sm rounded-xl p-3 hover:bg-black/70 transition-colors border border-white/10"
-                                            >
-                                                <Maximize2 className="w-5 h-5 text-white" />
-                                            </button>
-                                        </div>
-                                    </div>
-
-                                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6">
-                                        <div className="mb-3">
+                                {/* Custom Video Controls */}
+                                <div className="p-8 bg-black/60 backdrop-blur-3xl border-t border-white/10 z-20">
+                                    <div className="flex flex-col gap-6">
+                                        <div className="relative group/range">
                                             <input
                                                 type="range"
                                                 min="0"
                                                 max="100"
                                                 value={currentTime}
                                                 onChange={handleSeek}
-                                                className="w-full h-2 bg-white/20 rounded-full appearance-none [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-[#22C55E] [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg"
+                                                className="w-full h-1.5 bg-white/10 rounded-full appearance-none cursor-pointer outline-none overflow-hidden"
+                                                style={{
+                                                    background: `linear-gradient(to right, #10b981 ${currentTime}%, rgba(255,255,255,0.1) ${currentTime}%)`
+                                                }}
                                             />
+                                            <div className="absolute -top-8 bg-emerald-500 text-white text-[10px] font-black px-2 py-1 rounded opacity-0 group-hover/range:opacity-100 transition-opacity" style={{ left: `${currentTime}%`, transform: 'translateX(-50%)' }}>
+                                                {formatTime(currentTime)}
+                                            </div>
                                         </div>
 
                                         <div className="flex items-center justify-between">
-                                            <div className="flex items-center gap-4">
-                                                <button
-                                                    onClick={handlePlayPause}
-                                                    className="bg-gradient-to-br from-[#22C55E] to-[#16A34A] hover:from-[#16A34A] hover:to-[#15803D] text-white rounded-full p-4 shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1"
-                                                >
-                                                    {isPlaying ? (
-                                                        <Pause className="w-6 h-6" />
-                                                    ) : (
-                                                        <Play className="w-6 h-6" />
-                                                    )}
+                                            <div className="flex items-center gap-8">
+                                                <button onClick={handlePlayPause} className="text-white hover:text-emerald-400 transition-colors transform active:scale-95">
+                                                    {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8 ml-1" />}
                                                 </button>
-
-                                                <div className="hidden sm:flex items-center gap-3">
-                                                    <button className="text-white/70 hover:text-white transition-colors hover:bg-white/10 p-2 rounded-lg">
-                                                        <SkipBack className="w-5 h-5" />
-                                                    </button>
-                                                    <button className="text-white/70 hover:text-white transition-colors hover:bg-white/10 p-2 rounded-lg">
-                                                        <SkipForward className="w-5 h-5" />
-                                                    </button>
+                                                <div className="flex items-center gap-4">
+                                                    <button className="text-white/40 hover:text-white transition-colors"><SkipBack className="w-5 h-5" /></button>
+                                                    <button className="text-white/40 hover:text-white transition-colors"><SkipForward className="w-5 h-5" /></button>
                                                 </div>
-
-                                                <div className="text-white text-lg font-medium">
-                                                    {formatTime(currentTime)} / 3:00
-                                                </div>
+                                                <span className="text-white/80 font-black text-xs tracking-widest">
+                                                    {formatTime(currentTime)} / 03:00
+                                                </span>
                                             </div>
-
-                                            <div className="flex items-center gap-3">
-                                                <button className="text-white/70 hover:text-white transition-colors hover:bg-white/10 p-3 rounded-xl hidden sm:block">
-                                                    <Download className="w-5 h-5" />
+                                            <div className="flex items-center gap-6">
+                                                <button className="group flex items-center gap-2 text-white/40 hover:text-white transition-colors">
+                                                    <Download className="w-5 h-5 group-hover:-translate-y-1 transition-transform" />
+                                                    <span className="text-[10px] font-black">RESOURCES (.PDF)</span>
                                                 </button>
-                                                <button className="text-white/70 hover:text-white transition-colors hover:bg-white/10 p-3 rounded-xl">
-                                                    <Share2 className="w-5 h-5" />
+                                                <button className="p-3 bg-emerald-500 text-white rounded-xl shadow-lg hover:shadow-emerald-500/50 hover:bg-emerald-400 transition-all flex items-center gap-2">
+                                                    <Share2 className="w-4 h-4" />
+                                                    <span className="text-[10px] font-black">PARTAGER</span>
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                        </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                                {demoFeatures.map((feature, index) => (
-                                    <div
-                                        key={index}
-                                        className={`group ${feature.bgColor} backdrop-blur-sm p-8 rounded-3xl border-2 ${feature.borderColor} shadow-xl hover:shadow-2xl transition-all duration-500 hover:-translate-y-2`}
-                                    >
-                                        <div className="flex items-start gap-6">
-                                            <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center text-white flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
-                                                {feature.icon}
-                                            </div>
-                                            <div>
-                                                <h3 className="font-bold text-[#052E16] text-xl mb-3">{feature.title}</h3>
-                                                <p className="text-gray-600 text-lg">{feature.description}</p>
-                                            </div>
-                                        </div>
+                        {/* Feature Cards Glassmorphism */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                            {demoFeatures.map((feature, idx) => (
+                                <div
+                                    key={idx}
+                                    className={`group relative ${feature.bgColor} backdrop-blur-xl p-8 rounded-[40px] border border-white/10 transition-all duration-500 hover:-translate-y-4 hover:shadow-2xl overflow-hidden`}
+                                >
+                                    <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${feature.color} opacity-10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700`}></div>
+
+                                    <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center text-white mb-8 shadow-xl group-hover:rotate-6 transition-all`}>
+                                        {feature.icon}
                                     </div>
-                                ))}
-                            </div>
 
-                            <div className="bg-gradient-to-r from-white to-[#F0FDF4] rounded-3xl p-8 border-2 border-[#22C55E]/20 backdrop-blur-sm mb-12">
-                                <h3 className="text-2xl font-bold text-[#052E16] mb-8 text-center">
-                                    Comment ça marche ?
-                                </h3>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                                    {demoSteps.map((step, idx) => (
-                                        <div key={idx} className="relative">
-                                            <div className={`${step.bgColor} backdrop-blur-sm rounded-2xl p-6 border-2 ${step.borderColor} text-center`}>
-                                                <div className="w-12 h-12 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-xl flex items-center justify-center text-white mx-auto mb-4">
-                                                    {step.icon}
-                                                </div>
-                                                <h4 className="font-bold text-[#052E16] text-lg mb-2">{step.title}</h4>
-                                                <p className="text-gray-600">{step.description}</p>
+                                    <h3 className="text-white font-black text-xl mb-4 leading-tight group-hover:text-emerald-100 transition-colors">
+                                        {feature.title}
+                                    </h3>
+
+                                    <p className="text-white/50 text-sm font-medium leading-relaxed">
+                                        {feature.description}
+                                    </p>
+
+                                    <div className="mt-8 flex items-center gap-2 text-[10px] font-black text-emerald-400 tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <span>Détails</span>
+                                        <ArrowRight className="w-3 h-3" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* Benefits Section Refined */}
+                <section className="py-32 bg-slate-50 relative overflow-hidden">
+                    <div className="max-w-7xl mx-auto px-6">
+                        <div className="flex flex-col lg:flex-row gap-20">
+                            <div className="lg:w-1/2">
+                                <h2 className="text-5xl sm:text-7xl font-black text-[#052E16] leading-[0.9] tracking-tighter mb-12">
+                                    Une Croissance<br />Mesurable.
+                                </h2>
+                                <p className="text-emerald-900/60 text-xl font-medium mb-12">
+                                    Nous ne nous contentons pas de connecter vos champs. Nous augmentons leur intelligence naturelle.
+                                </p>
+
+                                <div className="space-y-6">
+                                    {benefits.map((benefit, idx) => (
+                                        <div key={idx} className="flex items-center gap-5 p-4 bg-white rounded-3xl border border-emerald-50 shadow-sm transition-all hover:translate-x-4">
+                                            <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg">
+                                                <CheckCircle className="w-5 h-5" />
                                             </div>
-                                            {idx < demoSteps.length - 1 && (
-                                                <div className="hidden lg:block absolute top-1/2 -right-3 transform -translate-y-1/2">
-                                                    <ChevronRight className="w-6 h-6 text-[#22C55E]/50" />
-                                                </div>
-                                            )}
+                                            <span className="text-[#052E16] font-bold text-lg">{benefit}</span>
                                         </div>
                                     ))}
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </section>
 
-                /* SECTION 3: AVANTAGES - Mixte Blanc et Vert */
-                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-[#F0FDF4] to-[#DCFCE7]">
-                    <div className="container mx-auto px-4 sm:px-6">
-                        <div className="max-w-6xl mx-auto">
-                            <div className="text-center mb-12 sm:mb-16">
-                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#052E16] mb-4 sm:mb-6">
-                                    Avantages Concrets
-                                </h2>
-                                <p className="text-lg sm:text-xl text-[#15803D] max-w-2xl mx-auto">
-                                    Découvrez comment Smart Agro peut transformer votre exploitation
-                                </p>
-                            </div>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-                                {benefits.map((benefit, index) => (
-                                    <div
-                                        key={index}
-                                        className="group bg-white/95 backdrop-blur-sm p-6 rounded-2xl border-2 border-[#22C55E]/20 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
-                                    >
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-6 h-6 bg-gradient-to-br from-[#22C55E] to-[#16A34A] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
-                                                <CheckCircle className="w-4 h-4 text-white" />
-                                            </div>
-                                            <p className="text-gray-800 font-medium text-lg">{benefit}</p>
+                            <div className="lg:w-1/2 relative">
+                                <div className="grid grid-cols-2 gap-8 h-full">
+                                    <div className="space-y-8 mt-12">
+                                        <div className="bg-emerald-600 p-10 rounded-[48px] text-white shadow-2xl relative overflow-hidden group">
+                                            <div className="absolute top-0 right-0 p-8 opacity-20"><BarChart3 className="w-20 h-20" /></div>
+                                            <p className="text-4xl font-black mb-2 tracking-tighter">40%</p>
+                                            <p className="text-emerald-100 text-xs font-black uppercase tracking-widest">Gain Rendement</p>
+                                        </div>
+                                        <div className="bg-white p-10 rounded-[48px] text-[#052E16] border border-emerald-100 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)] group">
+                                            <p className="text-4xl font-black mb-2 tracking-tighter text-emerald-600">30%</p>
+                                            <p className="text-gray-400 text-xs font-black uppercase tracking-widest">Économie Eau</p>
                                         </div>
                                     </div>
-                                ))}
-                            </div>
-
-                            {/* Statistiques supplémentaires avec style vert-blanc */}
-                            <div className="bg-gradient-to-r from-white to-[#F0FDF4] rounded-3xl p-8 border-2 border-[#22C55E]/20 shadow-lg">
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                                    <div className="text-center">
-                                        <div className="text-4xl font-black text-[#22C55E] mb-2">40%</div>
-                                        <div className="text-gray-700 font-medium">Augmentation de rendement</div>
-                                        <div className="mt-2 w-16 h-1 bg-gradient-to-r from-[#22C55E] to-[#84CC16] mx-auto rounded-full"></div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-4xl font-black text-[#16A34A] mb-2">30%</div>
-                                        <div className="text-gray-700 font-medium">Économie d'eau</div>
-                                        <div className="mt-2 w-16 h-1 bg-gradient-to-r from-[#16A34A] to-[#22C55E] mx-auto rounded-full"></div>
-                                    </div>
-                                    <div className="text-center">
-                                        <div className="text-4xl font-black text-[#84CC16] mb-2">99.8%</div>
-                                        <div className="text-gray-700 font-medium">Précision des prédictions</div>
-                                        <div className="mt-2 w-16 h-1 bg-gradient-to-r from-[#84CC16] to-[#16A34A] mx-auto rounded-full"></div>
+                                    <div className="space-y-8">
+                                        <div className="bg-[#F0FDF4] p-10 rounded-[48px] text-[#052E16] border border-emerald-200 shadow-xl group">
+                                            <p className="text-4xl font-black mb-2 tracking-tighter text-lime-600">24/7</p>
+                                            <p className="text-gray-400 text-xs font-black uppercase tracking-widest">Surveillance</p>
+                                        </div>
+                                        <div className="bg-emerald-900 p-10 rounded-[48px] text-white shadow-2xl group">
+                                            <p className="text-4xl font-black mb-2 tracking-tighter text-emerald-400">99.8%</p>
+                                            <p className="text-emerald-100/50 text-xs font-black uppercase tracking-widest">Précision IA</p>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -531,70 +499,72 @@ export default function DemoPage() {
                     </div>
                 </section>
 
-                {/* SECTION 4: FAQ - Blanc glacier avec vert émeraude */}
-                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white via-[#ECFDF5] to-[#D1FAE5]">
-                    <div className="container mx-auto px-4 sm:px-6">
-                        <div className="max-w-4xl mx-auto">
-                            <div className="text-center mb-12 sm:mb-16">
-                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#065F46] mb-4 sm:mb-6">
-                                    Questions Fréquentes
-                                </h2>
-                                <p className="text-lg sm:text-xl text-[#047857] max-w-2xl mx-auto">
-                                    Tout ce que vous devez savoir sur notre démo et notre plateforme
-                                </p>
-                            </div>
+                {/* FAQ Section Premium */}
+                <section className="py-32 bg-white relative">
+                    <div className="max-w-4xl mx-auto px-6">
+                        <div className="text-center mb-20">
+                            <span className="text-emerald-600 font-black text-xs uppercase tracking-[0.4em] mb-4 block">Knowledge Center</span>
+                            <h2 className="text-5xl font-black text-[#052E16] tracking-tighter mb-4">Questions Fréquentes</h2>
+                        </div>
 
-                            <div className="space-y-6">
-                                {[
-                                    {
-                                        question: "Combien de temps dure l'essai gratuit ?",
-                                        answer: "L'essai gratuit dure 14 jours. Pendant cette période, vous avez accès à toutes les fonctionnalités de la plateforme sans aucune limitation."
-                                    },
-                                    {
-                                        question: "Ai-je besoin de matériel spécifique ?",
-                                        answer: "Notre solution est compatible avec la plupart des capteurs IoT standards du marché. Nous pouvons vous conseiller sur le matériel adapté à votre exploitation."
-                                    },
-                                    {
-                                        question: "Puis-je annuler à tout moment ?",
-                                        answer: "Oui, vous pouvez annuler votre abonnement à tout moment. Aucun engagement à long terme n'est requis."
-                                    }
-                                ].map((faq, idx) => (
-                                    <div
-                                        key={idx}
-                                        className="bg-white/95 backdrop-blur-sm rounded-3xl p-8 border-2 border-[#10B981]/20 shadow-lg hover:shadow-xl transition-all duration-300"
-                                    >
-                                        <h3 className="font-bold text-[#065F46] text-xl mb-4">{faq.question}</h3>
-                                        <p className="text-[#047857] text-lg leading-relaxed">{faq.answer}</p>
+                        <div className="grid gap-6">
+                            {[
+                                {
+                                    q: "Combien de temps dure l'essai gratuit ?",
+                                    a: "L'essai gratuit dure 14 jours. Pendant cette période, vous avez accès à toutes les fonctionnalités de la plateforme sans aucune limitation.",
+                                    icon: <Clock className="w-6 h-6" />
+                                },
+                                {
+                                    q: "Ai-je besoin de matériel spécifique ?",
+                                    a: "Notre solution est compatible avec la plupart des capteurs IoT standards. Nous préconisons la gamme LoRaWAN pour une portée maximale.",
+                                    icon: <Cpu className="w-6 h-6" />
+                                },
+                                {
+                                    q: "Puis-je annuler à tout moment ?",
+                                    a: "Absolument. Nos offres sont sans engagement. Vous gérez votre abonnement en toute autonomie depuis votre espace client.",
+                                    icon: <Shield className="w-6 h-6" />
+                                }
+                            ].map((item, idx) => (
+                                <div key={idx} className="group bg-slate-50 rounded-[40px] p-10 border border-slate-100 transition-all hover:bg-white hover:shadow-2xl hover:border-emerald-100">
+                                    <div className="flex gap-8">
+                                        <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-emerald-600 shadow-sm group-hover:bg-emerald-500 group-hover:text-white transition-all">
+                                            {item.icon}
+                                        </div>
+                                        <div>
+                                            <h3 className="text-2xl font-black text-[#052E16] mb-4 tracking-tight">{item.q}</h3>
+                                            <p className="text-gray-500 font-medium leading-relaxed">{item.a}</p>
+                                        </div>
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
                         </div>
                     </div>
                 </section>
             </main>
 
             <style jsx>{`
-                @keyframes blob {
-                    0% { transform: translate(0px, 0px) scale(1); }
-                    33% { transform: translate(30px, -50px) scale(1.1); }
-                    66% { transform: translate(-20px, 20px) scale(0.9); }
-                    100% { transform: translate(0px, 0px) scale(1); }
-                }
                 @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(-10px); }
+                    from { opacity: 0; transform: translateY(20px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
-                .animate-blob {
-                    animation: blob 7s infinite;
-                }
                 .animate-fadeIn {
-                    animation: fadeIn 0.2s ease-out;
+                    animation: fadeIn 0.8s ease-out forwards;
                 }
-                .animation-delay-2000 {
-                    animation-delay: 2s;
+                input[type=range]::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 20px;
+                    height: 20px;
+                    background: #ffffff;
+                    border: 4px solid #10b981;
+                    border-radius: 50%;
+                    cursor: pointer;
+                    box-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
+                    transition: all 0.2s;
                 }
-                .animation-delay-4000 {
-                    animation-delay: 4s;
+                input[type=range]::-webkit-slider-thumb:hover {
+                    transform: scale(1.2);
+                    box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
                 }
             `}</style>
         </div>

@@ -15,7 +15,7 @@ export default function DashboardLayout({
         const userStr = localStorage.getItem("smartagro_user");
         const token = localStorage.getItem("smartagro_token");
 
-        if (!userStr || !token) {
+        if (!userStr || userStr === "undefined" || !token) {
             router.push("/login");
         } else {
             setIsAuthorized(true);

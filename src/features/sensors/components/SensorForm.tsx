@@ -1,8 +1,8 @@
 "use client";
 import { useState, useEffect } from "react";
-import { CapteursService } from "@/lib/services/CapteursService";
-import { ParcellesService } from "@/lib/services/ParcellesService";
-import { TerrainsService } from "@/lib/services/TerrainsService";
+import { sensorService } from "../services/sensorService";
+import { parcelService } from "../../parcels/services/parcelService";
+import { terrainService } from "../../terrains/services/terrainService";
 import { Calendar, Tag, Activity, Cpu } from "lucide-react";
 
 export default function SensorForm({ initialData, onSuccess, onCancel }: any) {
@@ -27,12 +27,9 @@ export default function SensorForm({ initialData, onSuccess, onCancel }: any) {
   useEffect(() => {
     const loadParcelles = async () => {
       try {
-        const terrains = await TerrainsService.getAllTerrainsApiV1TerrainsTerrainsGet();
-        const allParcellesPromises = terrains.map(t =>
-          ParcellesService.getParcellesByTerrainApiV1ParcellesParcellesTerrainTerrainIdGet(t.id)
-        );
-        const allParcellesResults = await Promise.all(allParcellesPromises);
-        setParcellesExistantes(allParcellesResults.flat());
+        const terrains: any = await terrainService.getTerrains();
+        const parcelles: any = await parcelService.getParcelles();
+        setParcellesExistantes(parcelles);
       } catch (error) {
         console.error("Error loading parcelles for sensor form:", error);
       }
@@ -45,37 +42,32 @@ export default function SensorForm({ initialData, onSuccess, onCancel }: any) {
     setLoading(true);
 
     try {
+      const sensorData: any = {
+        nom: formData.nom,
+        parcelleId: Number(formData.parcelle_id),
+        dev_eui: formData.dev_eui || Math.random().toString(16).slice(2, 18).padStart(16, '0'),
+        date_installation: formData.date_installation || new Date().toISOString(),
+        date_activation: formData.date_activation || null,
+        code: formData.code,
+      };
+
       if (initialData?.id) {
-        await CapteursService.updateCapteurApiV1CapteursCapteurIdPut(initialData.id, {
-          nom: formData.nom,
-          parcelle_id: formData.parcelle_id || null,
-          dev_eui: formData.dev_eui || null,
-          date_installation: formData.date_installation || null,
-          date_activation: formData.date_activation || null,
-        });
-      } else {
-        await CapteursService.createCapteurApiV1CapteursPost({
-          nom: formData.nom,
-          code: formData.code,
-          parcelle_id: formData.parcelle_id || null,
-          dev_eui: formData.dev_eui || Math.random().toString(16).slice(2, 18).padStart(16, '0'),
-          date_installation: formData.date_installation || new Date().toISOString(),
-          date_activation: formData.date_activation || null,
-        });
+        sensorData.id = initialData.id;
       }
+
+      await sensorService.saveSensor(sensorData);
 
       setLoading(false);
       onSuccess();
     } catch (error: any) {
       console.error("Erreur lors de la sauvegarde du capteur:", error);
-      alert(error.body?.detail || "Erreur lors de la sauvegarde.");
+      alert(error.message || "Erreur lors de la sauvegarde.");
       setLoading(false);
     }
   };
 
   return (
     <div className="flex flex-col items-center w-full pt-4">
-      {/* ... (Reste de votre design identique) */}
       <h1 className="text-2xl font-bold text-[#1A4D2E] mb-6 text-center">
         {initialData ? "Modifier le capteur" : "Ajouter un nouveau capteur"}
       </h1>
@@ -102,7 +94,6 @@ export default function SensorForm({ initialData, onSuccess, onCancel }: any) {
               onChange={(e) => setFormData({ ...formData, code: e.target.value })}
               required
             >
-              {/* Vos options identiques */}
               <optgroup label="Mesures Seules">
                 <option value="pH du sol">pH du sol</option>
                 <option value="Humidité du sol (h)">Humidité (h)</option>

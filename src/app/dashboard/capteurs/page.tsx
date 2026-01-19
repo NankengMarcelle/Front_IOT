@@ -3,41 +3,33 @@
 import { useState, useEffect } from "react";
 import DashboardHeader from '@/components/layout/Header';
 import DashboardFooter from '@/components/layout/Footer';
-import { CapteursService } from "@/lib/services/CapteursService";
-import { ParcellesService } from "@/lib/services/ParcellesService";
-import { TerrainsService } from "@/lib/services/TerrainsService";
-import { Capteur } from "@/lib/models/Capteur";
-import { ParcelleResponse } from "@/lib/models/ParcelleResponse";
-import SensorForm from "@/features/sensors/components/SensorForm";
+import { sensorService } from "@/features/sensors/services/sensorService";
+import { parcelService } from "@/features/parcels/services/parcelService";
 import {
   Thermometer,
   Droplets,
-  Activity
+  Activity,
+  Cpu,
+  RefreshCw,
+  Search,
+  Filter
 } from "lucide-react";
 
 export default function CapteursPage() {
-  const [view, setView] = useState("list");
-  const [sensors, setSensors] = useState<Capteur[]>([]);
-  const [parcelles, setParcelles] = useState<ParcelleResponse[]>([]);
-  const [selectedSensor, setSelectedSensor] = useState<Capteur | null>(null);
+  const [sensors, setSensors] = useState<any[]>([]);
+  const [parcelles, setParcelles] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const loadData = async () => {
     try {
       setLoading(true);
-      // Fetch parcelles first to be able to map names
-      const terrains = await TerrainsService.getAllTerrainsApiV1TerrainsTerrainsGet();
-      const allParcellesPromises = terrains.map(t =>
-        ParcellesService.getParcellesByTerrainApiV1ParcellesParcellesTerrainTerrainIdGet(t.id)
-      );
-      const allParcellesResults = await Promise.all(allParcellesPromises);
-      const flattenedParcelles = allParcellesResults.flat();
-      setParcelles(flattenedParcelles);
+      const parcellesData: any = await parcelService.getParcelles();
+      setParcelles(parcellesData);
 
-      // Fetch all sensors
-      const sData = await CapteursService.readCapteursApiV1CapteursGet();
+      // Fetch all sensors (simulation of backend-provided hardware)
+      const sData: any = await sensorService.getSensors();
       setSensors(sData);
-      setView("list");
     } catch (err) {
       console.error("Error loading sensors data:", err);
     } finally {
@@ -49,112 +41,159 @@ export default function CapteursPage() {
     loadData();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (confirm("Êtes-vous sûr de vouloir supprimer ce capteur ?")) {
-      try {
-        await CapteursService.deleteCapteurApiV1CapteursCapteurIdDelete(id);
-        loadData();
-      } catch (err) {
-        console.error("Error deleting sensor:", err);
-      }
-    }
-  };
-
-  const getParcelName = (parcelId: string | null | undefined): string => {
+  const getParcelName = (parcelId: number | null | undefined): string => {
     if (!parcelId) return "Non assignée";
-    const parcel = parcelles.find((p) => p.id === parcelId);
+    const parcel = parcelles.find((p) => String(p.id) === String(parcelId));
     return parcel?.nom ?? "Non assignée";
   };
 
   const getIconForType = (type: string) => {
-    if (type.toLowerCase().includes("temp")) return <Thermometer className="w-6 h-6 text-red-500" />;
-    if (type.toLowerCase().includes("hum")) return <Droplets className="w-6 h-6 text-blue-500" />;
-    return <Activity className="w-6 h-6 text-[#12A125]" />;
+    const t = type.toLowerCase();
+    if (t.includes("temp")) return <Thermometer className="w-5 h-5 text-rose-500" />;
+    if (t.includes("hum")) return <Droplets className="w-5 h-5 text-sky-500" />;
+    return <Activity className="w-5 h-5 text-emerald-500" />;
   };
 
-  // ==============================
-  // RENDER
-  // ==============================
+  const filteredSensors = sensors.filter(s =>
+    s.nom?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    s.code?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#F1F8F4]">
+    <div className="min-h-screen flex flex-col bg-[#F9FBFA]">
       <DashboardHeader />
 
-      <main className="flex-grow p-8 max-w-7xl mx-auto w-full">
-        {view === "form" ? (
-          <SensorForm
-            initialData={selectedSensor}
-            onSuccess={loadData}
-            onCancel={() => setView("list")}
-          />
-        ) : (
-          <>
-            <div className="flex justify-between items-center mb-10">
-              <h1 className="text-3xl font-extrabold text-green-900">Mes Capteurs</h1>
-              <button
-                onClick={() => { setSelectedSensor(null); setView("form"); }}
-                className="bg-[#22C55E] text-white px-8 py-3 rounded-2xl font-bold shadow-lg hover:bg-[#16A34A] transition-all transform active:scale-95"
-              >
-                + Ajouter
-              </button>
+      <main className="flex-grow p-6 sm:p-10 max-w-7xl mx-auto w-full">
+        {/* Header Section */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+          <div>
+            <h1 className="text-4xl font-black text-[#1A4D2E] tracking-tight">Capteurs Matériels</h1>
+            <p className="text-slate-500 mt-2 font-medium">Monitoring du matériel déployé sur vos parcelles.</p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={loadData}
+              className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-600 hover:text-emerald-600 hover:border-emerald-100 transition-all shadow-sm"
+              title="Actualiser"
+            >
+              <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+        </div>
+
+        {/* Stats Summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+          <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-50 flex items-center justify-center text-emerald-600">
+              <Cpu className="w-6 h-6" />
             </div>
+            <div>
+              <p className="text-slate-400 text-sm font-bold uppercase tracking-wider">Total</p>
+              <p className="text-2xl font-black text-slate-800">{sensors.length}</p>
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-rose-50 flex items-center justify-center text-rose-600">
+              <Thermometer className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-slate-400 text-sm font-bold uppercase tracking-wider">Température</p>
+              <p className="text-2xl font-black text-slate-800">
+                {sensors.filter(s => s.nom?.toLowerCase().includes('temp')).length}
+              </p>
+            </div>
+          </div>
+          <div className="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-sky-50 flex items-center justify-center text-sky-600">
+              <Droplets className="w-6 h-6" />
+            </div>
+            <div>
+              <p className="text-slate-400 text-sm font-bold uppercase tracking-wider">Humidité</p>
+              <p className="text-2xl font-black text-slate-800">
+                {sensors.filter(s => s.nom?.toLowerCase().includes('hum')).length}
+              </p>
+            </div>
+          </div>
+        </div>
 
-            {loading ? (
-              <div className="flex justify-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#12A125]"></div>
-              </div>
-            ) : sensors.length === 0 ? (
-              <div className="bg-white rounded-[40px] border-2 border-dashed border-gray-200 h-[400px] flex flex-col items-center justify-center">
-                <div className="bg-green-50 w-20 h-20 rounded-full flex items-center justify-center mb-4">
-                  <Activity className="w-10 h-10 text-[#12A125]" />
-                </div>
-                <p className="text-gray-400 text-xl font-semibold">Pas de capteur pour l&apos;instant</p>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {sensors.map((sensor) => (
-                  <div
-                    key={sensor.id}
-                    className="bg-white p-6 rounded-[32px] shadow-sm border border-gray-50 hover:shadow-md transition-all relative overflow-hidden group"
-                  >
-                    {/* Header Card */}
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="bg-green-50 p-3 rounded-2xl">
-                        {getIconForType(sensor.nom)}
-                      </div>
-                      <div className="flex gap-3">
-                        <button
-                          onClick={() => { setSelectedSensor(sensor); setView("form"); }}
-                          className="text-blue-500 font-bold text-sm hover:underline"
-                        >
-                          Modifier
-                        </button>
-                        <button
-                          onClick={() => handleDelete(sensor.id)}
-                          className="text-red-400 font-bold text-sm hover:underline"
-                        >
-                          Supprimer
-                        </button>
-                      </div>
+        {/* Search and Filters Strip */}
+        <div className="mb-8 flex flex-col sm:flex-row gap-4">
+          <div className="relative flex-grow">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-5 h-5" />
+            <input
+              type="text"
+              placeholder="Rechercher un capteur par nom ou code..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full bg-white border border-slate-200 rounded-[20px] pl-12 pr-4 py-4 text-slate-700 outline-none focus:border-emerald-500 focus:ring-4 focus:ring-emerald-50 transition-all font-medium"
+            />
+          </div>
+          <button className="bg-white border border-slate-200 rounded-[20px] px-6 py-4 text-slate-600 font-bold flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm">
+            <Filter className="w-5 h-5" />
+            Filtres
+          </button>
+        </div>
+
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="bg-white h-[200px] rounded-[32px] animate-pulse border border-slate-100" />
+            ))}
+          </div>
+        ) : filteredSensors.length === 0 ? (
+          <div className="bg-white rounded-[48px] border-2 border-dashed border-slate-200 py-20 flex flex-col items-center justify-center text-center px-6">
+            <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mb-6">
+              <Search className="w-10 h-10 text-slate-300" />
+            </div>
+            <h3 className="text-2xl font-black text-slate-800 mb-2">Aucun matériel trouvé</h3>
+            <p className="text-slate-500 max-w-md font-medium">Les capteurs sont automatiquement détectés lorsqu'ils sont installés sur le terrain par nos techniciens.</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredSensors.map((sensor) => (
+              <div
+                key={sensor.id}
+                className="bg-white p-8 rounded-[40px] shadow-sm border border-slate-100 hover:shadow-xl hover:-translate-y-1 transition-all group overflow-hidden relative"
+              >
+                {/* Background Decor */}
+                <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-50 rounded-bl-[100px] -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-700 opacity-50" />
+
+                <div className="relative z-10">
+                  <div className="flex justify-between items-start mb-6">
+                    <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-white group-hover:shadow-lg transition-all">
+                      {getIconForType(sensor.nom || sensor.code)}
                     </div>
-
-                    {/* Body Card */}
-                    <h3 className="font-extrabold text-xl text-gray-800 mb-1">{sensor.nom}</h3>
-                    <p className="text-gray-400 text-sm mb-6 bg-gray-50 inline-block px-2 py-1 rounded-lg">
-                      {sensor.code}
-                    </p>
-
-                    {/* Footer Card */}
-                    <div className="flex justify-between items-center pt-4 border-t border-gray-50">
-                      <span className="text-gray-500 font-medium text-sm">Parcelle</span>
-                      <span className="text-[#22C55E] font-bold text-sm">
-                        {getParcelName(sensor.parcelle_id)}
+                    <div className="flex flex-col items-end">
+                      <span className="px-3 py-1 bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-full">
+                        Connecté
                       </span>
                     </div>
                   </div>
-                ))}
+
+                  <h3 className="font-black text-2xl text-slate-800 mb-1 group-hover:text-emerald-900 transition-colors">
+                    {sensor.nom}
+                  </h3>
+                  <code className="text-[11px] font-bold text-slate-400 bg-slate-50 px-3 py-1 rounded-lg">
+                    ID: {sensor.code}
+                  </code>
+
+                  <div className="mt-8 pt-6 border-t border-slate-50 flex items-center justify-between">
+                    <div>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Localisation</p>
+                      <p className="text-sm font-black text-slate-700">
+                        {getParcelName(sensor.parcelleId || sensor.parcelle_id)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Dernier Ping</p>
+                      <p className="text-sm font-black text-slate-700">Il y a 2m</p>
+                    </div>
+                  </div>
+                </div>
               </div>
-            )}
-          </>
+            ))}
+          </div>
         )}
       </main>
 

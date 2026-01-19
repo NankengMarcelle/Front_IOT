@@ -51,5 +51,31 @@ export const recommendationService = {
         });
       }, 2000);
     });
+  },
+
+  /**
+   * Récupère l'historique des recommandations
+   */
+  getRecommendationsHistory: async () => {
+    return new Promise<any[]>((resolve) => {
+      setTimeout(() => {
+        resolve([
+          {
+            id: 1,
+            parcelle_id: 1,
+            culture_predite: "Maïs",
+            created_at: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
+            expert_advice: "Tout semble en ordre."
+          },
+          {
+            id: 2,
+            parcelle_id: 2,
+            culture_predite: "Blé",
+            created_at: new Date(Date.now() - 86400000 * 5).toISOString(), // 5 days ago
+            expert_advice: "Ajustez l'irrigation."
+          }
+        ]);
+      }, 800);
+    });
   }
 };

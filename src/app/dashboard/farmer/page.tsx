@@ -3,25 +3,19 @@
 import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import DashboardHeader from '@/components/layout/Header';
-import { TerrainsService } from "@/lib/services/TerrainsService";
-import { ParcellesService } from "@/lib/services/ParcellesService";
+import { terrainService } from "@/features/terrains/services/terrainService";
+import { parcelService } from "@/features/parcels/services/parcelService";
 import { useTranslation } from "@/providers/TranslationProvider";
-import { 
-  LayoutGrid, 
-  Map as MapIcon, 
-  BrainCircuit, 
-  Lightbulb, 
-  History, 
+import {
+  LayoutGrid,
+  Map as MapIcon,
+  BrainCircuit,
+  Lightbulb,
   ArrowRight,
   Bell,
-  TrendingUp,
-  AlertCircle,
   Activity,
-  Zap,
-  Droplets,
-  Wind
 } from "lucide-react";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 export default function FarmerDashboard() {
   const router = useRouter();
@@ -36,16 +30,13 @@ export default function FarmerDashboard() {
     const loadAllData = async () => {
       try {
         setLoading(true);
-        // Fetch terrains
-        const terrainData = await TerrainsService.getAllTerrainsApiV1TerrainsTerrainsGet();
+        // Fetch terrains using mock service
+        const terrainData: any = await terrainService.getTerrains();
         setTerrains(terrainData);
 
-        // Fetch parcelles for each terrain
-        const allParcellesPromises = terrainData.map(t =>
-          ParcellesService.getParcellesByTerrainApiV1ParcellesParcellesTerrainTerrainIdGet(t.id)
-        );
-        const allParcellesResults = await Promise.all(allParcellesPromises);
-        setParcelles(allParcellesResults.flat());
+        // Fetch parcelles using mock service
+        const parcellesData = await parcelService.getParcelles();
+        setParcelles(parcellesData);
       } catch (error) {
         console.error("Erreur de chargement:", error);
       } finally {
@@ -72,11 +63,6 @@ export default function FarmerDashboard() {
     { month: "Jun", N: 50, P: 40, K: 55, pH: 6.9, humidity: 70, temperature: 28 }
   ];
 
-  const yieldGoalData = [
-    { name: "Atteint", value: 82 },
-    { name: "Restant", value: 18 }
-  ];
-
   const parcellePerformance = [
     { id: 1, name: "Parcelle A", area: 5, crop: "Maïs", fertilityScore: 85, recommendation: "Ajouter engrais N", badge: "Optimal", icon: "🌾", active: true },
     { id: 2, name: "Parcelle B", area: 3.5, crop: "Blé", fertilityScore: 72, recommendation: "Augmenter irrigation", badge: "Needs Irrigation", icon: "🌾", active: true },
@@ -89,8 +75,6 @@ export default function FarmerDashboard() {
     { zone: "Sud-Ouest", status: "healthy", battery: 92 },
     { zone: "Centre", status: "warning", battery: 35 }
   ];
-
-  const COLORS = { optimal: "#4CAF50", moderate: "#FFEB3B", low: "#FF6B6B" };
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: "#FFFFFF" }}>
@@ -191,7 +175,7 @@ export default function FarmerDashboard() {
           <div className="mb-12">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-[#2E7D32]">Top Parcelles Performantes</h2>
-              <button 
+              <button
                 onClick={() => router.push('/dashboard/parcelles')}
                 className="text-[#4CAF50] hover:text-[#2E7D32] text-sm font-semibold flex items-center gap-2 transition-colors"
               >
@@ -212,7 +196,7 @@ export default function FarmerDashboard() {
                 </thead>
                 <tbody>
                   {parcellePerformance.map((parcelle, idx) => (
-                    <tr 
+                    <tr
                       key={parcelle.id}
                       className="border-b border-gray-100 hover:bg-[#F1F8F6] transition-colors duration-200 cursor-pointer"
                       onClick={() => router.push(`/dashboard/parcelles/${parcelle.id}`)}
@@ -228,8 +212,8 @@ export default function FarmerDashboard() {
                       <td className="px-6 py-4 text-sm">
                         <div className="flex items-center gap-2">
                           <div className="w-12 h-2 bg-gray-200 rounded-full overflow-hidden">
-                            <div 
-                              className="h-full bg-[#4CAF50]" 
+                            <div
+                              className="h-full bg-[#4CAF50]"
                               style={{ width: `${parcelle.fertilityScore}%` }}
                             ></div>
                           </div>
@@ -238,12 +222,11 @@ export default function FarmerDashboard() {
                       </td>
                       <td className="px-6 py-4 text-sm text-[#757575]">{parcelle.recommendation}</td>
                       <td className="px-6 py-4 text-sm">
-                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          parcelle.badge === "Optimal" ? "bg-[#E8F5E9] text-[#2E7D32]" :
-                          parcelle.badge === "High Yield" ? "bg-[#C8E6C9] text-[#1B5E20]" :
-                          parcelle.badge === "Needs Irrigation" ? "bg-[#FFF9C4] text-[#F57F17]" :
-                          "bg-[#FFCCBC] text-[#D84315]"
-                        }`}>
+                        <span className={`px-3 py-1 rounded-full text-xs font-semibold ${parcelle.badge === "Optimal" ? "bg-[#E8F5E9] text-[#2E7D32]" :
+                            parcelle.badge === "High Yield" ? "bg-[#C8E6C9] text-[#1B5E20]" :
+                              parcelle.badge === "Needs Irrigation" ? "bg-[#FFF9C4] text-[#F57F17]" :
+                                "bg-[#FFCCBC] text-[#D84315]"
+                          }`}>
                           {parcelle.badge}
                         </span>
                       </td>
@@ -265,9 +248,9 @@ export default function FarmerDashboard() {
                     <CartesianGrid strokeDasharray="3 3" stroke="#E8F5E9" />
                     <XAxis dataKey="month" stroke="#757575" />
                     <YAxis stroke="#757575" />
-                    <Tooltip 
-                      contentStyle={{ 
-                        backgroundColor: "#FFFFFF", 
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#FFFFFF",
                         border: `1px solid #4CAF50`,
                         borderRadius: "8px"
                       }}
@@ -315,7 +298,7 @@ export default function FarmerDashboard() {
                       </div>
                     </div>
                     <div className="w-24 h-2 bg-gray-200 rounded-full overflow-hidden">
-                      <div 
+                      <div
                         className={`h-full ${sensor.battery > 50 ? 'bg-[#4CAF50]' : 'bg-[#FFEB3B]'}`}
                         style={{ width: `${sensor.battery}%` }}
                       ></div>
@@ -377,15 +360,15 @@ interface MetricCardProps {
   onClick: () => void;
 }
 
-function MetricCard({ 
-  icon, 
-  title, 
-  value, 
-  subtitle, 
-  trend, 
-  trendUp, 
-  description, 
-  onClick 
+function MetricCard({
+  icon,
+  title,
+  value,
+  subtitle,
+  trend,
+  trendUp,
+  description,
+  onClick
 }: MetricCardProps) {
   return (
     <div

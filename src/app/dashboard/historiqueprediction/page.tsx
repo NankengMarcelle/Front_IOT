@@ -3,9 +3,9 @@
 import { useState, useEffect } from "react";
 import DashboardHeader from '@/components/layout/Header';
 import DashboardFooter from '@/components/layout/Footer';
-import { RecommandationsService } from "@/lib/services/RecommandationsService";
-import { ParcellesService } from "@/lib/services/ParcellesService";
-import { TerrainsService } from "@/lib/services/TerrainsService";
+import { recommendationService } from "@/features/recommendations/services/recommendationService";
+import { parcelService } from "@/features/parcels/services/parcelService";
+import { terrainService } from "@/features/terrains/services/terrainService";
 import { useTranslation } from "@/providers/TranslationProvider";
 
 export default function PredictionsListPage() {
@@ -17,19 +17,15 @@ export default function PredictionsListPage() {
     const loadPredictions = async () => {
       setLoading(true);
       try {
-        // Fetch all parcelles to map IDs to names
-        const terrains = await TerrainsService.getAllTerrainsApiV1TerrainsTerrainsGet();
-        const allParcellesPromises = terrains.map(t =>
-          ParcellesService.getParcellesByTerrainApiV1ParcellesParcellesTerrainTerrainIdGet(t.id)
-        );
-        const allParcellesResults = await Promise.all(allParcellesPromises);
-        const parcelles = allParcellesResults.flat();
+        // Fetch all parcelles to map IDs to names using mock services
+        const terrains: any = await terrainService.getTerrains();
+        const parcelles: any = await parcelService.getParcelles();
 
-        // Fetch recommendations history
-        const history = await RecommandationsService.getAllRecommendationsApiV1RecommendationsGet();
+        // Fetch recommendations history using mock service
+        const history: any = await recommendationService.getRecommendationsHistory();
 
         const mappedList = history.map((rec: any) => {
-          const parcel = parcelles.find(p => p.id === rec.parcelle_id);
+          const parcel = parcelles.find((p: any) => p.id === rec.parcelle_id);
           return {
             id: rec.id,
             nomParcelle: parcel?.nom || "Parcelle inconnue",

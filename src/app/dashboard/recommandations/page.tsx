@@ -3,10 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import DashboardHeader from '@/components/layout/Header';
 import DashboardFooter from '@/components/layout/Footer';
-import { ParcellesService } from "@/lib/services/ParcellesService";
-import { TerrainsService } from "@/lib/services/TerrainsService";
-import { RecommandationsService } from "@/lib/services/RecommandationsService";
-import { DonnEsDeCapteursService } from "@/lib/services/DonnEsDeCapteursService";
+import { parcelService } from "@/features/parcels/services/parcelService";
+import { terrainService } from "@/features/terrains/services/terrainService";
+import { recommendationService } from "@/features/recommendations/services/recommendationService";
+import { sensorDataService } from "@/features/sensors/services/sensorDataService";
 import { useTranslation } from "@/providers/TranslationProvider";
 import { Bot, User, Loader2, Send, Sparkles, AlertCircle, MapPin, ChevronRight } from "lucide-react";
 
@@ -28,12 +28,9 @@ export default function RecommandationsPage() {
   useEffect(() => {
     const loadParcelles = async () => {
       try {
-        const terrains = await TerrainsService.getAllTerrainsApiV1TerrainsTerrainsGet();
-        const allParcellesPromises = terrains.map(t =>
-          ParcellesService.getParcellesByTerrainApiV1ParcellesParcellesTerrainTerrainIdGet(t.id)
-        );
-        const allParcellesResults = await Promise.all(allParcellesPromises);
-        setParcelles(allParcellesResults.flat());
+        const terrains: any = await terrainService.getTerrains();
+        const parcellesData = await parcelService.getParcelles();
+        setParcelles(parcellesData);
       } catch (e) {
         console.error("Error loading parcelles:", e);
       }
@@ -51,8 +48,8 @@ export default function RecommandationsPage() {
     setLoading(true);
 
     try {
-      // Get latest soil data for the parcel
-      const measurements = await DonnEsDeCapteursService.getMeasurementsByParcelleApiV1SensorDataSensorDataParcelleParcelleIdGet(parcel.id, 0, 1);
+      // Get latest soil data for the parcel using mock service
+      const measurements = await sensorDataService.getMeasurementsByParcelle(parcel.id);
       const latest = measurements[0];
 
       if (latest) {
@@ -66,17 +63,14 @@ export default function RecommandationsPage() {
         };
         setLatestSoilData(soilData);
 
-        const res = await RecommandationsService.predictCropUnifiedApiV1RecommendationsPredictCropPost({
-          soil_data: soilData,
-          parcelle_id: parcel.id
-        });
+        const recommendations: any = await recommendationService.getRecommendations(parcel.id, parcel.culturePredite || "Maïs");
 
-        if (res.expert_advice) {
-          setMessages([{
-            agent: "Expert Agrotank",
-            message: `Culture prédite : ${res.predicted_crop}. ${res.expert_advice}`,
+        if (recommendations && recommendations.length > 0) {
+          setMessages(recommendations.map((r: any) => ({
+            agent: r.agent,
+            message: r.message,
             type: "bot"
-          }]);
+          })));
         }
       } else {
         setMessages([{
@@ -102,15 +96,11 @@ export default function RecommandationsPage() {
     setIsTyping(true);
 
     try {
-      const res = await RecommandationsService.predictCropUnifiedApiV1RecommendationsPredictCropPost({
-        soil_data: latestSoilData,
-        query: userText,
-        parcelle_id: selectedParcel.id
-      });
+      const res: any = await recommendationService.askQuestion(selectedParcel.id, userText);
 
       setMessages(prev => [...prev, {
-        agent: "Expert Agrotank",
-        message: res.expert_advice || "Je n'ai pas pu générer de réponse spécifique.",
+        agent: res.agent,
+        message: res.message || "Je n'ai pas pu générer de réponse spécifique.",
         type: "bot"
       }]);
     } catch (error) {
@@ -203,11 +193,6 @@ export default function RecommandationsPage() {
                     <Sparkles size={48} className="mb-4" />
                     <p className="font-bold text-center px-10">{t('recommandations.start_consultation')}</p>
                   </div>
-                ) : !selectedParcel.culturePredite ? (
-                  <div className="h-full flex flex-col items-center justify-center text-orange-400 p-10 text-center">
-                    <AlertCircle size={48} className="mb-4" />
-                    <p className="font-bold">{t('recommandations.no_prediction_error')}</p>
-                  </div>
                 ) : loading ? (
                   <div className="h-full flex items-center justify-center"><Loader2 className="animate-spin text-green-500" size={32} /></div>
                 ) : (
@@ -249,7 +234,7 @@ export default function RecommandationsPage() {
                 <input
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  disabled={!selectedParcel || !selectedParcel.culturePredite}
+                  disabled={!selectedParcel}
                   placeholder={t('recommandations.input_placeholder')}
                   className="flex-grow bg-slate-50 px-6 py-4 rounded-2xl outline-none border border-slate-200 focus:border-[#22C55E] focus:bg-white font-medium disabled:opacity-50 transition-all shadow-inner"
                 />

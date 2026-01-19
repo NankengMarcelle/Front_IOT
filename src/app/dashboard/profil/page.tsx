@@ -1,10 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  Eye, 
-  EyeOff, 
-  Camera, 
+import {
+  Eye,
+  EyeOff,
+  Camera,
   CheckCircle2,
   User,
   Mail,
@@ -16,15 +16,10 @@ import {
   Check,
   Shield,
   Bell,
-  Settings,
   Calendar,
-  MapPin,
-  Building
 } from "lucide-react";
 import DashboardHeader from '@/components/layout/Header';
 import DashboardFooter from '@/components/layout/Footer';
-import { UsersService } from "@/lib/services/UsersService";
-import { AuthenticationService } from "@/lib/services/AuthenticationService";
 import { useLanguageStore } from '@/store/useUserStore';
 import { useTranslation } from '@/providers/TranslationProvider';
 import Link from "next/link";
@@ -60,18 +55,17 @@ export default function ProfilPage() {
   const [showPass, setShowPass] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<'profile' | 'security'>('profile');
-  const [avatarFile, setAvatarFile] = useState<File | null>(null);
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const [userData, setUserData] = useState<UserProfile>({
-    id: "",
-    email: "",
-    nom: "",
-    prenom: "",
-    role: undefined,
-    phone: "",
-    address: "",
-    joinDate: "",
+    id: "mock-id-123",
+    email: "user@example.com",
+    nom: "Dupont",
+    prenom: "Jean",
+    role: "AGRICULTEUR",
+    phone: "+237 600 00 00 00",
+    address: "Yaoundé, Cameroun",
+    joinDate: "12 janvier 2024",
     langue: lang,
     password: "",
     confirmPassword: "",
@@ -91,42 +85,24 @@ export default function ProfilPage() {
   });
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const profile = await UsersService.getMyProfileApiV1UsersMeGet();
-        const formattedDate = profile.created_at 
-          ? new Date(profile.created_at).toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric'
-            })
-          : "";
-        
-        // Correction du type pour role
-        const roleString = profile.role ? String(profile.role) : "";
-        
-        setUserData(prev => ({
-          ...prev,
-          id: profile.id,
-          email: profile.email,
-          nom: profile.nom || "",
-          prenom: profile.prenom || "",
-          role: roleString as UserRole,
-          phone: profile.telephone || "",
-          joinDate: formattedDate,
-          langue: lang
-        }));
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
-    fetchProfile();
+    // Simulation du chargement du profil depuis le localStorage ou un mock
+    const savedUser = localStorage.getItem('smartagro_user');
+    if (savedUser) {
+      const user = JSON.parse(savedUser);
+      setUserData(prev => ({
+        ...prev,
+        id: user.id || prev.id,
+        email: user.email || prev.email,
+        nom: user.name?.split(' ')[1] || prev.nom,
+        prenom: user.name?.split(' ')[0] || prev.prenom,
+        role: user.role || prev.role,
+      }));
+    }
   }, [lang]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type.startsWith('image/')) {
-      setAvatarFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatarPreview(reader.result as string);
@@ -177,41 +153,31 @@ export default function ProfilPage() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) {
       return;
     }
 
     setLoading(true);
 
-    try {
-      // Mettre à jour le profil
-      await UsersService.updateMyProfileApiV1UsersMePut({
-        nom: userData.nom.trim(),
-        prenom: userData.prenom.trim(),
-        telephone: userData.phone.trim()
-      });
-
-      // Mettre à jour le mot de passe si fourni
-      if (userData.password) {
-        await AuthenticationService.changePasswordApiV1AuthChangePasswordPost({
-          new_password: userData.password,
-          old_password: "" // À compléter avec un champ pour l'ancien mot de passe
-        });
-      }
-
+    // Simulation de sauvegarde
+    setTimeout(() => {
       setIsEditing(false);
       setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-      
-      // Réinitialiser les mots de passe
-      setUserData(prev => ({ ...prev, password: "", confirmPassword: "" }));
-    } catch (error: any) {
-      alert(error.body?.detail || "Une erreur est survenue lors de l'enregistrement.");
-      console.error(error);
-    } finally {
       setLoading(false);
-    }
+      setTimeout(() => setShowSuccess(false), 3000);
+      setUserData(prev => ({ ...prev, password: "", confirmPassword: "" }));
+
+      // Mettre à jour le localStorage pour simuler la persistence
+      const updatedUser = {
+        id: userData.id,
+        email: userData.email,
+        name: `${userData.prenom} ${userData.nom}`,
+        role: userData.role,
+        isActive: true
+      };
+      localStorage.setItem('smartagro_user', JSON.stringify(updatedUser));
+    }, 1000);
   };
 
   const handleLanguageChange = (newLang: "fr" | "en") => {
@@ -219,14 +185,14 @@ export default function ProfilPage() {
     setUserData(prev => ({ ...prev, langue: newLang }));
   };
 
-  const ProfileField = ({ 
-    label, 
-    value, 
+  const ProfileField = ({
+    label,
+    value,
     icon: Icon,
     type = "text",
     required = false,
     error = "",
-    ...props 
+    ...props
   }: any) => (
     <div className="space-y-2">
       <label className="block text-sm font-medium text-gray-700 flex items-center gap-2">
@@ -278,9 +244,9 @@ export default function ProfilPage() {
                 <div className="relative mb-6">
                   <div className="w-24 h-24 mx-auto rounded-full border-4 border-white shadow-lg bg-gradient-to-br from-[#1B831B] to-[#146314] flex items-center justify-center text-3xl font-bold text-white">
                     {avatarPreview ? (
-                      <img 
-                        src={avatarPreview} 
-                        alt="Avatar" 
+                      <img
+                        src={avatarPreview}
+                        alt="Avatar"
                         className="w-full h-full rounded-full object-cover"
                       />
                     ) : (
@@ -309,7 +275,7 @@ export default function ProfilPage() {
                       {userData.role || "Utilisateur"}
                     </p>
                   </div>
-                  
+
                   <div className="flex items-center justify-center gap-2 text-gray-600">
                     <Mail className="w-4 h-4" />
                     <span className="text-sm">{userData.email}</span>
@@ -381,7 +347,7 @@ export default function ProfilPage() {
               </div>
 
               {/* Lien vers paramètres de notification */}
-              <Link 
+              <Link
                 href="/dashboard/parametres"
                 className="block bg-white rounded-2xl p-6 shadow-sm border border-gray-200 hover:border-[#1B831B]/30 hover:shadow-md transition-all duration-200 group"
               >
@@ -404,11 +370,12 @@ export default function ProfilPage() {
                 <div className="border-b border-gray-200">
                   <div className="flex">
                     <button
+                      type="button"
                       onClick={() => setActiveTab('profile')}
                       className={`flex-1 py-4 px-6 text-center font-medium ${activeTab === 'profile'
                         ? 'border-b-2 border-[#1B831B] text-[#1B831B] bg-[#1B831B]/10'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                      } transition-colors`}
+                        } transition-colors`}
                     >
                       <div className="flex items-center justify-center gap-2">
                         <User className="w-4 h-4" />
@@ -416,11 +383,12 @@ export default function ProfilPage() {
                       </div>
                     </button>
                     <button
+                      type="button"
                       onClick={() => setActiveTab('security')}
                       className={`flex-1 py-4 px-6 text-center font-medium ${activeTab === 'security'
                         ? 'border-b-2 border-[#1B831B] text-[#1B831B] bg-[#1B831B]/10'
                         : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
-                      } transition-colors`}
+                        } transition-colors`}
                     >
                       <div className="flex items-center justify-center gap-2">
                         <Shield className="w-4 h-4" />
@@ -448,7 +416,7 @@ export default function ProfilPage() {
                             icon={User}
                             required
                             disabled={!isEditing}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                               setUserData({ ...userData, nom: e.target.value })
                             }
                             error={formErrors.nom}
@@ -459,7 +427,7 @@ export default function ProfilPage() {
                             icon={User}
                             required
                             disabled={!isEditing}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                               setUserData({ ...userData, prenom: e.target.value })
                             }
                             error={formErrors.prenom}
@@ -479,10 +447,10 @@ export default function ProfilPage() {
                             value={userData.phone}
                             icon={Phone}
                             disabled={!isEditing}
-                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                               setUserData({ ...userData, phone: e.target.value })
                             }
-                            placeholder="+33 6 12 34 56 78"
+                            placeholder="+237 600 00 00 00"
                             error={formErrors.phone}
                           />
                         </div>
@@ -505,7 +473,7 @@ export default function ProfilPage() {
                               className={`flex items-center gap-2 px-4 py-3 rounded-lg border ${lang === option.value
                                 ? 'border-[#1B831B] bg-[#1B831B]/10 text-[#1B831B]'
                                 : 'border-gray-300 hover:border-[#1B831B]/30 hover:bg-gray-50'
-                              } transition-colors`}
+                                } transition-colors`}
                             >
                               <span className="text-lg">{option.flag}</span>
                               <span className="font-medium">{option.label}</span>
@@ -531,7 +499,7 @@ export default function ProfilPage() {
                         <p className="text-gray-600 mb-6 ml-9">
                           Assurez-vous d'utiliser un mot de passe long et aléatoire pour rester en sécurité.
                         </p>
-                        
+
                         <div className="space-y-4">
                           <div className="relative">
                             <ProfileField
@@ -540,7 +508,7 @@ export default function ProfilPage() {
                               icon={Lock}
                               type={showPass ? "text" : "password"}
                               disabled={!isEditing}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                 setUserData({ ...userData, password: e.target.value })
                               }
                               error={formErrors.password}
@@ -561,7 +529,7 @@ export default function ProfilPage() {
                               icon={Lock}
                               type={showPass ? "text" : "password"}
                               disabled={!isEditing}
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => 
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                                 setUserData({ ...userData, confirmPassword: e.target.value })
                               }
                               error={formErrors.confirmPassword}
@@ -595,17 +563,17 @@ export default function ProfilPage() {
                               <p className="font-medium text-gray-900">Sessions actives</p>
                               <p className="text-sm text-gray-600">Gérez vos sessions connectées</p>
                             </div>
-                            <button className="text-sm text-[#1B831B] hover:text-[#146314] font-medium">
+                            <button type="button" className="text-sm text-[#1B831B] hover:text-[#146314] font-medium">
                               Voir toutes
                             </button>
                           </div>
-                          
+
                           <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
                             <div>
                               <p className="font-medium text-gray-900">Authentification à deux facteurs</p>
                               <p className="text-sm text-gray-600">Ajoutez une couche de sécurité supplémentaire</p>
                             </div>
-                            <button className="text-sm text-[#1B831B] hover:text-[#146314] font-medium">
+                            <button type="button" className="text-sm text-[#1B831B] hover:text-[#146314] font-medium">
                               Activer
                             </button>
                           </div>

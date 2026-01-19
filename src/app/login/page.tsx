@@ -4,20 +4,8 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import LoginForm from '@/features/auth/components/LoginForm';
 import { Suspense } from 'react';
-import { 
-  User, 
-  LogOut, 
-  Home, 
-  Map, 
-  Grid3x3, 
-  RadioTower, 
-  Leaf,
-  Menu,
-  ChevronDown,
-  Settings
-} from 'lucide-react';
 
-// Composant interne pour gérer les SearchParams (nécessaire pour Next.js 15+)
+// Composant interne pour gérer les SearchParams
 function LoginContent() {
   const searchParams = useSearchParams();
   const role = searchParams.get('role');
@@ -27,23 +15,35 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <main className="relative min-h-screen w-full flex items-center justify-center p-4">
-      {/* Background Image fixe */}
-      <div className="absolute inset-0 z-[-1]">
+    <main className="relative min-h-screen w-full flex items-center justify-center p-4 overflow-hidden">
+      {/* Premium Background handling */}
+      <div className="absolute inset-0 z-0">
         <Image
-          src="/image.png"
-          alt="Fond rural"
+          src="/strawberry-field.jpg"
+          alt="Smart Agro Background"
           fill
-          className="object-cover"
+          className="object-cover scale-105"
           priority
         />
-        <div className="absolute inset-0 bg-black/5" />
+        <div className="absolute inset-0 bg-[#052E16]/40 backdrop-blur-[2px]" />
+        <div className="absolute inset-0 bg-gradient-to-tr from-[#052E16] via-transparent to-transparent opacity-60" />
       </div>
 
-      {/* Utilisation de Suspense car useSearchParams est utilisé côté client */}
-      <Suspense fallback={<div className="text-white">Chargement...</div>}>
-        <LoginContent />
-      </Suspense>
+      {/* Decorative Animated Glows */}
+      <div className="absolute top-1/4 -right-20 w-[600px] h-[600px] bg-emerald-500/10 rounded-full blur-[120px] animate-pulse z-10 pointer-events-none" />
+      <div className="absolute -bottom-20 -left-20 w-[500px] h-[500px] bg-lime-500/10 rounded-full blur-[100px] z-10 pointer-events-none" />
+
+      {/* Content wrapper for z-index management */}
+      <div className="relative z-20 w-full flex justify-center items-center">
+        <Suspense fallback={
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-white font-black text-[10px] uppercase tracking-widest">Initialisation...</p>
+          </div>
+        }>
+          <LoginContent />
+        </Suspense>
+      </div>
     </main>
   );
 }
