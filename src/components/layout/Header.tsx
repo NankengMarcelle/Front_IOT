@@ -23,7 +23,19 @@ export default function DashboardHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [userInfo, setUserInfo] = useState<any>(null);
+  const [userInfo, setUserInfo] = useState<any>(() => {
+    if (typeof window !== 'undefined') {
+      const savedUser = localStorage.getItem('smartagro_user');
+      if (savedUser && savedUser !== "undefined") {
+        try {
+          return JSON.parse(savedUser);
+        } catch (e) {
+          return null;
+        }
+      }
+    }
+    return null;
+  });
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,7 +45,8 @@ export default function DashboardHeader() {
         const savedUser = localStorage.getItem('smartagro_user');
         if (savedUser && savedUser !== "undefined") {
           try {
-            setUserInfo(JSON.parse(savedUser));
+            const parsed = JSON.parse(savedUser);
+            setUserInfo(parsed);
           } catch (e) {
             router.push('/login');
           }
@@ -59,17 +72,21 @@ export default function DashboardHeader() {
     { href: "/dashboard/farmer", label: t('nav.dashboard'), icon: Home },
     { href: "/dashboard/terrains", label: t('nav.terrains'), icon: Map },
     { href: "/dashboard/parcelles", label: t('nav.parcelles'), icon: Grid3x3 },
+    { href: "/dashboard/historiqueprediction", label: "Historique", icon: RadioTower },
     { href: "/dashboard/recommandations", label: "IA Chat", icon: Sparkles },
   ];
 
   const getInitial = () => {
     if (!userInfo) return "F";
-    return (userInfo.nom?.charAt(0) || userInfo.prenom?.charAt(0) || "F").toUpperCase();
+    const name = userInfo.name || userInfo.nom || userInfo.prenom || "";
+    return (name.charAt(0) || "F").toUpperCase();
   };
 
   const getFullName = () => {
     if (!userInfo) return "Chargement...";
-    return `${userInfo.prenom || ''} ${userInfo.nom || ''}`.trim() || "Expert Agro";
+    if (userInfo.name) return userInfo.name;
+    const fullName = `${userInfo.prenom || ''} ${userInfo.nom || ''}`.trim();
+    return fullName || "Expert Agro";
   };
 
   return (

@@ -1,153 +1,155 @@
-// src/services/parcelService.ts
-
 import { Parcelle } from "@/types/user";
-
-// Simulation de la base de données locale
-let mockParcelles = [
-  { 
-    id: 1, 
-    nom: "Parcelle Nord", 
-    superficie: 2.3, 
-    terrainId: 1,
-    code: "PK-01",
-    azote: 12,        // Portion verte (12/20)
-    phosphore: 8,     // Portion orange (8/20)
-    potassium: 15,    // Portion violette (15/20)
-    humidite: 23,     // Portion bleue (23%)
-    temperature: 28,
-    ph: 6.4,
-    culturePredite: "Blé tendre"
-  },
-  { 
-    id: 2, 
-    nom: "Zone Est", 
-    superficie: 1.8, 
-    terrainId: 1,
-    code: "PK-02",
-    azote: 7, 
-    phosphore: 5, 
-    potassium: 10, 
-    humidite: 12, 
-    temperature: 25,
-    ph: 5.9,
-    culturePredite: "Colza"
-  }
-];
-
-const API_URL = "http://localhost:5000/api/parcelles"; // URL de votre futur Backend
+import { ParcellesService, TerrainsService, DonnEsDeCapteursService, CapteursService, ParcelleCreate, ParcelleUpdate, SensorMeasurementsResponse } from "@/lib";
 
 export const parcelService = {
-  
-  /**
-   * RÉCUPÉRER TOUTES LES PARCELLES
-   */
-  getParcelles: async () => {
-      /* // --- LOGIQUE BACKEND ---
-      try {
-          const response = await fetch(API_URL);
-          if (!response.ok) throw new Error("Erreur lors de la récupération");
-          return await response.json(); // Le backend devrait renvoyer la parcelle + ses capteurs
-      } catch (error) {
-          console.error("Erreur getParcelles:", error);
-          return [];
-      }
-      */
 
-      // --- LOGIQUE SIMULÉE ---
-      return new Promise<Parcelle[]>((resolve) => {
-          setTimeout(() => resolve([...mockParcelles]), 400);
-      });
-  },
+    /**
+     * RÉCUPÉRER TOUTES LES PARCELLES
+     * Stratégie : Récupérer les terrains, puis pour chaque terrain récupérer ses parcelles
+     */
+    getParcelles: async (): Promise<Parcelle[]> => {
+        try {
+            console.log("Fetching parcelles: Step 1 - Get Terrains");
+            // 1. Récupérer les terrains
+            const terrainsResponse = await TerrainsService.getAllTerrainsApiV1TerrainsTerrainsGet() as any;
+            const terrains = Array.isArray(terrainsResponse) ? terrainsResponse : (terrainsResponse.data || []);
+            console.log(`Fetching parcelles: Found ${terrains.length} terrains`);
 
-  /**
-   * ENREGISTRER OU MODIFIER UNE PARCELLE
-   */
-  saveParcelle: async (parcelle: Parcelle) => {
-      /* // --- LOGIQUE BACKEND ---
-      try {
-          const isUpdate = !!parcelle.id;
-          const url = isUpdate ? `${API_URL}/${parcelle.id}` : API_URL;
-          const method = isUpdate ? 'PUT' : 'POST';
+            let allParcels: Parcelle[] = [];
 
-          const response = await fetch(url, {
-              method: method,
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(parcelle),
-          });
+            // 2. Pour chaque terrain, récupérer les parcelles
+            // Note: Idéalement, le backend devrait avoir un endpoint /parcelles/all
+            for (const terrain of terrains) {
+                try {
+                    console.log(`Fetching parcels for terrain: ${terrain.nom} (${terrain.id})`);
+                    const parcellesRaw = await ParcellesService.getParcellesByTerrainApiV1ParcellesParcellesTerrainTerrainIdGet(terrain.id) as any;
+                    const parcellesResponse = Array.isArray(parcellesRaw) ? parcellesRaw : (parcellesRaw.data || []);
 
-          if (!response.ok) throw new Error("Erreur lors de la sauvegarde");
-          return await response.json();
-      } catch (error) {
-          console.error("Erreur saveParcelle:", error);
-          throw error;
-      }
-      */
+                    const enrichedParcels = await Promise.all(parcellesResponse.map(async (p: any) => {
+                        // 3. Enrichir avec les données de capteurs (Dernière mesure)
+                        let stats: Partial<SensorMeasurementsResponse> = {};
+                        try {
+                            const measurementsRaw = await DonnEsDeCapteursService.getMeasurementsByParcelleApiV1SensorDataSensorDataParcelleParcelleIdGet(
+                                p.id,
+                                0,
+                                1 // On essaie de récupérer la plus récente
+                            ) as any;
+                            const measurements = Array.isArray(measurementsRaw) ? measurementsRaw : (measurementsRaw.data || []);
 
-      // --- LOGIQUE SIMULÉE ---
-      return new Promise((resolve) => {
-          setTimeout(() => {
-              if (parcelle.id) {
-                  mockParcelles = mockParcelles.map(p => p.id === parcelle.id ? { ...parcelle } : p);
-              } else {
-                  const nouvelle = { ...parcelle, id: Date.now() };
-                  mockParcelles.push(nouvelle);
-              }
-              resolve(true);
-          }, 600);
-      });
-  },
+                            // On suppose que l'API renvoie la plus récente en premier ou unique
+                            if (measurements && measurements.length > 0) {
+                                // stats = measurements[0];
+                                stats = measurements[0];
+                            }
+                        } catch (e) {
+                            // Pas de mesure ou 403, on ignore silencieusement
+                            // console.warn(`Impossible de récupérer les mesures pour parcelle ${p.id}`, e);
+                        }
 
-  /**
-   * SUPPRIMER UNE PARCELLE
-   */
-  deleteParcelle: async (id: number | string) => {
-      /* // --- LOGIQUE BACKEND ---
-      try {
-          const response = await fetch(`${API_URL}/${id}`, {
-              method: 'DELETE',
-          });
-          if (!response.ok) throw new Error("Erreur lors de la suppression");
-          return true;
-      } catch (error) {
-          console.error("Erreur deleteParcelle:", error);
-          throw error;
-      }
-      */
+                        return {
+                            id: p.id,
+                            nom: p.nom,
+                            superficie: p.superficie,
+                            terrainId: terrain.id,
+                            code: p.code || 'N/A',
+                            description: p.description,
+                            azote: stats.azote || 0,
+                            phosphore: stats.phosphore || 0,
+                            potassium: stats.potassium || 0,
+                            humidite: stats.humidity || 0,
+                            temperature: stats.temperature || 0,
+                            ph: stats.ph || 0,
+                            culturePredite: "Maïs",
+                            hasMeasurements: !!(stats.id),
+                            capteursListe: stats.capteur_id ? await (async () => {
+                                try {
+                                    const c = await CapteursService.readCapteurApiV1CapteursCapteurIdGet(stats.capteur_id!);
+                                    return c.code;
+                                } catch (e) {
+                                    return "";
+                                }
+                            })() : ""
+                        };
+                    }));
 
-      // --- LOGIQUE SIMULÉE ---
-      return new Promise((resolve) => {
-          setTimeout(() => {
-              mockParcelles = mockParcelles.filter(p => String(p.id) !== String(id));
-              resolve(true);
-          }, 300);
-      });
-  },
+                    allParcels = [...allParcels, ...enrichedParcels];
+                } catch (err) {
+                    console.error(`Erreur lors de la récupération des parcelles pour terrain ${terrain.id} (${terrain.nom}):`, err);
+                    // On continue vers le prochain terrain sans crasher
+                }
+            }
 
-  /**
-   * MISE À JOUR PARTIELLE (PATCH)
-   */
-  updateParcel: async (id: string | number, data: Parcelle) => {
-      /* // --- LOGIQUE BACKEND ---
-      try {
-          const response = await fetch(`${API_URL}/${id}`, {
-              method: 'PATCH',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(data),
-          });
-          if (!response.ok) throw new Error("Erreur lors de la mise à jour");
-          return await response.json();
-      } catch (error) {
-          console.error("Erreur updateParcel:", error);
-          throw error;
-      }
-      */
+            return allParcels;
 
-      // --- SIMULATION ---
-      return new Promise((resolve) => {
-          mockParcelles = mockParcelles.map(p => 
-              String(p.id) === String(id) ? { ...p, ...data } : p
-          );
-          resolve(true);
-      });
-  }
+        } catch (error) {
+            console.error("Erreur getParcelles:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * ENREGISTRER OU MODIFIER UNE PARCELLE
+     */
+    saveParcelle: async (parcelle: Parcelle) => {
+        try {
+            if (parcelle.id && typeof parcelle.id === 'string' && parcelle.id.length > 10) {
+                // Update: Seulement nom, description, superficie supportés par ParcelleUpdate
+                return await ParcellesService.updateParcelleApiV1ParcellesParcellesParcelleIdPut(
+                    String(parcelle.id),
+                    {
+                        nom: parcelle.nom,
+                        description: parcelle.description || "Mis à jour via Frontend",
+                        superficie: parcelle.superficie
+                    }
+                );
+            } else {
+                // Create
+                return await ParcellesService.createParcelleApiV1ParcellesParcellesPost({
+                    nom: parcelle.nom,
+                    terrain_id: String(parcelle.terrainId),
+                    superficie: parcelle.superficie,
+                    description: parcelle.description || "Créé via Frontend",
+                    code: parcelle.code || null
+                });
+            }
+        } catch (error) {
+            console.error("Erreur saveParcelle:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * SUPPRIMER UNE PARCELLE
+     */
+    deleteParcelle: async (id: number | string) => {
+        try {
+            await ParcellesService.deleteParcelleApiV1ParcellesParcellesParcelleIdDelete(String(id));
+            return true;
+        } catch (error) {
+            console.error("Erreur deleteParcelle:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * MISE À JOUR PARTIELLE (PATCH)
+     */
+    updateParcel: async (id: string | number, data: Partial<Parcelle>) => {
+        try {
+            // On utilise Update qui est un PUT dans ce SDK, donc il faut envoyer l'objet partiel
+            // Si l'API supporte le PATCH partiel. Le SDK a `ParcelleUpdate` ou `ParcelleCreate`.
+            // `ParcelleUpdate` a les champs optionnels (nullable) dans le modèle.
+            return await ParcellesService.updateParcelleApiV1ParcellesParcellesParcelleIdPut(
+                String(id),
+                {
+                    nom: data.nom,
+                    superficie: data.superficie
+                    // Autres champs si nécessaire
+                }
+            );
+        } catch (error) {
+            console.error("Erreur updateParcel:", error);
+            throw error;
+        }
+    }
 };

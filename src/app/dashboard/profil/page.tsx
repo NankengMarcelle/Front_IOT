@@ -22,9 +22,43 @@ import {
 } from "lucide-react";
 import { useLanguageStore } from '@/store/useUserStore';
 import { useTranslation } from '@/providers/TranslationProvider';
-import Link from "next/link";
+import { authService } from "@/features/auth/services/authService";
 
-type UserRole = "ADMIN" | "FARMER" | "AGENT" | "MANAGER" | string;
+const ProfileField = ({ label, value, icon: Icon, type = "text", error = "", isEditing, ...props }: any) => {
+  const [show, setShow] = useState(false);
+  const inputType = type === "password" ? (show ? "text" : "password") : type;
+
+  return (
+    <div className="space-y-3 relative">
+      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#052E16]/30 px-2 flex items-center gap-2">
+        <Icon className="w-3 h-3" />
+        {label}
+      </label>
+      <div className="relative">
+        <input
+          type={inputType}
+          value={value}
+          className={`w-full px-8 py-5 rounded-[24px] border ${error ? 'border-rose-300 bg-rose-50 text-rose-900' : 'border-emerald-50 bg-white/50 text-[#052E16]'} 
+            focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold tracking-tight
+            ${!isEditing && 'bg-emerald-50/20 text-[#052E16]/40 cursor-not-allowed'}`}
+          {...props}
+        />
+        {type === "password" && isEditing && (
+          <button
+            type="button"
+            onClick={() => setShow(!show)}
+            className="absolute right-6 top-1/2 -translate-y-1/2 text-emerald-200 hover:text-emerald-500 transition-colors"
+          >
+            {show ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        )}
+      </div>
+      {error && <p className="text-[9px] font-black uppercase tracking-widest text-rose-500 px-2">{error}</p>}
+    </div>
+  );
+};
+
+type UserRole = "ADMIN" | "FARMER" | "AGENT" | "MANAGER" | "AGRICULTEUR" | "UTILISATEUR" | string;
 
 interface UserProfile {
   id: string;
@@ -36,8 +70,9 @@ interface UserProfile {
   address: string;
   joinDate: string;
   langue: "fr" | "en";
-  password: string;
-  confirmPassword: string;
+  password?: string;
+  confirmPassword?: string;
+  oldPassword?: string;
   notifications: {
     email: boolean;
     sms: boolean;
@@ -57,17 +92,15 @@ export default function ProfilPage() {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const [userData, setUserData] = useState<UserProfile>({
-    id: "mock-id-123",
-    email: "user@example.com",
-    nom: "Dupont",
-    prenom: "Jean",
+    id: "",
+    email: "",
+    nom: "",
+    prenom: "",
     role: "AGRICULTEUR",
-    phone: "+237 600 00 00 00",
+    phone: "",
     address: "Yaoundé, Cameroun",
-    joinDate: "12 janvier 2024",
+    joinDate: "",
     langue: lang,
-    password: "",
-    confirmPassword: "",
     notifications: {
       email: true,
       sms: false,
@@ -83,24 +116,31 @@ export default function ProfilPage() {
     confirmPassword: ""
   });
 
-  useEffect(() => {
-    const savedUser = localStorage.getItem('smartagro_user');
-    if (savedUser) {
-      try {
-        const user = JSON.parse(savedUser);
-        const nameParts = user.name ? user.name.split(' ') : [];
-        setUserData(prev => ({
-          ...prev,
-          id: user.id || prev.id,
-          email: user.email || prev.email,
-          nom: nameParts.length > 1 ? nameParts.slice(1).join(' ') : (user.nom || prev.nom),
-          prenom: nameParts.length > 0 ? nameParts[0] : (user.prenom || prev.prenom),
-          role: user.role || prev.role,
-        }));
-      } catch (e) {
-        console.error("Failed to parse saved user", e);
-      }
+  const fetchProfile = async () => {
+    try {
+      setLoading(true);
+      const user = await authService.getProfile();
+      setUserData(prev => ({
+        ...prev,
+        id: user.id,
+        email: user.email,
+        nom: user.nom || "",
+        prenom: user.prenom || "",
+        role: user.role,
+        phone: user.telephone || "",
+        joinDate: user.date_inscription ? new Date(user.date_inscription).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }) : "",
+        // avatar handle
+      }));
+      if (user.avatar) setAvatarPreview(user.avatar);
+    } catch (error) {
+      console.error("Failed to fetch profile", error);
+    } finally {
+      setLoading(false);
     }
+  };
+
+  useEffect(() => {
+    fetchProfile();
   }, []);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,7 +159,8 @@ export default function ProfilPage() {
     let isValid = true;
     if (!userData.nom.trim()) { errors.nom = "Le nom est requis"; isValid = false; }
     if (!userData.prenom.trim()) { errors.prenom = "Le prénom est requis"; isValid = false; }
-    if (userData.phone && !/^[+]?[\d\s-]{10,}$/.test(userData.phone)) { errors.phone = "Format invalide"; isValid = false; }
+    // if (userData.phone && !/^[+]?[\d\s-]{10,}$/.test(userData.phone)) { errors.phone = "Format invalide"; isValid = false; }
+
     if (userData.password) {
       if (userData.password.length < 8) { errors.password = "8+ caractères requis"; isValid = false; }
       if (userData.password !== userData.confirmPassword) { errors.confirmPassword = "Les mots de passe ne correspondent pas"; isValid = false; }
@@ -133,46 +174,60 @@ export default function ProfilPage() {
     if (!validateForm()) return;
     setLoading(true);
 
-    // Simuler un appel API
-    setTimeout(() => {
+    try {
+      await authService.updateProfile({
+        nom: userData.nom,
+        prenom: userData.prenom,
+        telephone: userData.phone,
+        avatar: avatarPreview || undefined
+      });
+
+      // Si changement de mot de passe, on pourrait appeler un autre service si existant
+      // Mais ici le UserUpdate ne semble pas inclure le password
+
       setIsEditing(false);
       setShowSuccess(true);
-      setLoading(false);
 
-      // Réinitialiser les mots de passe après sauvegarde
-      setUserData(prev => ({ ...prev, password: "", confirmPassword: "" }));
+      // Refresh local data
+      fetchProfile();
 
-      // Mettre à jour le stockage local
-      const updatedUser = {
-        id: userData.id,
-        email: userData.email,
-        name: `${userData.prenom} ${userData.nom}`,
-        role: userData.role,
-        isActive: true
-      };
-      localStorage.setItem('smartagro_user', JSON.stringify(updatedUser));
+      // Reset password fields
+      setUserData(prev => ({ ...prev, oldPassword: "", password: "", confirmPassword: "" }));
 
       setTimeout(() => setShowSuccess(false), 3000);
-    }, 1000);
+    } catch (error) {
+      console.error("Failed to update profile", error);
+      alert("Erreur lors de la mise à jour du profil");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const ProfileField = ({ label, value, icon: Icon, type = "text", error = "", ...props }: any) => (
-    <div className="space-y-3">
-      <label className="text-[10px] font-black uppercase tracking-[0.2em] text-[#052E16]/30 px-2 flex items-center gap-2">
-        <Icon className="w-3 h-3" />
-        {label}
-      </label>
-      <input
-        type={type}
-        value={value}
-        className={`w-full px-8 py-5 rounded-[24px] border ${error ? 'border-rose-300 bg-rose-50 text-rose-900' : 'border-emerald-50 bg-white/50 text-[#052E16]'} 
-          focus:ring-4 focus:ring-emerald-500/10 focus:border-emerald-500 outline-none transition-all font-bold tracking-tight
-          ${!isEditing && 'bg-emerald-50/20 text-[#052E16]/40 cursor-not-allowed'}`}
-        {...props}
-      />
-      {error && <p className="text-[9px] font-black uppercase tracking-widest text-rose-500 px-2">{error}</p>}
-    </div>
-  );
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!userData.oldPassword || !userData.password || userData.password !== userData.confirmPassword) {
+      setFormErrors(prev => ({
+        ...prev,
+        password: !userData.password ? "Requis" : (userData.password.length < 8 ? "8+ car." : ""),
+        confirmPassword: userData.password !== userData.confirmPassword ? "Différent" : ""
+      }));
+      return;
+    }
+
+    setLoading(true);
+    try {
+      await authService.changePassword(userData.oldPassword, userData.password);
+      setShowSuccess(true);
+      setUserData(prev => ({ ...prev, oldPassword: "", password: "", confirmPassword: "" }));
+      setTimeout(() => setShowSuccess(false), 3000);
+    } catch (error: any) {
+      console.error("Password change failed", error);
+      alert(error.body?.detail || "Erreur de changement de mot de passe. Vérifiez l'ancien mot de passe.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <div className="relative min-h-screen overflow-hidden">
@@ -242,7 +297,13 @@ export default function ProfilPage() {
                       <button onClick={handleSave} disabled={loading} className="w-full bg-[#052E16] text-white py-4 md:py-5 rounded-xl md:rounded-[24px] font-black text-[10px] md:text-xs uppercase tracking-widest shadow-xl hover:bg-emerald-800 transition-all flex items-center justify-center gap-2">
                         {loading ? <Loader2 className="animate-spin w-4 h-4" /> : "Enregistrer"}
                       </button>
-                      <button onClick={() => setIsEditing(false)} className="w-full bg-rose-50 text-rose-600 py-4 md:py-5 rounded-xl md:rounded-[24px] font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-rose-100 transition-all">
+                      <button
+                        onClick={() => {
+                          setIsEditing(false);
+                          setUserData(prev => ({ ...prev, oldPassword: "", password: "", confirmPassword: "" }));
+                        }}
+                        className="w-full bg-rose-50 text-rose-600 py-4 md:py-5 rounded-xl md:rounded-[24px] font-black text-[10px] md:text-xs uppercase tracking-widest hover:bg-rose-100 transition-all"
+                      >
                         Annuler
                       </button>
                     </div>
@@ -282,12 +343,12 @@ export default function ProfilPage() {
                   {activeTab === 'profile' ? (
                     <div className="space-y-8 md:space-y-12">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                        <ProfileField label="Nom" value={userData.nom} icon={User} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, nom: e.target.value })} error={formErrors.nom} />
-                        <ProfileField label="Prénom" value={userData.prenom} icon={User} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, prenom: e.target.value })} error={formErrors.prenom} />
+                        <ProfileField label="Nom" value={userData.nom} icon={User} isEditing={isEditing} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, nom: e.target.value })} error={formErrors.nom} />
+                        <ProfileField label="Prénom" value={userData.prenom} icon={User} isEditing={isEditing} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, prenom: e.target.value })} error={formErrors.prenom} />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                        <ProfileField label="Email" value={userData.email} icon={Mail} disabled={true} />
-                        <ProfileField label="Téléphone" value={userData.phone} icon={Phone} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, phone: e.target.value })} error={formErrors.phone} />
+                        <ProfileField label="Email" value={userData.email} icon={Mail} isEditing={false} disabled={true} />
+                        <ProfileField label="Téléphone" value={userData.phone} icon={Phone} isEditing={isEditing} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, phone: e.target.value })} error={formErrors.phone} />
                       </div>
                       <div className="pt-8 md:pt-12 border-t border-emerald-50">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[#052E16]/30 mb-6 md:mb-8 flex items-center gap-3"><Globe className="w-3.5 h-3.5" /> Préférences de Langue</h3>
@@ -307,25 +368,44 @@ export default function ProfilPage() {
                     </div>
                   ) : (
                     <div className="space-y-8 md:space-y-12">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                        <div className="relative">
-                          <ProfileField label="Nouveau Mot de Passe" value={userData.password} type={showPass ? "text" : "password"} icon={Lock} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, password: e.target.value })} error={formErrors.password} />
-                          {isEditing && (
-                            <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-6 top-14 text-emerald-200 hover:text-emerald-500 transition-colors">
-                              {showPass ? <EyeOff size={18} /> : <Eye size={18} />}
-                            </button>
-                          )}
+                      <div className="p-6 md:p-8 bg-emerald-50/50 rounded-[28px] md:rounded-[32px] border border-emerald-50 flex items-start gap-4">
+                        <Shield className="w-5 h-5 md:w-6 md:h-6 text-emerald-600 mt-1" />
+                        <div>
+                          <p className="font-black text-[#052E16] mb-2 text-sm md:text-base">Sécurité Critique</p>
+                          <p className="text-xs md:text-sm font-medium text-[#052E16]/60 leading-relaxed">Le changement de mot de passe est une action sensible. Vous devrez fournir votre mot de passe actuel.</p>
                         </div>
-                        <ProfileField label="Confirmation" value={userData.confirmPassword} type={showPass ? "text" : "password"} icon={Lock} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, confirmPassword: e.target.value })} error={formErrors.confirmPassword} />
                       </div>
-                      <div className="p-6 md:p-8 bg-emerald-50/50 rounded-[28px] md:rounded-[32px] border border-emerald-50">
-                        <div className="flex items-start gap-4">
-                          <Shield className="w-5 h-5 md:w-6 md:h-6 text-emerald-600 mt-1" />
-                          <div>
-                            <p className="font-black text-[#052E16] mb-2 text-sm md:text-base">Sécurité Critique</p>
-                            <p className="text-xs md:text-sm font-medium text-[#052E16]/60 leading-relaxed">Votre mot de passe doit comporter au moins 12 caractères pour un niveau de protection Elite SmartAgro.</p>
+
+                      <div className="space-y-6">
+                        <ProfileField
+                          label="Mot de passe actuel"
+                          value={userData.oldPassword || ""}
+                          type="password"
+                          icon={Lock}
+                          isEditing={isEditing}
+                          disabled={!isEditing}
+                          onChange={(e: any) => setUserData({ ...userData, oldPassword: e.target.value })}
+                        />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+                          <div className="relative">
+                            <ProfileField label="Nouveau Mot de Passe" value={userData.password || ""} type="password" icon={Lock} isEditing={isEditing} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, password: e.target.value })} error={formErrors.password} />
                           </div>
+                          <ProfileField label="Confirmation" value={userData.confirmPassword || ""} type="password" icon={Lock} isEditing={isEditing} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, confirmPassword: e.target.value })} error={formErrors.confirmPassword} />
                         </div>
+
+                        {isEditing && (
+                          <div className="pt-6">
+                            <button
+                              onClick={handleUpdatePassword}
+                              disabled={loading || !userData.oldPassword || !userData.password}
+                              className="w-full sm:w-auto px-10 py-4 bg-emerald-900 text-white rounded-[20px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-800 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                            >
+                              {loading ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                              Mettre à jour le mot de passe
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   )}

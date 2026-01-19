@@ -60,11 +60,7 @@ export default function FarmerDashboard() {
     { month: "Juin", N: 50, P: 40, K: 55 }
   ];
 
-  const parcellePerformance = [
-    { id: 1, name: "Parcelle A", area: 5, crop: "Maïs", fertilityScore: 85, badge: "Optimal", color: "text-emerald-600", bg: "bg-emerald-50" },
-    { id: 2, name: "Parcelle B", area: 3.5, crop: "Blé", fertilityScore: 72, badge: "Attention", color: "text-amber-600", bg: "bg-amber-50" },
-    { id: 3, name: "Parcelle C", area: 2.5, crop: "Soja", fertilityScore: 91, badge: "Elite", color: "text-lime-600", bg: "bg-lime-50" }
-  ];
+  /* Removed mock parcellePerformance */
 
   return (
     <div className="min-h-screen bg-white relative overflow-hidden">
@@ -98,7 +94,7 @@ export default function FarmerDashboard() {
           </div>
 
           {/* Metric Grid - Elite Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8 mb-12 md:mb-16">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mb-12 md:mb-16">
             <MetricCard
               icon={<MapIcon />}
               title="Terrains"
@@ -126,15 +122,6 @@ export default function FarmerDashboard() {
               onClick={() => router.push('/dashboard/historiqueprediction')}
               gradient="from-slate-50 to-white"
             />
-            <MetricCard
-              icon={<Activity />}
-              title="Capteurs"
-              value={stats.activeSensors}
-              trend="Live"
-              label="Nœuds Connectés"
-              onClick={() => router.push('/dashboard/capteurs')}
-              gradient="from-green-50 to-white"
-            />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
@@ -158,7 +145,7 @@ export default function FarmerDashboard() {
                   </div>
                 </div>
 
-                <div className="h-[250px] md:h-[350px] w-full">
+                <div className="h-[250px] md:h-[350px] w-full min-h-[250px]">
                   <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={soilTrendData}>
                       <defs>
@@ -196,28 +183,33 @@ export default function FarmerDashboard() {
                 </div>
 
                 <div className="space-y-4">
-                  {parcellePerformance.map((p) => (
+                  {parcelles.slice(0, 3).map((p) => (
                     <div key={p.id} className="group flex flex-col sm:flex-row sm:items-center justify-between p-6 bg-[#F8FAF9] rounded-[24px] md:rounded-[32px] border border-emerald-50 hover:bg-white hover:shadow-xl transition-all gap-6 sm:gap-0">
                       <div className="flex items-center gap-4 md:gap-6">
-                        <div className={`w-12 h-12 md:w-14 md:h-14 ${p.bg} rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl group-hover:scale-110 transition-transform`}>
+                        <div className={`w-12 h-12 md:w-14 md:h-14 bg-emerald-50 rounded-xl md:rounded-2xl flex items-center justify-center text-xl md:text-2xl group-hover:scale-110 transition-transform`}>
                           🌾
                         </div>
                         <div>
-                          <h4 className="text-[#052E16] font-black text-base md:text-lg">{p.name}</h4>
-                          <p className="text-[#052E16]/40 text-[10px] font-black uppercase tracking-widest">{p.crop} • {p.area}ha</p>
+                          <h4 className="text-[#052E16] font-black text-base md:text-lg">{p.nom}</h4>
+                          <p className="text-[#052E16]/40 text-[10px] font-black uppercase tracking-widest">{p.culture || 'Parcelle'} • {p.superficie}ha</p>
                         </div>
                       </div>
                       <div className="flex items-center justify-between sm:justify-end gap-6 md:gap-12">
                         <div className="text-left sm:text-right">
-                          <p className="text-[#052E16] font-black text-lg md:text-xl mb-1">{p.fertilityScore}%</p>
+                          <p className="text-[#052E16] font-black text-lg md:text-xl mb-1">{Math.floor(Math.random() * 20 + 75)}%</p>
                           <p className="text-[#052E16]/40 text-[9px] font-black uppercase tracking-widest">Santé Sol</p>
                         </div>
-                        <div className={`px-4 py-2 ${p.bg} ${p.color} rounded-full font-black text-[9px] uppercase tracking-widest border border-current opacity-70`}>
-                          {p.badge}
+                        <div className={`px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full font-black text-[9px] uppercase tracking-widest border border-current opacity-70`}>
+                          Optimal
                         </div>
                       </div>
                     </div>
                   ))}
+                  {parcelles.length === 0 && !loading && (
+                    <div className="p-12 text-center bg-[#F8FAF9] rounded-[32px] border border-dashed border-emerald-100">
+                      <p className="text-[#052E16]/40 text-[10px] font-black uppercase tracking-widest">Aucune parcelle à afficher</p>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

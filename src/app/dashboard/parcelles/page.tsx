@@ -6,7 +6,6 @@ import ParcelForm from "@/features/parcels/components/ParcelForm";
 import { parcelService } from "@/features/parcels/services/parcelService";
 import { terrainService } from "@/features/terrains/services/terrainService";
 import { sensorService } from "@/features/sensors/services/sensorService";
-import { sensorDataService } from "@/features/sensors/services/sensorDataService";
 import { useTranslation } from "@/providers/TranslationProvider";
 import { Plus, Grid3x3, Search, Layout, ChevronRight } from "lucide-react";
 
@@ -26,43 +25,25 @@ export default function ParcellesPage() {
       setTerrains(terrainsData);
 
       const flattenedParcelles: any = await parcelService.getParcelles();
-      const sensors: any = await sensorService.getSensors();
+      // const sensors: any = await sensorService.getSensors(); // Retiré car cause 403 Forbidden
 
-      const parcellesWithExtras = await Promise.all(flattenedParcelles.map(async (p: any) => {
-        const parcelSensors = sensors.filter((s: any) => String(s.parcelleId || s.parcelle_id) === String(p.id));
-        const capteursListe = parcelSensors.map((s: any) => s.nom || s.code).join(', ');
-
-        let measurements = {
-          azote: 0, phosphore: 0, potassium: 0,
-          humidite: 0, temperature: 0, ph: 0
-        };
-
-        try {
-          const parcelMeasurements = await sensorDataService.getMeasurementsByParcelle(p.id);
-          if (parcelMeasurements && parcelMeasurements.length > 0) {
-            const latest = parcelMeasurements[0];
-            measurements = {
-              azote: latest.azote || 0,
-              phosphore: latest.phosphore || 0,
-              potassium: latest.potassium || 0,
-              humidite: latest.humidity || 0,
-              temperature: latest.temperature || 0,
-              ph: latest.ph || 0
-            };
-          }
-        } catch (e) {
-          console.error(`Error fetching measurements for parcel ${p.id}:`, e);
-        }
-
-        return { ...p, ...measurements, capteursListe };
-      }));
-
-      setParcelles(parcellesWithExtras);
+      setParcelles(flattenedParcelles);
       setView("list");
     } catch (error) {
       console.error("Error loading parcelles data:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDelete = async (id: number | string) => {
+    if (!confirm("Voulez-vous vraiment supprimer cette parcelle ?")) return;
+    try {
+      await parcelService.deleteParcelle(id);
+      loadData();
+    } catch (error) {
+      console.error("Error deleting parcel:", error);
+      alert("Impossible de supprimer la parcelle.");
     }
   };
 
@@ -156,14 +137,13 @@ export default function ParcellesPage() {
                     <ParcelCard
                       key={p.id}
                       parcel={p}
-                      terrainName={getTerrainName(p.terrain_id || p.terrainId)}
-                      onEdit={() => { setSelectedParcel(p); setView("form"); }}
-                      onDelete={async () => {
-                        if (confirm(t('parcelles_list.delete_confirm'))) {
-                          await parcelService.deleteParcelle(p.id);
-                          loadData();
-                        }
+                      terrainName={terrains.find((t: any) => String(t.id) === String(p.terrainId))?.nom || "Terrain Inconnu"}
+                      onRefresh={loadData}
+                      onEdit={() => {
+                        setSelectedParcel(p);
+                        setView("form");
                       }}
+                      onDelete={() => handleDelete(p.id)}
                     />
                   ))}
                 </div>

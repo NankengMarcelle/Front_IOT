@@ -1,79 +1,77 @@
 import { Terrain } from "@/types/user";
-
-// Simulation d'une base de données en mémoire pour le mode démo
-let mockTerrains = [
-  { id: 1, nom: "Terrain Nord", superficie: 500, pays: "Cameroun", ville: "Yaoundé", quartier: "Melen" },
-];
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+import { TerrainsService, TerrainResponse, TerrainCreate } from "@/lib";
+import { localiteService } from "./localiteService";
 
 export const terrainService = {
-  
+
   // ==========================================
   // LOGIQUE BACKEND RÉELLE (API)
   // ==========================================
-  /*
-  getTerrains: async () => {
-    const response = await fetch(`${API_URL}/terrains`);
-    if (!response.ok) throw new Error("Erreur lors de la récupération des terrains");
-    return await response.json();
+  getTerrains: async (): Promise<Terrain[]> => {
+    try {
+      const [terrainsResponse, localites] = await Promise.all([
+        TerrainsService.getAllTerrainsApiV1TerrainsTerrainsGet() as any,
+        localiteService.getAllLocalites()
+      ]);
+
+      const terrainsData = Array.isArray(terrainsResponse) ? terrainsResponse : (terrainsResponse.data || []);
+
+      // MAPPING: Adapter TerrainResponse vers le type Terrain du frontend
+      return terrainsData.map((t: any) => {
+        const localite = localites.find((l: any) => l.id === t.localite_id);
+
+        return {
+          id: t.id,
+          localite_id: t.localite_id,
+          description: t.description,
+          nom: t.nom,
+          superficie: 0, // Pas disponible dans TerrainResponse
+          pays: localite?.pays || "Non défini",
+          ville: localite?.ville || "Non défini",
+          quartier: localite?.nom || "Non défini", // On utilise le nom de la localité comme quartier/zone
+          nombre_parcelles: t.nombre_parcelles || 0,
+          created_at: t.created_at
+        };
+      });
+    } catch (error) {
+      console.error("Erreur getTerrains:", error);
+      throw error;
+    }
   },
 
   saveTerrain: async (terrain: any) => {
-    const isUpdate = !!terrain.id;
-    const url = isUpdate ? `${API_URL}/terrains/${terrain.id}` : `${API_URL}/terrains`;
-    const method = isUpdate ? 'PUT' : 'POST';
-
-    const response = await fetch(url, {
-      method: method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(terrain)
-    });
-
-    if (!response.ok) throw new Error("Erreur lors de l'enregistrement");
-    return await response.json();
+    try {
+      if (terrain.id) {
+        // Update
+        return await TerrainsService.updateTerrainApiV1TerrainsTerrainsTerrainIdPut(
+          String(terrain.id),
+          {
+            nom: terrain.nom,
+            description: terrain.description,
+            // Autres champs update
+          }
+        );
+      } else {
+        // Create
+        return await TerrainsService.createTerrainApiV1TerrainsTerrainsPost({
+          nom: terrain.nom,
+          description: terrain.description || "Nouveau terrain",
+          localite_id: terrain.localite_id,
+        });
+      }
+    } catch (error) {
+      console.error("Erreur saveTerrain:", error);
+      throw error;
+    }
   },
 
-  deleteTerrain: async (id: number) => {
-    const response = await fetch(`${API_URL}/terrains/${id}`, {
-      method: 'DELETE'
-    });
-    if (!response.ok) throw new Error("Erreur lors de la suppression");
-    return true;
-  },
-  */
-
-  // ==========================================
-  // LOGIQUE SIMULÉE AVEC MOCKS (Actuelle)
-  // ==========================================
-  getTerrains: async () => {
-    return new Promise((resolve) => {
-      setTimeout(() => resolve([...mockTerrains]), 500);
-    });
-  },
-
-  saveTerrain: async (terrain: Terrain) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        if (terrain.id) {
-          // Mise à jour
-          mockTerrains = mockTerrains.map(t => t.id === terrain.id ? terrain : t);
-        } else {
-          // Création
-          const nouveau = { ...terrain, id: Date.now() };
-          mockTerrains.push(nouveau);
-        }
-        resolve(true);
-      }, 800);
-    });
-  },
-
-  deleteTerrain: async (id: number) => {
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        mockTerrains = mockTerrains.filter(t => t.id !== id);
-        resolve(true);
-      }, 400);
-    });
+  deleteTerrain: async (id: number | string) => {
+    try {
+      await TerrainsService.deleteTerrainApiV1TerrainsTerrainsTerrainIdDelete(String(id));
+      return true;
+    } catch (error) {
+      console.error("Erreur deleteTerrain:", error);
+      throw error;
+    }
   }
 };

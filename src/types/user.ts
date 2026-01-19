@@ -58,10 +58,10 @@ export type User = {
 };
 
 export type Parcelle = {
-  id: number;
+  id: number | string;
   nom: string;
   superficie: number;
-  terrainId: number;
+  terrainId: number | string;
   code: string;
   azote: number;
   phosphore: number;
@@ -70,6 +70,9 @@ export type Parcelle = {
   temperature: number;
   ph: number;
   culturePredite: string;
+  description?: string;
+  hasMeasurements?: boolean;
+  capteursListe?: string;
 };
 
 export type Prediction = {
@@ -86,19 +89,19 @@ export type Recommendation = {
 };
 
 export type Sensor = {
-  id: number;
-  parcelleId: number;
+  id: number | string;
+  parcelleId?: number | string;
   nom: string;
-  typeMesure: string;
+  typeMesure?: string;
 }
 
 export type Terrain = {
-  id: number;
+  id: number | string;
   nom: string;
   superficie: number;
-  pays: string;
-  ville: string;
-  quartier: string;
+  pays?: string;
+  ville?: string;
+  quartier?: string;
   type_terrain?: TypeTerrain;
   statut?: StatutTerrain;
   description?: string;
@@ -107,6 +110,8 @@ export type Terrain = {
   perimetre?: number;
   pente?: number;
   date_acquisition?: string;
+  nombre_parcelles?: number;
+  created_at?: string;
 };
 
 export type langue = "fr" | "en";

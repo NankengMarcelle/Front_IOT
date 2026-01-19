@@ -40,13 +40,15 @@ export default function TerrainsPage() {
     return { count: terrains.length, surface: totalSurface };
   }, [terrains]);
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number | string) => {
     if (confirm(t('terrains.delete_confirm'))) {
       try {
+        console.log("Deleting terrain:", id);
         await terrainService.deleteTerrain(id);
         loadData();
       } catch (error) {
         console.error("Error deleting terrain:", error);
+        alert(t('terrains.delete_error') || "Impossible de supprimer ce terrain. Assurez-vous qu'il ne contient aucune parcelle ou donnée liée.");
       }
     }
   };
@@ -78,7 +80,7 @@ export default function TerrainsPage() {
               </div>
               <TerrainForm
                 initialData={selectedTerrain}
-                onSuccess={loadData}
+                onSuccess={() => { loadData(); setView("list"); }}
                 onCancel={() => setView("list")}
               />
             </div>
@@ -164,7 +166,7 @@ export default function TerrainsPage() {
                         <div>
                           <p className="text-[8px] md:text-[9px] text-[#052E16]/30 font-black uppercase tracking-widest mb-1">Surface Totale</p>
                           <p className="text-[#052E16] font-black text-xl md:text-2xl tracking-tighter">
-                            {(t_node.superficie || t_node.superficie_totale).toLocaleString()} <span className="text-[10px] font-black text-emerald-500/50">M²</span>
+                            {(t_node.superficie ?? t_node.superficie_totale ?? 0).toLocaleString()} <span className="text-[10px] font-black text-emerald-500/50">M²</span>
                           </p>
                         </div>
                         <div className="text-right">

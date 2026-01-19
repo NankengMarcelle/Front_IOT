@@ -3,7 +3,8 @@
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Leaf, Mail, Lock, ShieldCheck, ArrowRight, ArrowLeft, Loader2 } from 'lucide-react';
+import { Leaf, Mail, Lock, ShieldCheck, ArrowRight, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
+import { authService } from '../services/authService';
 
 interface LoginFormProps {
   role: string | null;
@@ -14,6 +15,7 @@ export default function LoginForm({ role }: LoginFormProps) {
   const isAdmin = role === 'admin';
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // LE CODE ADMINISTRATEUR FIXE
   const ADMIN_SECRET_CODE = "SA-2025-ADMIN";
@@ -37,24 +39,20 @@ export default function LoginForm({ role }: LoginFormProps) {
       }
     }
 
-    // 2. Logique d'authentification simulée
-    setTimeout(() => {
-      // Stockage de données fictives
-      const mockUser = {
-        id: "mock-id",
-        email: email,
-        name: isAdmin ? "Admin User" : "Farmer User",
-        role: isAdmin ? "ADMIN" : "AGRICULTEUR",
-        isActive: true
-      };
+    // 2. Authentification réelle via le backend
+    try {
+      const user = await authService.login(email, password);
 
-      localStorage.setItem('smartagro_token', 'mock-token-' + Date.now());
-      localStorage.setItem('smartagro_user', JSON.stringify(mockUser));
+      // 3. Vérification du rôle (optionnelle : si l'admin doit avoir un rôle spécifique)
+      // L'API a déjà renvoyé le profil
 
       setLoading(false);
-      // Redirection selon le rôle
       router.push(isAdmin ? '/dashboard/admin' : '/dashboard/farmer');
-    }, 1500);
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Identifiants invalides");
+      setLoading(false);
+    }
   };
 
   return (
@@ -110,11 +108,18 @@ export default function LoginForm({ role }: LoginFormProps) {
               </div>
               <input
                 name="password"
-                type="password"
+                type={showPassword ? "text" : "password"}
                 required
                 placeholder="••••••••"
-                className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-6 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
+                className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-12 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
               />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-900/30 hover:text-emerald-600 transition-colors"
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
             </div>
           </div>
 

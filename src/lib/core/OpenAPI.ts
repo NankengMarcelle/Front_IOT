@@ -20,11 +20,16 @@ export type OpenAPIConfig = {
 };
 
 export const OpenAPI: OpenAPIConfig = {
-    BASE: 'https://iot-soil-backend.onrender.com',
-    VERSION: '1.0.0',
-    WITH_CREDENTIALS: false,
+    BASE: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000',
+    VERSION: '0.1.0',
+    WITH_CREDENTIALS: true,
     CREDENTIALS: 'include',
-    TOKEN: undefined,
+    TOKEN: async () => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('smartagro_token') || '';
+        }
+        return '';
+    },
     USERNAME: undefined,
     PASSWORD: undefined,
     HEADERS: undefined,
