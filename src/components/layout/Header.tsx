@@ -23,6 +23,7 @@ export default function DashboardHeader() {
   const router = useRouter();
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [userInfo, setUserInfo] = useState<any>(() => {
     if (typeof window !== 'undefined') {
       const savedUser = localStorage.getItem('smartagro_user');
@@ -132,7 +133,10 @@ export default function DashboardHeader() {
 
           {/* Profile Hub */}
           <div className="relative group/profile">
-            <button className="flex items-center gap-2 md:gap-3 p-1 md:p-1.5 bg-slate-50/50 rounded-xl md:rounded-2xl hover:bg-white transition-all border border-transparent hover:border-emerald-100">
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="flex items-center gap-2 md:gap-3 p-1 md:p-1.5 bg-slate-50/50 rounded-xl md:rounded-2xl hover:bg-white transition-all border border-transparent hover:border-emerald-100"
+            >
               <div className="w-8 h-8 md:w-10 md:h-10 bg-[#052E16] rounded-lg md:rounded-xl flex items-center justify-center text-white font-black text-[10px] md:text-xs shadow-lg">
                 {getInitial()}
               </div>
@@ -141,13 +145,14 @@ export default function DashboardHeader() {
                   {getFullName()}
                 </p>
               </div>
-              <ChevronDown className="w-3 h-3 md:w-4 md:h-4 text-[#052E16]/20 transition-transform group-hover/profile:rotate-180" />
+              <ChevronDown className={`w-3 h-3 md:w-4 md:h-4 text-[#052E16]/20 transition-transform ${isProfileOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {/* Elite Dropdown */}
-            <div className="absolute right-0 top-[calc(100%+12px)] w-60 md:w-64 bg-white rounded-[24px] md:rounded-[32px] shadow-2xl shadow-emerald-900/10 border border-emerald-50 p-2 md:p-3 invisible opacity-0 translate-y-4 group-hover/profile:visible group-hover/profile:opacity-100 group-hover/profile:translate-y-0 transition-all duration-500 z-[101]">
+            <div className={`absolute right-0 top-[calc(100%+12px)] w-60 md:w-64 bg-white rounded-[24px] md:rounded-[32px] shadow-2xl shadow-emerald-900/10 border border-emerald-50 p-2 md:p-3 transition-all duration-500 z-[101] ${isProfileOpen ? 'visible opacity-100 translate-y-0' : 'invisible opacity-0 translate-y-4'}`}>
               <Link
                 href="/dashboard/profil"
+                onClick={() => setIsProfileOpen(false)}
                 className="flex items-center gap-3 md:gap-4 p-3 md:p-4 hover:bg-emerald-50 rounded-[16px] md:rounded-[20px] transition-all group/item"
               >
                 <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-50 rounded-lg md:rounded-xl flex items-center justify-center text-emerald-600 group-hover/item:bg-[#052E16] group-hover/item:text-white transition-all">
@@ -157,6 +162,7 @@ export default function DashboardHeader() {
               </Link>
               <Link
                 href="/dashboard/parametres"
+                onClick={() => setIsProfileOpen(false)}
                 className="flex items-center gap-3 md:gap-4 p-3 md:p-4 hover:bg-emerald-50 rounded-[16px] md:rounded-[20px] transition-all group/item"
               >
                 <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-50 rounded-lg md:rounded-xl flex items-center justify-center text-emerald-600 group-hover/item:bg-[#052E16] group-hover/item:text-white transition-all">
@@ -189,7 +195,7 @@ export default function DashboardHeader() {
 
       {/* Mobile Menu - Elite Overlay */}
       {isMenuOpen && (
-        <div className="fixed inset-0 top-[80px] md:top-[100px] z-[99] p-4 md:p-6 lg:hidden animate-fadeIn">
+        <div className="fixed inset-0 top-[80px] md:top-[100px] z-[99] p-4 md:p-6 lg:hidden animate-fadeIn pointer-events-auto">
           <div className="absolute inset-x-4 md:inset-x-6 top-0 bg-white rounded-[32px] md:rounded-[48px] shadow-2xl border border-emerald-50 p-6 md:p-10 flex flex-col gap-4 md:gap-6 animate-slideDown">
             {navItems.map((item, id) => (
               <Link
@@ -204,9 +210,43 @@ export default function DashboardHeader() {
                 <span className="text-lg md:text-xl font-black tracking-tighter text-[#052E16]">{item.label}</span>
               </Link>
             ))}
+
+            <div className="h-px bg-emerald-50/50 my-2"></div>
+
+            <Link
+              href="/dashboard/profil"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-4 p-4 hover:bg-emerald-50 rounded-[24px] transition-all group"
+            >
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-emerald-600 group-hover:bg-[#052E16] group-hover:text-white transition-all">
+                <User size={20} />
+              </div>
+              <span className="text-lg font-black tracking-tighter text-[#052E16]">{t('nav.profile')}</span>
+            </Link>
+
+            <Link
+              href="/dashboard/parametres"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center gap-4 p-4 hover:bg-emerald-50 rounded-[24px] transition-all group"
+            >
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-emerald-600 group-hover:bg-[#052E16] group-hover:text-white transition-all">
+                <Settings size={20} />
+              </div>
+              <span className="text-lg font-black tracking-tighter text-[#052E16]">Paramètres</span>
+            </Link>
+
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-4 p-4 hover:bg-rose-50 rounded-[24px] transition-all group"
+            >
+              <div className="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all">
+                <LogOut size={20} />
+              </div>
+              <span className="text-lg font-black tracking-tighter text-rose-600">Déconnexion</span>
+            </button>
           </div>
           {/* Backdrop Click-off */}
-          <div className="fixed inset-0 -z-10 bg-black/5" onClick={() => setIsMenuOpen(false)}></div>
+          <div className="fixed inset-0 -z-10 bg-black/5" onClick={() => { setIsMenuOpen(false); setIsProfileOpen(false); }}></div>
         </div>
       )}
     </header>
