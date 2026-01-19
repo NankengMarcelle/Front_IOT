@@ -2,13 +2,15 @@
 import { useState, useEffect } from "react";
 import { terrainService } from "../../terrains/services/terrainService";
 import { parcelService } from "../services/parcelService";
+import { sensorService } from "../../sensors/services/sensorService";
 import { TypeSol, StatutParcelle, Parcelle, Terrain } from "@/types/user";
-import { Info, Calendar, Tag, Activity, MapPin, Ruler, X, ChevronDown } from "lucide-react";
+import { Info, Calendar, Tag, Activity, MapPin, Ruler, X, ChevronDown, RadioTower } from "lucide-react";
 
 export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
   const [loading, setLoading] = useState(false);
   const [terrainsExistants, setTerrainsExistants] = useState<any[]>([]);
   const [parcellesExistantes, setParcellesExistantes] = useState<any[]>([]);
+  const [capteursDisponibles, setCapteursDisponibles] = useState<any[]>([]);
   const [error, setError] = useState("");
   const [formData, setFormData] = useState(initialData ? {
     nom: initialData.nom,
@@ -19,7 +21,8 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
     description: initialData.description || "",
     culture_actuelle: initialData.culture_actuelle || "",
     date_plantation: initialData.date_plantation ? new Date(initialData.date_plantation).toISOString().split('T')[0] : "",
-    statut: initialData.statut || StatutParcelle.ACTIVE
+    statut: initialData.statut || StatutParcelle.ACTIVE,
+    sensor_id: initialData.sensor_id || ""
   } : {
     nom: "",
     superficie: "",
@@ -29,7 +32,8 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
     description: "",
     culture_actuelle: "",
     date_plantation: "",
-    statut: StatutParcelle.ACTIVE
+    statut: StatutParcelle.ACTIVE,
+    sensor_id: ""
   });
 
   useEffect(() => {
@@ -40,6 +44,9 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
 
         const parcellesData: any = await parcelService.getParcelles();
         setParcellesExistantes(parcellesData);
+
+        const capteursData: any = await sensorService.getSensors();
+        setCapteursDisponibles(capteursData);
       } catch (error) {
         console.error("Error loading form data:", error);
       }
@@ -86,6 +93,7 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
         code: formData.code || null,
         terrainId: Number(formData.terrain_id),
         type_sol: formData.type_sol,
+        sensor_id: formData.sensor_id ? Number(formData.sensor_id) : null,
       };
 
       if (initialData?.id) {
@@ -217,6 +225,27 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
                 </select>
                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 pointer-events-none" />
               </div>
+            </div>
+          </div>
+
+          {/* Capteur Assigné */}
+          <div className="space-y-2">
+            <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Capteur IoT (Optionnel)</label>
+            <div className="relative group">
+              <select
+                className="w-full bg-slate-50 border border-slate-100 rounded-[20px] pl-12 pr-10 py-3.5 text-slate-800 font-bold outline-none focus:border-emerald-500 focus:bg-white transition-all appearance-none cursor-pointer shadow-inner"
+                value={formData.sensor_id}
+                onChange={(e) => setFormData({ ...formData, sensor_id: e.target.value })}
+              >
+                <option value="">Aucun capteur</option>
+                {capteursDisponibles.map(capteur => (
+                  <option key={capteur.id} value={capteur.id}>
+                    {capteur.nom} - {capteur.type}
+                  </option>
+                ))}
+              </select>
+              <RadioTower className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 group-focus-within:text-emerald-500 transition-colors" />
+              <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 pointer-events-none" />
             </div>
           </div>
 
