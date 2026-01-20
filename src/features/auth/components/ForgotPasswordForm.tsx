@@ -3,6 +3,7 @@
 import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { Leaf, Mail, ArrowRight, ArrowLeft, Send, CheckCircle2, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function ForgotPasswordForm({ role }: { role: string | null }) {
   const [isSent, setIsSent] = useState(false);
@@ -12,10 +13,12 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    const toastId = toast.loading("Envoi du lien...");
 
     // Simulation envoi
     setTimeout(() => {
       console.log("Envoi du lien à :", email);
+      toast.success("Lien envoyé ! Vérifiez votre boîte mail.", { id: toastId });
       setIsSent(true);
       setLoading(false);
     }, 1500);
@@ -29,9 +32,9 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
 
         {/* Header */}
         <div className="w-full text-center mb-10 relative z-10">
-          <div className="inline-flex p-3 bg-white rounded-2xl shadow-sm mb-6 border border-emerald-50">
+          <Link href="/" className="inline-flex p-3 bg-white rounded-2xl shadow-sm mb-6 border border-emerald-50 hover:scale-110 transition-transform">
             <Leaf className="w-8 h-8 text-emerald-600" />
-          </div>
+          </Link>
           <h1 className="text-3xl font-black text-[#052E16] tracking-tighter mb-2">
             Mot de passe oublié
           </h1>
@@ -100,6 +103,17 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
             </div>
           </form>
         )}
+      </div>
+
+      {/* Back to Home Button */}
+      <div className="mt-8 text-center">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl text-[#052E16] hover:bg-white hover:shadow-lg transition-all font-black text-[10px] uppercase tracking-[0.2em]"
+        >
+          <ArrowLeft className="w-3 h-3" />
+          Retour à l'accueil
+        </Link>
       </div>
     </div>
   );

@@ -15,6 +15,7 @@ import {
   X
 } from "lucide-react";
 import { CapteursService } from "@/lib";
+import { toast } from "sonner";
 
 export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRefresh }: any) {
   const [showAssignModal, setShowAssignModal] = useState(false);
@@ -39,14 +40,18 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
     if (!sensorCode.trim()) return;
     setIsAssigning(true);
     setAssignError("");
+    const toastId = toast.loading("Assignation du capteur...");
     try {
       await CapteursService.assignCapteurApiV1CapteursAssignPost(parcel.code, sensorCode);
+      toast.success("Capteur assigné avec succès !", { id: toastId });
       setShowAssignModal(false);
       setSensorCode("");
       if (onRefresh) onRefresh();
     } catch (err: any) {
       console.error("Erreur assignation:", err);
-      setAssignError(err.body?.message || "Impossible d'assigner le capteur. Vérifiez le code.");
+      const errorMsg = err.body?.message || "Impossible d'assigner le capteur. Vérifiez le code.";
+      setAssignError(errorMsg);
+      toast.error(errorMsg, { id: toastId });
     } finally {
       setIsAssigning(false);
     }
@@ -54,12 +59,14 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
 
   const handleUnassign = async (cCode: string) => {
     if (!confirm(`Désassigner le capteur ${cCode} ?`)) return;
+    const toastId = toast.loading("Désassignation...");
     try {
       await CapteursService.desassignCapteurApiV1CapteursDesassignPost(parcel.code, cCode);
+      toast.success("Capteur désassigné.", { id: toastId });
       if (onRefresh) onRefresh();
     } catch (err: any) {
       console.error("Erreur désassignation:", err);
-      alert("Erreur lors de la désassignation.");
+      toast.error("Erreur lors de la désassignation.", { id: toastId });
     }
   };
 

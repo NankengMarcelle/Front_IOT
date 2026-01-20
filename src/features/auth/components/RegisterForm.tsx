@@ -2,30 +2,93 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Leaf, User, UserCircle, Phone, Mail, Lock, ArrowRight, ArrowLeft, Loader2, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { Leaf, User, Phone, Mail, Lock, ArrowRight, ArrowLeft, Loader2, CheckCircle2, Eye, EyeOff, AlertCircle } from 'lucide-react';
+import { validatePassword, passwordsMatch } from '@/lib/utils/passwordValidator';
+import { authService } from '@/features/auth/services/authService';
+import { toast } from "sonner";
 
 export default function RegisterForm({ role }: { role: string | null }) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  // Form State
+  const [formData, setFormData] = useState({
+    prenom: '',
+    nom: '',
+    phone: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
+
+  const [errors, setErrors] = useState({
+    password: '',
+    confirmPassword: '',
+    general: ''
+  });
+
   const isAdmin = role === 'admin';
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+
+    // Clear errors when user types
+    if (name === 'password' || name === 'confirmPassword') {
+      setErrors(prev => ({ ...prev, [name]: '', general: '' }));
+    }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
 
-    // Simulation inscription
-    setTimeout(() => {
-      localStorage.setItem('smartagro_user', JSON.stringify({
-        email: 'nouveau@user.com',
-        name: 'Nouveau User',
-        role: isAdmin ? 'ADMIN' : 'AGRICULTEUR'
-      }));
-      localStorage.setItem('smartagro_token', 'simulated-jwt-token-' + Date.now());
+    // Validation
+    if (!formData.prenom.trim() || !formData.nom.trim()) {
+      const msg = "Veuillez remplir votre prénom et votre nom";
+      setErrors(prev => ({ ...prev, general: msg }));
+      toast.error(msg);
+      return;
+    }
+
+    const passwordError = validatePassword(formData.password);
+    if (passwordError) {
+      setErrors(prev => ({ ...prev, password: passwordError }));
+      toast.error(passwordError);
+      return;
+    }
+
+    if (!passwordsMatch(formData.password, formData.confirmPassword)) {
+      const msg = "Les mots de passe ne correspondent pas";
+      setErrors(prev => ({ ...prev, confirmPassword: msg }));
+      toast.error(msg);
+      return;
+    }
+
+    setLoading(true);
+    const toastId = toast.loading("Création de votre compte...");
+
+    try {
+      await authService.register({
+        nom: formData.nom,
+        prenom: formData.prenom,
+        email: formData.email,
+        telephone: formData.phone,
+        password: formData.password
+      }, isAdmin);
+
+      toast.success("Compte créé avec succès ! Bienvenue.", { id: toastId });
       setLoading(false);
       window.location.href = '/login';
-    }, 1500);
+    } catch (error: any) {
+      console.error("Registration failed:", error);
+      const errorMsg = error.message || "L'inscription a échoué";
+      setErrors(prev => ({ ...prev, general: errorMsg }));
+      toast.error(errorMsg, { id: toastId });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,9 +99,9 @@ export default function RegisterForm({ role }: { role: string | null }) {
 
         {/* Header */}
         <div className="w-full text-center mb-8 relative z-10">
-          <div className="inline-flex p-3 bg-white rounded-2xl shadow-sm mb-6 border border-emerald-50">
+          <Link href="/" className="inline-flex p-3 bg-white rounded-2xl shadow-sm mb-6 border border-emerald-50 hover:scale-110 transition-transform">
             <Leaf className="w-8 h-8 text-emerald-600" />
-          </div>
+          </Link>
           <h1 className="text-2xl sm:text-3xl font-black text-[#052E16] tracking-tighter">Créer un compte</h1>
           <p className="text-emerald-900/40 text-[10px] font-black uppercase tracking-[0.2em] mt-2">Étape {step} sur 2</p>
         </div>
@@ -49,35 +112,50 @@ export default function RegisterForm({ role }: { role: string | null }) {
           <div className={`h-1.5 rounded-full transition-all duration-500 ${step === 2 ? 'w-8 bg-emerald-500' : 'w-4 bg-emerald-200'}`}></div>
         </div>
 
+        {errors.general && (
+          <div className="w-full mb-6 p-4 bg-rose-50 border border-rose-100 rounded-2xl flex items-center gap-3 text-rose-600 animate-in fade-in slide-in-from-top-2">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <p className="text-xs font-bold leading-tight">{errors.general}</p>
+          </div>
+        )}
+
         <form onSubmit={handleRegister} className="w-full flex flex-col gap-6 relative z-10">
           {step === 1 ? (
             /* ÉTAPE 1 : Informations Personnelles */
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-              <div className="space-y-2">
-                <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Nom Complet</label>
-                <div className="relative group/input">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
-                    <User className="w-5 h-5" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Prénom</label>
+                  <div className="relative group/input">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
+                      <User className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="text"
+                      name="prenom"
+                      value={formData.prenom}
+                      onChange={handleInputChange}
+                      placeholder="Prénom"
+                      className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-4 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Votre nom"
-                    className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-6 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
-                  />
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Pseudonyme</label>
-                <div className="relative group/input">
-                  <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
-                    <UserCircle className="w-5 h-5" />
+                <div className="space-y-2">
+                  <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Nom</label>
+                  <div className="relative group/input">
+                    <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
+                      <User className="w-5 h-5" />
+                    </div>
+                    <input
+                      type="text"
+                      name="nom"
+                      value={formData.nom}
+                      onChange={handleInputChange}
+                      placeholder="Nom"
+                      className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-4 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
+                    />
                   </div>
-                  <input
-                    type="text"
-                    placeholder="Nom d'utilisateur"
-                    className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-6 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
-                  />
                 </div>
               </div>
 
@@ -89,6 +167,9 @@ export default function RegisterForm({ role }: { role: string | null }) {
                   </div>
                   <input
                     type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleInputChange}
                     placeholder="+237 ..."
                     className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-6 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
                   />
@@ -118,6 +199,9 @@ export default function RegisterForm({ role }: { role: string | null }) {
                   </div>
                   <input
                     type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
                     placeholder="votre@email.com"
                     className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-6 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
                   />
@@ -132,8 +216,11 @@ export default function RegisterForm({ role }: { role: string | null }) {
                   </div>
                   <input
                     type={showPassword ? "text" : "password"}
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
                     placeholder="••••••••"
-                    className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-12 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
+                    className={`w-full bg-white/60 border ${errors.password ? 'border-rose-400' : 'border-white/40'} rounded-[20px] pl-12 pr-12 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20`}
                   />
                   <button
                     type="button"
@@ -143,6 +230,11 @@ export default function RegisterForm({ role }: { role: string | null }) {
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-rose-500 ml-1 mt-1">
+                    <AlertCircle className="w-3 h-3" /> {errors.password}
+                  </p>
+                )}
               </div>
 
               <div className="space-y-2">
@@ -153,8 +245,11 @@ export default function RegisterForm({ role }: { role: string | null }) {
                   </div>
                   <input
                     type={showConfirmPassword ? "text" : "password"}
+                    name="confirmPassword"
+                    value={formData.confirmPassword}
+                    onChange={handleInputChange}
                     placeholder="••••••••"
-                    className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-12 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
+                    className={`w-full bg-white/60 border ${errors.confirmPassword ? 'border-rose-400' : 'border-white/40'} rounded-[20px] pl-12 pr-12 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20`}
                   />
                   <button
                     type="button"
@@ -164,6 +259,11 @@ export default function RegisterForm({ role }: { role: string | null }) {
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
+                {errors.confirmPassword && (
+                  <p className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-rose-500 ml-1 mt-1">
+                    <AlertCircle className="w-3 h-3" /> {errors.confirmPassword}
+                  </p>
+                )}
               </div>
 
               <div className="flex gap-4 mt-4">
@@ -200,6 +300,17 @@ export default function RegisterForm({ role }: { role: string | null }) {
           <span className="text-[#052E16]/40">Déjà un compte ? </span>
           <Link href={`/login?role=${role}`} className="text-emerald-600 hover:text-emerald-700 transition-colors">Se connecter</Link>
         </div>
+      </div>
+
+      {/* Back to Home Button */}
+      <div className="mt-8 text-center">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl text-[#052E16] hover:bg-white hover:shadow-lg transition-all font-black text-[10px] uppercase tracking-[0.2em]"
+        >
+          <ArrowLeft className="w-3 h-3" />
+          Retour à l'accueil
+        </Link>
       </div>
     </div>
   );

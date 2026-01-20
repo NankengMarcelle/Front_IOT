@@ -23,8 +23,18 @@ import {
 import { useLanguageStore } from '@/store/useUserStore';
 import { useTranslation } from '@/providers/TranslationProvider';
 import { authService } from "@/features/auth/services/authService";
+import { validatePassword, passwordsMatch } from '@/lib/utils/passwordValidator';
+import { toast } from 'sonner';
 
-const ProfileField = ({ label, value, icon: Icon, type = "text", error = "", isEditing, ...props }: any) => {
+const ProfileField = ({ label, value, icon: Icon, type = "text", error = "", isEditing, ...props }: {
+  label: string,
+  value: string,
+  icon: any,
+  type?: string,
+  error?: string,
+  isEditing: boolean,
+  [key: string]: any
+}) => {
   const [show, setShow] = useState(false);
   const inputType = type === "password" ? (show ? "text" : "password") : type;
 
@@ -78,6 +88,7 @@ interface UserProfile {
     sms: boolean;
     weeklyReport: boolean;
   };
+  avatar?: string;
 }
 
 export default function ProfilPage() {
@@ -159,11 +170,16 @@ export default function ProfilPage() {
     let isValid = true;
     if (!userData.nom.trim()) { errors.nom = "Le nom est requis"; isValid = false; }
     if (!userData.prenom.trim()) { errors.prenom = "Le prénom est requis"; isValid = false; }
-    // if (userData.phone && !/^[+]?[\d\s-]{10,}$/.test(userData.phone)) { errors.phone = "Format invalide"; isValid = false; }
 
     if (userData.password) {
-      if (userData.password.length < 8) { errors.password = "8+ caractères requis"; isValid = false; }
-      if (userData.password !== userData.confirmPassword) { errors.confirmPassword = "Les mots de passe ne correspondent pas"; isValid = false; }
+      const passwordError = validatePassword(userData.password);
+      if (passwordError) {
+        errors.password = passwordError;
+        isValid = false;
+      } else if (!passwordsMatch(userData.password, userData.confirmPassword || '')) {
+        errors.confirmPassword = "Les mots de passe ne correspondent pas";
+        isValid = false;
+      }
     }
     setFormErrors(errors);
     return isValid;
@@ -172,8 +188,7 @@ export default function ProfilPage() {
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
-    setLoading(true);
-
+    const toastId = toast.loading("Mise à jour du profil...");
     try {
       await authService.updateProfile({
         nom: userData.nom,
@@ -182,22 +197,17 @@ export default function ProfilPage() {
         avatar: avatarPreview || undefined
       });
 
-      // Si changement de mot de passe, on pourrait appeler un autre service si existant
-      // Mais ici le UserUpdate ne semble pas inclure le password
-
       setIsEditing(false);
-      setShowSuccess(true);
+      toast.success("Profil mis à jour avec succès !", { id: toastId });
 
       // Refresh local data
       fetchProfile();
 
       // Reset password fields
       setUserData(prev => ({ ...prev, oldPassword: "", password: "", confirmPassword: "" }));
-
-      setTimeout(() => setShowSuccess(false), 3000);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to update profile", error);
-      alert("Erreur lors de la mise à jour du profil");
+      toast.error(error.message || "Erreur lors de la mise à jour du profil", { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -205,24 +215,39 @@ export default function ProfilPage() {
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userData.oldPassword || !userData.password || userData.password !== userData.confirmPassword) {
-      setFormErrors(prev => ({
-        ...prev,
-        password: !userData.password ? "Requis" : (userData.password.length < 8 ? "8+ car." : ""),
-        confirmPassword: userData.password !== userData.confirmPassword ? "Différent" : ""
-      }));
+
+    // Validate Current Password
+    if (!userData.oldPassword) {
+      setFormErrors(prev => ({ ...prev, password: "Ancien mot de passe requis" })); // Note: reused slot for brevity or add field
+      return;
+    }
+
+    // Validate New Password
+    const passwordError = validatePassword(userData.password || '');
+    if (passwordError) {
+      setFormErrors(prev => ({ ...prev, password: passwordError }));
+      return;
+    }
+
+    // Validate Confirmation
+    if (!passwordsMatch(userData.password || '', userData.confirmPassword || '')) {
+      setFormErrors(prev => ({ ...prev, confirmPassword: "Les mots de passe ne correspondent pas" }));
       return;
     }
 
     setLoading(true);
+    const toastId = toast.loading("Changement du mot de passe...");
     try {
-      await authService.changePassword(userData.oldPassword, userData.password);
-      setShowSuccess(true);
+      const { oldPassword, password } = userData;
+      if (!oldPassword || !password) return;
+
+      await authService.changePassword(oldPassword, password);
+      toast.success("Mot de passe modifié !", { id: toastId });
       setUserData(prev => ({ ...prev, oldPassword: "", password: "", confirmPassword: "" }));
-      setTimeout(() => setShowSuccess(false), 3000);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Password change failed", error);
-      alert(error.body?.detail || "Erreur de changement de mot de passe. Vérifiez l'ancien mot de passe.");
+      const errorMessage = (error as any).body?.detail || (error as any).message || "Erreur de changement de mot de passe.";
+      toast.error(errorMessage, { id: toastId });
     } finally {
       setLoading(false);
     }
@@ -343,12 +368,12 @@ export default function ProfilPage() {
                   {activeTab === 'profile' ? (
                     <div className="space-y-8 md:space-y-12">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-                        <ProfileField label="Nom" value={userData.nom} icon={User} isEditing={isEditing} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, nom: e.target.value })} error={formErrors.nom} />
-                        <ProfileField label="Prénom" value={userData.prenom} icon={User} isEditing={isEditing} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, prenom: e.target.value })} error={formErrors.prenom} />
+                        <ProfileField label="Nom" value={userData.nom} icon={User} isEditing={isEditing} disabled={!isEditing} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserData({ ...userData, nom: e.target.value })} error={formErrors.nom} />
+                        <ProfileField label="Prénom" value={userData.prenom} icon={User} isEditing={isEditing} disabled={!isEditing} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserData({ ...userData, prenom: e.target.value })} error={formErrors.prenom} />
                       </div>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                         <ProfileField label="Email" value={userData.email} icon={Mail} isEditing={false} disabled={true} />
-                        <ProfileField label="Téléphone" value={userData.phone} icon={Phone} isEditing={isEditing} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, phone: e.target.value })} error={formErrors.phone} />
+                        <ProfileField label="Téléphone" value={userData.phone} icon={Phone} isEditing={isEditing} disabled={!isEditing} onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserData({ ...userData, phone: e.target.value })} error={formErrors.phone} />
                       </div>
                       <div className="pt-8 md:pt-12 border-t border-emerald-50">
                         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[#052E16]/30 mb-6 md:mb-8 flex items-center gap-3"><Globe className="w-3.5 h-3.5" /> Préférences de Langue</h3>
@@ -356,8 +381,14 @@ export default function ProfilPage() {
                           {[
                             { val: 'fr', label: 'Français', flag: '🇫🇷' },
                             { val: 'en', label: 'English', flag: '🇺🇸' }
-                          ].map(opt => (
-                            <button type="button" key={opt.val} onClick={() => setLang(opt.val as any)} disabled={!isEditing} className={`flex-1 px-6 md:px-8 py-4 md:py-5 rounded-xl md:rounded-[24px] border-2 transition-all flex items-center justify-center sm:justify-start gap-3 font-bold tracking-tight ${lang === opt.val ? 'border-emerald-600 bg-emerald-50 text-[#052E16]' : 'border-emerald-50/50 hover:border-emerald-100 text-[#052E16]/40'} ${!isEditing && 'opacity-50 cursor-not-allowed'}`}>
+                          ].map((opt) => (
+                            <button
+                              type="button"
+                              key={opt.val}
+                              onClick={() => setLang(opt.val as 'fr' | 'en')}
+                              disabled={!isEditing}
+                              className={`flex-1 px-6 md:px-8 py-4 md:py-5 rounded-xl md:rounded-[24px] border-2 transition-all flex items-center justify-center sm:justify-start gap-3 font-bold tracking-tight ${lang === opt.val ? 'border-emerald-600 bg-emerald-50 text-[#052E16]' : 'border-emerald-50/50 hover:border-emerald-100 text-[#052E16]/40'} ${!isEditing && 'opacity-50 cursor-not-allowed'}`}
+                            >
                               <span className="text-xl">{opt.flag}</span>
                               {opt.label}
                               {lang === opt.val && <Check size={16} className="text-emerald-500" />}
@@ -384,14 +415,32 @@ export default function ProfilPage() {
                           icon={Lock}
                           isEditing={isEditing}
                           disabled={!isEditing}
-                          onChange={(e: any) => setUserData({ ...userData, oldPassword: e.target.value })}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserData({ ...userData, oldPassword: e.target.value })}
                         />
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
                           <div className="relative">
-                            <ProfileField label="Nouveau Mot de Passe" value={userData.password || ""} type="password" icon={Lock} isEditing={isEditing} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, password: e.target.value })} error={formErrors.password} />
+                            <ProfileField
+                              label="Nouveau Mot de Passe"
+                              value={userData.password || ""}
+                              type="password"
+                              icon={Lock}
+                              isEditing={isEditing}
+                              disabled={!isEditing}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserData({ ...userData, password: e.target.value })}
+                              error={formErrors.password}
+                            />
                           </div>
-                          <ProfileField label="Confirmation" value={userData.confirmPassword || ""} type="password" icon={Lock} isEditing={isEditing} disabled={!isEditing} onChange={(e: any) => setUserData({ ...userData, confirmPassword: e.target.value })} error={formErrors.confirmPassword} />
+                          <ProfileField
+                            label="Confirmation"
+                            value={userData.confirmPassword || ""}
+                            type="password"
+                            icon={Lock}
+                            isEditing={isEditing}
+                            disabled={!isEditing}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setUserData({ ...userData, confirmPassword: e.target.value })}
+                            error={formErrors.confirmPassword}
+                          />
                         </div>
 
                         {isEditing && (
@@ -412,17 +461,7 @@ export default function ProfilPage() {
                 </div>
               </div>
 
-              {showSuccess && (
-                <div className="p-6 md:p-8 bg-emerald-600 text-white rounded-[32px] md:rounded-[40px] shadow-2xl flex items-center gap-4 animate-fadeIn">
-                  <div className="w-12 h-12 md:w-14 md:h-14 bg-white/20 rounded-xl md:rounded-2xl flex items-center justify-center">
-                    <CheckCircle2 className="w-7 h-7 md:w-8 md:h-8" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg md:text-xl font-black tracking-tighter leading-none mb-1">Succès!</h4>
-                    <p className="text-xs md:text-sm font-medium opacity-90">Vos réglages ont été synchronisés instantanément.</p>
-                  </div>
-                </div>
-              )}
+              {/* Fin du contenu principal */}
             </div>
           </div>
         </div>

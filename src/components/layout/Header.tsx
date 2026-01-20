@@ -17,6 +17,7 @@ import {
   Zap
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useUserStore } from '@/store/useUserStore';
 
 export default function DashboardHeader() {
   const { t } = useTranslation();
@@ -24,48 +25,20 @@ export default function DashboardHeader() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const [userInfo, setUserInfo] = useState<any>(() => {
-    if (typeof window !== 'undefined') {
-      const savedUser = localStorage.getItem('smartagro_user');
-      if (savedUser && savedUser !== "undefined") {
-        try {
-          return JSON.parse(savedUser);
-        } catch (e) {
-          return null;
-        }
-      }
-    }
-    return null;
-  });
+  const { user: userInfo, logout: storeLogout } = useUserStore();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUserInfo = () => {
-      try {
-        setLoading(true);
-        const savedUser = localStorage.getItem('smartagro_user');
-        if (savedUser && savedUser !== "undefined") {
-          try {
-            const parsed = JSON.parse(savedUser);
-            setUserInfo(parsed);
-          } catch (e) {
-            router.push('/login');
-          }
-        } else {
-          router.push('/login');
-        }
-      } catch (error) {
-        console.error("Error fetching user info:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUserInfo();
-  }, [router]);
+    if (!userInfo && typeof window !== 'undefined') {
+      // Check if we have something in localStorage that hasn't been picked up by store yet
+      // but persistence should handle this.
+    }
+  }, [userInfo]);
 
   const handleLogout = () => {
     localStorage.removeItem('smartagro_token');
     localStorage.removeItem('smartagro_user');
+    storeLogout();
     router.push('/login');
   };
 
@@ -91,8 +64,8 @@ export default function DashboardHeader() {
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-[100] px-4 md:px-6 py-4 pointer-events-none">
-      <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/70 backdrop-blur-3xl border border-white/50 rounded-[24px] md:rounded-[32px] px-4 md:px-8 py-2 md:py-3 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] pointer-events-auto transition-all duration-500">
+    <header className="fixed top-0 left-0 right-0 z-[100] px-4 md:px-6 py-4 pointer-events-none backdrop-blur-md bg-white/5">
+      <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/40 backdrop-blur-3xl saturate-150 border border-white/40 rounded-[24px] md:rounded-[32px] px-4 md:px-8 py-2 md:py-3 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] pointer-events-auto transition-all duration-500">
 
         {/* Brand */}
         <Link href="/dashboard/farmer" className="flex items-center gap-2 md:gap-3 group">

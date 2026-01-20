@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { TranslationProvider } from "@/providers/TranslationProvider";
+import { Toaster } from 'sonner';
 
 export const metadata: Metadata = {
   title: "Smart Agro",
@@ -18,6 +19,7 @@ export default function RootLayout({
         <TranslationProvider>
           {children}
         </TranslationProvider>
+        <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
   );

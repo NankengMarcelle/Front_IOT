@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { terrainService } from "../services/terrainService";
 import { localiteService } from "../services/localiteService";
 import { ChevronDown, MapPin, AlignLeft, TreePine, X, Sprout } from "lucide-react";
+import { toast } from "sonner";
 
 export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
   const [loading, setLoading] = useState(false);
@@ -32,12 +33,16 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLoading(true);
-    try {
-      if (!formData.localite_id) {
-        throw new Error("Veuillez sélectionner une localité.");
-      }
 
+    if (!formData.localite_id) {
+      const msg = "Veuillez sélectionner une localité.";
+      toast.error(msg);
+      return;
+    }
+
+    setLoading(true);
+    const toastId = toast.loading(initialData ? "Mise à jour du terrain..." : "Création du terrain...");
+    try {
       const terrainData: any = {
         nom: formData.nom,
         localite_id: formData.localite_id,
@@ -49,10 +54,12 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
       }
 
       await terrainService.saveTerrain(terrainData);
+      toast.success(initialData ? "Terrain mis à jour !" : "Terrain créé avec succès !", { id: toastId });
       onSuccess();
     } catch (error: any) {
       console.error("Erreur lors de l'enregistrement:", error);
-      alert(error.message || "Erreur lors de la sauvegarde.");
+      const errorMsg = error.message || "Erreur lors de la sauvegarde.";
+      toast.error(errorMsg, { id: toastId });
     } finally {
       setLoading(false);
     }

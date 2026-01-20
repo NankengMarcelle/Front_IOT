@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Leaf, Mail, Lock, ShieldCheck, ArrowRight, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../services/authService';
+import { toast } from 'sonner';
 
 interface LoginFormProps {
   role: string | null;
@@ -40,17 +41,21 @@ export default function LoginForm({ role }: LoginFormProps) {
     }
 
     // 2. Authentification réelle via le backend
+    const toastId = toast.loading("Connexion en cours...");
     try {
       const user = await authService.login(email, password);
 
       // 3. Vérification du rôle (optionnelle : si l'admin doit avoir un rôle spécifique)
       // L'API a déjà renvoyé le profil
 
+      toast.success("Connexion réussie ! Bienvenue.", { id: toastId });
       setLoading(false);
       router.push(isAdmin ? '/dashboard/admin' : '/dashboard/farmer');
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Identifiants invalides");
+      const errorMsg = err.message || "Identifiants invalides";
+      setError(errorMsg);
+      toast.error(errorMsg, { id: toastId });
       setLoading(false);
     }
   };
@@ -63,9 +68,9 @@ export default function LoginForm({ role }: LoginFormProps) {
 
         {/* Header Section */}
         <div className="w-full text-center mb-10 relative z-10">
-          <div className="inline-flex p-3 bg-white rounded-2xl shadow-sm mb-6 border border-emerald-50">
+          <Link href="/" className="inline-flex p-3 bg-white rounded-2xl shadow-sm mb-6 border border-emerald-50 hover:scale-110 transition-transform">
             <Leaf className="w-8 h-8 text-emerald-600" />
-          </div>
+          </Link>
           <h1 className="text-3xl sm:text-4xl font-black text-[#052E16] tracking-tighter mb-2">
             Bon retour
           </h1>
@@ -182,11 +187,11 @@ export default function LoginForm({ role }: LoginFormProps) {
         </div>
       </div>
 
-      {/* Social Login / Back to home hint */}
+      {/* Back to Home Button */}
       <div className="mt-8 text-center">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-[#052E16]/40 hover:text-[#052E16] text-[10px] font-black uppercase tracking-[0.2em] transition-all"
+          className="inline-flex items-center gap-2 px-6 py-3 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl text-[#052E16] hover:bg-white hover:shadow-lg transition-all font-black text-[10px] uppercase tracking-[0.2em]"
         >
           <ArrowLeft className="w-3 h-3" />
           Retour à l'accueil

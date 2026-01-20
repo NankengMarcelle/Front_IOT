@@ -94,7 +94,7 @@ export default function LandingPage() {
             </div>
 
             {/* Premium Header/Nav */}
-            <header className="fixed top-0 left-0 right-0 z-50 px-6 py-6 transition-all duration-300">
+            <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-300 backdrop-blur-md bg-white/5">
                 <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/40 backdrop-blur-2xl rounded-[32px] px-8 py-4 border border-white/40 shadow-sm">
                     <Link href="/" className="flex items-center gap-2 group">
                         <div className="w-10 h-10 bg-[#052E16] rounded-xl flex items-center justify-center group-hover:bg-[#1A4D2E] transition-all">
@@ -166,7 +166,7 @@ export default function LandingPage() {
                                         className="group relative px-10 py-5 bg-[#052E16] text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_-15px_rgba(5,46,22,0.3)] flex items-center justify-center gap-3"
                                     >
                                         <Play className="w-4 h-4 fill-current" />
-                                        Explorer la Démo
+                                        Notre vision
                                     </Link>
 
                                     <button
@@ -329,7 +329,7 @@ export default function LandingPage() {
                                             <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-lime-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500"></div>
                                         </Link>
                                         <Link href="/demo" className="px-10 py-5 bg-white border-2 border-emerald-100 text-[#052E16] rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-50 hover:border-emerald-500 transition-all">
-                                            Voir la démo live
+                                            Notre vision
                                         </Link>
                                     </div>
                                 </div>

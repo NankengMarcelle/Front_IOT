@@ -1,5 +1,6 @@
 import { AuthenticationService, LoginRequest, UsersService } from "@/lib";
 import { OpenAPI } from "@/lib/core/OpenAPI";
+import { useUserStore } from "@/store/useUserStore";
 
 const TOKEN_KEY = 'smartagro_token';
 const USER_KEY = 'smartagro_user';
@@ -46,6 +47,7 @@ export const authService = {
             };
 
             localStorage.setItem(USER_KEY, JSON.stringify(userDetails));
+            useUserStore.getState().setUser(userDetails);
 
             return userDetails;
 
@@ -58,6 +60,7 @@ export const authService = {
     logout: () => {
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(USER_KEY);
+        useUserStore.getState().logout();
         window.location.href = '/login';
     },
 
@@ -77,7 +80,9 @@ export const authService = {
             const response = await UsersService.getMyProfileApiV1UsersMeGet() as any;
             // Gérer le wrapping si nécessaire
             const user = response.data || response;
-            localStorage.setItem(USER_KEY, JSON.stringify({ ...user, token: localStorage.getItem(TOKEN_KEY) }));
+            const userDetails = { ...user, token: localStorage.getItem(TOKEN_KEY) };
+            localStorage.setItem(USER_KEY, JSON.stringify(userDetails));
+            useUserStore.getState().setUser(userDetails);
             return user;
         } catch (error) {
             console.error("GetProfile Error:", error);
@@ -94,7 +99,9 @@ export const authService = {
                 avatar: data.avatar
             }) as any;
             const user = response.data || response;
-            localStorage.setItem(USER_KEY, JSON.stringify({ ...user, token: localStorage.getItem(TOKEN_KEY) }));
+            const userDetails = { ...user, token: localStorage.getItem(TOKEN_KEY) };
+            localStorage.setItem(USER_KEY, JSON.stringify(userDetails));
+            useUserStore.getState().setUser(userDetails);
             return user;
         } catch (error) {
             console.error("UpdateProfile Error:", error);
@@ -111,6 +118,18 @@ export const authService = {
         } catch (error) {
             console.error("ChangePassword Error:", error);
             throw error;
+        }
+    },
+
+    register: async (data: { nom: string, prenom: string, email: string, telephone?: string, password: string }, isAdmin: boolean = false) => {
+        try {
+            if (isAdmin) {
+                return await AuthenticationService.registerAdminApiV1AuthRegisterAdminPost(data);
+            }
+            return await AuthenticationService.registerUserApiV1AuthRegisterUserPost(data);
+        } catch (error: any) {
+            console.error("Register Error:", error.body);
+            throw new Error(error.body?.detail || "Échec de l'inscription");
         }
     }
 };

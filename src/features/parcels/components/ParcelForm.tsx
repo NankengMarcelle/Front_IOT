@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { terrainService } from "../../terrains/services/terrainService";
 import { parcelService } from "../services/parcelService";
 import { Tag, MapPin, Ruler, X, ChevronDown, AlignLeft, Sprout } from "lucide-react";
+import { toast } from "sonner";
 
 export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
   const [loading, setLoading] = useState(false);
@@ -47,6 +48,7 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
     }
 
     setLoading(true);
+    const toastId = toast.loading(initialData?.id ? "Mise à jour de la parcelle..." : "Création de la parcelle...");
     try {
       const parcelData: any = {
         nom: formData.nom,
@@ -62,10 +64,13 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
       console.log("Données de la parcelle à sauvegarder:", parcelData);
       await parcelService.saveParcelle(parcelData);
       console.log("Parcelle sauvegardée avec succès.");
+      toast.success(initialData?.id ? "Parcelle mise à jour !" : "Parcelle créée !", { id: toastId });
       onSuccess();
     } catch (err: any) {
       console.error("Erreur saveParcelle", err);
-      setError(err.message || "Une erreur est survenue lors de la sauvegarde.");
+      const errorMsg = err.message || "Une erreur est survenue lors de la sauvegarde.";
+      setError(errorMsg);
+      toast.error(errorMsg, { id: toastId });
     } finally {
       setLoading(false);
     }
