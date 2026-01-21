@@ -1,27 +1,9 @@
+"use client";
+
 import Link from 'next/link';
-import { useTranslation } from '@/providers/TranslationProvider';
-import {
-    Leaf,
-    Zap,
-    Layout,
-    Map,
-    Grid3x3,
-    Brain,
-    ShieldCheck,
-    MessageSquare,
-    Globe
-} from 'lucide-react';
+import { Leaf, ShieldCheck, Zap, Globe } from 'lucide-react';
 
-export default function DashboardFooter() {
-    const { t } = useTranslation();
-
-    const navLinks = [
-        { name: t('nav.dashboard'), href: '/dashboard/farmer', icon: Layout },
-        { name: t('nav.terrains'), href: '/dashboard/terrains', icon: Map },
-        { name: t('nav.parcelles'), href: '/dashboard/parcelles', icon: Grid3x3 },
-        { name: "IA Chat", href: '/dashboard/recommandations', icon: Brain },
-    ];
-
+export default function SimpleFooter() {
     const legalLinks = [
         { name: "Politique de Confidentialité", href: "#" },
         { name: "Conditions d'Utilisation", href: "#" },
@@ -35,7 +17,7 @@ export default function DashboardFooter() {
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-lime-500/5 rounded-full blur-[80px] translate-y-1/2 -translate-x-1/2"></div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 md:py-20">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 md:gap-16 mb-12">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-12 md:gap-16 mb-12">
 
                     {/* Column 1: Brand */}
                     <div className="space-y-6">
@@ -48,25 +30,12 @@ export default function DashboardFooter() {
                                 <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400/40 italic">Elite Systems</p>
                             </div>
                         </div>
-                        <p className="text-emerald-50/40 text-xs font-medium leading-relaxed max-w-[240px]">
+                        <p className="text-emerald-50/40 text-xs font-medium leading-relaxed max-w-[280px]">
                             Intelligence artificielle et IoT connectés pour une agriculture durable et haute performance.
                         </p>
                     </div>
 
-                    {/* Column 2: Navigation */}
-                    <div className="space-y-6">
-                        <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/30">Navigation Rapide</h4>
-                        <nav className="flex flex-col gap-4">
-                            {navLinks.map((link, idx) => (
-                                <Link key={idx} href={link.href} className="flex items-center gap-3 text-xs font-bold text-emerald-50/60 hover:text-lime-400 transition-all group">
-                                    <link.icon className="w-4 h-4 text-emerald-500 group-hover:scale-110 group-hover:text-lime-400 transition-all" />
-                                    {link.name}
-                                </Link>
-                            ))}
-                        </nav>
-                    </div>
-
-                    {/* Column 3: Legal & Support */}
+                    {/* Column 2: Legal & Support */}
                     <div className="space-y-6">
                         <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400/30">Ressources</h4>
                         <nav className="flex flex-col gap-4">
@@ -82,8 +51,8 @@ export default function DashboardFooter() {
                         </div>
                     </div>
 
-                    {/* Column 4: Elite Status Card */}
-                    <div>
+                    {/* Column 3: Elite Status Card */}
+                    <div className="sm:col-span-2 lg:col-span-1">
                         <div className="bg-white/5 backdrop-blur-xl rounded-[32px] p-8 border border-white/10 space-y-4">
                             <div className="flex items-center gap-3">
                                 <ShieldCheck className="text-lime-400 w-5 h-5" />

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslation } from '@/providers/TranslationProvider';
-import Footer from '@/components/layout/Footer';
+import SimpleFooter from '@/components/layout/SimpleFooter';
 import { ArrowLeft, Play, Pause, SkipBack, SkipForward, Maximize2, Settings, Download, Share2, BarChart3, Cpu, Leaf, Zap, Target, Shield, Clock, Users, CheckCircle, ChevronRight, Globe, ChevronDown, Radio, Brain, Cloud, WifiIcon, FileText, Smartphone, Database, ArrowRight, ChevronUp } from 'lucide-react';
 import React, { useState, useRef, useEffect } from 'react';
 
@@ -541,6 +541,8 @@ export default function DemoPage() {
                     </div>
                 </section>
             </main>
+
+            <SimpleFooter />
 
             <style jsx>{`
                 @keyframes fadeIn {

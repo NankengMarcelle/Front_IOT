@@ -16,8 +16,10 @@ import {
 } from "lucide-react";
 import { CapteursService } from "@/lib";
 import { toast } from "sonner";
+import { useConfirmDialog } from "@/components/ConfirmDialog";
 
 export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRefresh }: any) {
+  const { confirm } = useConfirmDialog();
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [sensorCode, setSensorCode] = useState("");
   const [isAssigning, setIsAssigning] = useState(false);
@@ -48,8 +50,30 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
       setSensorCode("");
       if (onRefresh) onRefresh();
     } catch (err: any) {
-      console.error("Erreur assignation:", err);
-      const errorMsg = err.body?.message || "Impossible d'assigner le capteur. Vérifiez le code.";
+
+      // Extraire le message d'erreur de différentes structures possibles
+      let errorMsg = "Impossible d'assigner le capteur.";
+
+      // Essayer différentes structures de réponse d'erreur
+      if (err.body?.detail) {
+        errorMsg = err.body.detail;
+      } else if (err.body?.message) {
+        errorMsg = err.body.message;
+      } else if (err.message) {
+        errorMsg = err.message;
+      } else if (typeof err.body === 'string') {
+        errorMsg = err.body;
+      }
+
+      // Messages personnalisés pour des cas spécifiques
+      if (errorMsg.toLowerCase().includes('already assigned') || errorMsg.toLowerCase().includes('déjà assigné')) {
+        errorMsg = `Le capteur ${sensorCode} est déjà assigné à une autre parcelle.`;
+      } else if (errorMsg.toLowerCase().includes('not found') || errorMsg.toLowerCase().includes('introuvable')) {
+        errorMsg = `Le capteur ${sensorCode} n'existe pas dans le système.`;
+      } else if (errorMsg.toLowerCase().includes('invalid') || errorMsg.toLowerCase().includes('invalide')) {
+        errorMsg = `Le code ${sensorCode} n'est pas valide.`;
+      }
+
       setAssignError(errorMsg);
       toast.error(errorMsg, { id: toastId });
     } finally {
@@ -58,20 +82,49 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
   };
 
   const handleUnassign = async (cCode: string) => {
-    if (!confirm(`Désassigner le capteur ${cCode} ?`)) return;
+    const confirmed = await confirm({
+      title: 'Désassigner le capteur',
+      message: `Êtes-vous sûr de vouloir désassigner le capteur ${cCode} de cette parcelle ?`,
+      confirmText: 'Désassigner',
+      cancelText: 'Annuler',
+      type: 'danger'
+    });
+
+    if (!confirmed) return;
+
     const toastId = toast.loading("Désassignation...");
     try {
       await CapteursService.desassignCapteurApiV1CapteursDesassignPost(parcel.code, cCode);
-      toast.success("Capteur désassigné.", { id: toastId });
+      toast.success("Capteur désassigné avec succès.", { id: toastId });
       if (onRefresh) onRefresh();
     } catch (err: any) {
-      console.error("Erreur désassignation:", err);
-      toast.error("Erreur lors de la désassignation.", { id: toastId });
+
+      // Extraire le message d'erreur
+      let errorMsg = "Erreur lors de la désassignation.";
+
+      if (err.body?.detail) {
+        errorMsg = err.body.detail;
+      } else if (err.body?.message) {
+        errorMsg = err.body.message;
+      } else if (err.message) {
+        errorMsg = err.message;
+      } else if (typeof err.body === 'string') {
+        errorMsg = err.body;
+      }
+
+      // Messages personnalisés
+      if (errorMsg.toLowerCase().includes('not found') || errorMsg.toLowerCase().includes('introuvable')) {
+        errorMsg = `Le capteur ${cCode} n'est pas assigné à cette parcelle.`;
+      } else if (errorMsg.toLowerCase().includes('not assigned') || errorMsg.toLowerCase().includes('pas assigné')) {
+        errorMsg = `Le capteur ${cCode} n'est pas assigné à cette parcelle.`;
+      }
+
+      toast.error(errorMsg, { id: toastId });
     }
   };
 
   return (
-    <div className="group bg-white rounded-[48px] border border-emerald-50 shadow-sm hover:shadow-[0_48px_80px_-20px_rgba(0,0,0,0.08)] hover:-translate-y-4 transition-all duration-700 flex flex-col overflow-hidden relative">
+    <div className="group bg-white rounded-[32px] md:rounded-[48px] border border-emerald-50 shadow-sm md:hover:shadow-[0_48px_80px_-20px_rgba(0,0,0,0.08)] md:hover:-translate-y-4 transition-all duration-700 flex flex-col overflow-hidden relative">
 
       {/* Assign Modal Overlay */}
       {showAssignModal && (

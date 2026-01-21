@@ -184,39 +184,7 @@ export default function DashboardHeader() {
               </Link>
             ))}
 
-            <div className="h-px bg-emerald-50/50 my-2"></div>
 
-            <Link
-              href="/dashboard/profil"
-              onClick={() => setIsMenuOpen(false)}
-              className="flex items-center gap-4 p-4 hover:bg-emerald-50 rounded-[24px] transition-all group"
-            >
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-emerald-600 group-hover:bg-[#052E16] group-hover:text-white transition-all">
-                <User size={20} />
-              </div>
-              <span className="text-lg font-black tracking-tighter text-[#052E16]">{t('nav.profile')}</span>
-            </Link>
-
-            <Link
-              href="/dashboard/parametres"
-              onClick={() => setIsMenuOpen(false)}
-              className="flex items-center gap-4 p-4 hover:bg-emerald-50 rounded-[24px] transition-all group"
-            >
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-emerald-600 group-hover:bg-[#052E16] group-hover:text-white transition-all">
-                <Settings size={20} />
-              </div>
-              <span className="text-lg font-black tracking-tighter text-[#052E16]">Paramètres</span>
-            </Link>
-
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-4 p-4 hover:bg-rose-50 rounded-[24px] transition-all group"
-            >
-              <div className="w-12 h-12 bg-rose-50 rounded-xl flex items-center justify-center text-rose-500 group-hover:bg-rose-500 group-hover:text-white transition-all">
-                <LogOut size={20} />
-              </div>
-              <span className="text-lg font-black tracking-tighter text-rose-600">Déconnexion</span>
-            </button>
           </div>
           {/* Backdrop Click-off */}
           <div className="fixed inset-0 -z-10 bg-black/5" onClick={() => { setIsMenuOpen(false); setIsProfileOpen(false); }}></div>

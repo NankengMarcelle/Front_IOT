@@ -7,10 +7,12 @@ import { parcelService } from "@/features/parcels/services/parcelService";
 import { terrainService } from "@/features/terrains/services/terrainService";
 import { sensorService } from "@/features/sensors/services/sensorService";
 import { useTranslation } from "@/providers/TranslationProvider";
+import { useConfirmDialog } from "@/components/ConfirmDialog";
 import { Plus, Grid3x3, Search, Layout, ChevronRight } from "lucide-react";
 
 export default function ParcellesPage() {
   const { t } = useTranslation();
+  const { confirm } = useConfirmDialog();
   const [view, setView] = useState("list");
   const [parcelles, setParcelles] = useState<any[]>([]);
   const [terrains, setTerrains] = useState<any[]>([]);
@@ -37,13 +39,28 @@ export default function ParcellesPage() {
   };
 
   const handleDelete = async (id: number | string) => {
-    if (!confirm("Voulez-vous vraiment supprimer cette parcelle ?")) return;
+    const confirmed = await confirm({
+      title: 'Supprimer la parcelle',
+      message: 'Êtes-vous sûr de vouloir supprimer cette parcelle ? Cette action est irréversible.',
+      confirmText: 'Supprimer',
+      cancelText: 'Annuler',
+      type: 'danger'
+    });
+
+    if (!confirmed) return;
+
     try {
       await parcelService.deleteParcelle(id);
       loadData();
     } catch (error) {
       console.error("Error deleting parcel:", error);
-      alert("Impossible de supprimer la parcelle.");
+      // On pourrait aussi utiliser un toast ici au lieu d'alert
+      await confirm({
+        title: 'Erreur',
+        message: 'Impossible de supprimer la parcelle.',
+        confirmText: 'OK',
+        type: 'danger'
+      });
     }
   };
 

@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useTranslation } from '@/providers/TranslationProvider';
 import { ArrowRight, Leaf, Cpu, BarChart3, Shield, Zap, Target, Globe, ChevronDown, Cloud, Brain, Smartphone, Radio, FileText, ArrowLeft, Play, Layout, Users } from 'lucide-react';
 import React, { useState, useRef, RefObject } from 'react';
+import SimpleFooter from '@/components/layout/SimpleFooter';
 
 export default function LandingPage() {
     const { t, isLoading } = useTranslation();
@@ -338,6 +339,8 @@ export default function LandingPage() {
                     </div>
                 </section>
             </main>
+
+            <SimpleFooter />
 
             <style jsx>{`
                 @keyframes fadeIn {

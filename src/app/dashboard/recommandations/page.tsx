@@ -6,11 +6,15 @@ import { terrainService } from "@/features/terrains/services/terrainService";
 import { recommendationService } from "@/features/recommendations/services/recommendationService";
 import { sensorDataService } from "@/features/sensors/services/sensorDataService";
 import { useTranslation } from "@/providers/TranslationProvider";
-import { Bot, User, Loader2, Send, Sparkles, MapPin, ChevronRight, MessageSquare } from "lucide-react";
+import { Bot, User, Loader2, Send, Sparkles, MapPin, ChevronRight, MessageSquare, Search } from "lucide-react";
+
+
 
 export default function RecommandationsPage() {
   const { t } = useTranslation();
   const [parcelles, setParcelles] = useState<any[]>([]);
+  const [filteredParcelles, setFilteredParcelles] = useState<any[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedParcel, setSelectedParcel] = useState<any>(null);
   const [latestSoilData, setLatestSoilData] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
@@ -18,7 +22,12 @@ export default function RecommandationsPage() {
   const [inputMessage, setInputMessage] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -29,12 +38,24 @@ export default function RecommandationsPage() {
       try {
         const parcellesData = await parcelService.getParcelles();
         setParcelles(parcellesData);
+        setFilteredParcelles(parcellesData);
       } catch (e) {
         console.error("Error loading parcelles:", e);
       }
     };
     loadParcelles();
   }, []);
+
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredParcelles(parcelles);
+    } else {
+      setFilteredParcelles(parcelles.filter(p =>
+        p.nom.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (p.culturePredite && p.culturePredite.toLowerCase().includes(searchTerm.toLowerCase()))
+      ));
+    }
+  }, [searchTerm, parcelles]);
 
   const handleParcelSelect = async (id: string) => {
     if (!id) { setSelectedParcel(null); setMessages([]); return; }
@@ -87,17 +108,18 @@ export default function RecommandationsPage() {
     }
   };
 
-  const handleSendMessage = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!inputMessage.trim() || !selectedParcel || !latestSoilData) return;
+  const handleSendMessage = async (e?: React.FormEvent, customMessage?: string) => {
+    if (e) e.preventDefault();
+    const textToSend = customMessage || inputMessage;
 
-    const userText = inputMessage;
-    setInputMessage("");
-    setMessages(prev => [...prev, { agent: t('recommandations.user_label'), message: userText, type: "user" }]);
+    if (!textToSend.trim() || !selectedParcel || !latestSoilData) return;
+
+    if (!customMessage) setInputMessage("");
+    setMessages(prev => [...prev, { agent: t('recommandations.user_label'), message: textToSend, type: "user" }]);
     setIsTyping(true);
 
     try {
-      const res: any = await recommendationService.askQuestion(selectedParcel.id, userText);
+      const res: any = await recommendationService.askQuestion(selectedParcel.id, textToSend);
       setMessages(prev => [...prev, {
         agent: res.agent,
         message: res.message || "Je n'ai pas pu générer de réponse spécifique.",
@@ -110,6 +132,8 @@ export default function RecommandationsPage() {
     }
   };
 
+  if (!isMounted) return null;
+
   return (
     <div className="relative min-h-screen overflow-hidden">
       {/* Background Glows */}
@@ -118,21 +142,36 @@ export default function RecommandationsPage() {
         <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-lime-50/50 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 opacity-60"></div>
       </div>
 
-      <div className="flex relative z-10 pt-0 h-[calc(100vh-96px)]">
-        {/* SIDEBAR - Elite Glassmorphism */}
-        <aside className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} fixed lg:relative z-[60] lg:z-10 w-full max-w-[320px] md:max-w-96 bg-white/70 lg:bg-white/40 backdrop-blur-3xl border-r border-emerald-50 flex flex-col h-full shadow-2xl transition-transform duration-500`}>
+      <div className="flex relative z-20 pt-0 h-[calc(100vh-96px)] lg:h-[calc(100vh-60px)] lg:px-6 lg:pb-6 lg:gap-6">
+        {/* SIDEBAR - Elite Floating Panel */}
+        <aside className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} fixed lg:relative z-[60] lg:z-10 w-full max-w-[320px] md:max-w-96 bg-white lg:bg-white/40 backdrop-blur-3xl border-r lg:border lg:border-white/40 lg:shadow-2xl lg:shadow-emerald-900/5 rounded-[32px] m-4 h-[calc(100vh-6rem)] lg:m-0 lg:h-full lg:rounded-[32px] border-emerald-50 flex flex-col transition-all duration-500 overflow-hidden`}>
           <div className="p-8 md:p-10 pb-6 border-b border-emerald-50/50 flex items-center justify-between">
             <div>
               <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#052E16]/30 mb-2">Choisir une</h2>
               <h1 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter leading-none">Parcelle.</h1>
             </div>
-            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-3 bg-emerald-50 rounded-2xl text-emerald-600">
+            <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-3 bg-white rounded-2xl text-emerald-600">
               <ChevronRight className="w-6 h-6 rotate-180" />
             </button>
           </div>
+
+          {/* Search Bar */}
+          <div className="px-6 pb-2">
+            <div className="relative group">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-900/30 group-focus-within:text-emerald-500 transition-colors" />
+              <input
+                type="text"
+                placeholder="Filtrer les parcelles..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-slate-50 border border-emerald-50/50 rounded-2xl pl-10 pr-4 py-3 text-sm font-bold text-[#052E16] outline-none focus:bg-white focus:border-emerald-200 focus:shadow-lg transition-all placeholder:text-emerald-900/20"
+              />
+            </div>
+          </div>
+
           <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 custom-scrollbar">
-            {parcelles.length > 0 ? (
-              parcelles.map((p) => (
+            {filteredParcelles.length > 0 ? (
+              filteredParcelles.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => handleParcelSelect(p.id)}
@@ -160,8 +199,14 @@ export default function RecommandationsPage() {
               ))
             ) : (
               <div className="py-20 text-center space-y-4">
-                <Loader2 className="w-8 h-8 text-emerald-200 animate-spin mx-auto" />
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#052E16]/20">Initialisation...</p>
+                {parcelles.length === 0 ? (
+                  <>
+                    <Loader2 className="w-8 h-8 text-emerald-200 animate-spin mx-auto" />
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#052E16]/20">Chargement...</p>
+                  </>
+                ) : (
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#052E16]/40">Aucune parcelle trouvée</p>
+                )}
               </div>
             )}
           </div>
@@ -172,8 +217,8 @@ export default function RecommandationsPage() {
           <div className="fixed inset-0 z-[55] bg-emerald-950/20 backdrop-blur-sm lg:hidden" onClick={() => setIsSidebarOpen(false)}></div>
         )}
 
-        {/* MAIN CHAT AREA */}
-        <main className="flex-1 flex flex-col min-h-0 bg-transparent">
+        {/* MAIN CHAT AREA - Elite Floating Panel */}
+        <main className="flex-1 flex flex-col min-h-0 bg-transparent lg:bg-white/20 lg:backdrop-blur-xl lg:rounded-[32px] lg:border lg:border-white/40 lg:shadow-2xl lg:shadow-emerald-900/5 overflow-hidden transition-all duration-500">
           {/* Elite Chat Header */}
           <div className="px-6 md:px-10 py-6 md:py-8 bg-white/20 backdrop-blur-md border-b border-emerald-50/50 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-center gap-4 md:gap-5">
@@ -202,57 +247,59 @@ export default function RecommandationsPage() {
           </div>
 
           {/* Chat Bubble Zone */}
-          <div className="flex-1 overflow-y-auto p-4 md:p-10 space-y-6 md:space-y-8 custom-scrollbar relative">
-            {!selectedParcel ? (
-              <div className="h-full flex flex-col items-center justify-center text-[#052E16]/10 px-6 text-center">
-                <MessageSquare size={window?.innerWidth < 768 ? 80 : 120} strokeWidth={0.5} className="mb-6 md:mb-8" />
-                <h3 className="text-xl md:text-2xl font-black tracking-tighter">Sélectionnez une zone</h3>
-                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest mt-2 px-10">Pour démarrer le diagnostic intelligent et recevoir vos recommandations personnalisées.</p>
-              </div>
-            ) : loading ? (
-              <div className="h-full flex flex-col items-center justify-center">
-                <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-emerald-500 animate-spin" />
-                <p className="mt-4 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]/40 animate-pulse">Chargement de l'expertise...</p>
-              </div>
-            ) : (
-              <>
-                {messages.map((msg, idx) => (
-                  <div key={idx} className={`flex gap-3 md:gap-6 ${msg.type === 'user' ? 'flex-row-reverse' : ''} animate-fadeIn`}>
-                    <div className={`w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-[20px] flex items-center justify-center shrink-0 shadow-lg border border-white ${msg.type === 'user' ? 'bg-[#052E16] text-white' : 'bg-white text-emerald-600'}`}>
-                      {msg.type === 'user' ? <User size={24} /> : <Bot size={24} />}
-                    </div>
-                    <div className={`p-5 md:p-8 rounded-[24px] md:rounded-[40px] max-w-[85%] md:max-w-[70%] shadow-2xl relative ${msg.type === 'user'
-                      ? 'bg-[#052E16] text-white rounded-tr-none shadow-emerald-900/10'
-                      : 'bg-white/80 backdrop-blur-xl text-[#052E16] rounded-tl-none border border-emerald-50 shadow-emerald-900/5'
-                      }`}>
-                      <div className={`flex items-center gap-2 mb-2 md:mb-3 opacity-30 ${msg.type === 'user' ? 'justify-end' : ''}`}>
-                        <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em]">{msg.agent}</span>
+          <div className="flex-1 overflow-y-auto p-4 md:p-0 custom-scrollbar relative">
+            <div className="max-w-4xl mx-auto h-full flex flex-col p-4 md:p-10 space-y-6 md:space-y-8">
+              {!selectedParcel ? (
+                <div className="h-full flex flex-col items-center justify-center text-[#052E16]/10 px-6 text-center">
+                  <MessageSquare size={window?.innerWidth < 768 ? 80 : 120} strokeWidth={0.5} className="mb-6 md:mb-8" />
+                  <h3 className="text-xl md:text-2xl font-black tracking-tighter">Sélectionnez une zone</h3>
+                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest mt-2 px-10">Pour démarrer le diagnostic intelligent et recevoir vos recommandations personnalisées.</p>
+                </div>
+              ) : loading ? (
+                <div className="h-full flex flex-col items-center justify-center">
+                  <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-emerald-500 animate-spin" />
+                  <p className="mt-4 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]/40 animate-pulse">Chargement de l'expertise...</p>
+                </div>
+              ) : (
+                <>
+                  {messages.map((msg, idx) => (
+                    <div key={idx} className={`flex gap-3 md:gap-6 ${msg.type === 'user' ? 'flex-row-reverse' : ''} animate-fadeIn`}>
+                      <div className={`w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-[20px] flex items-center justify-center shrink-0 shadow-lg border border-white ${msg.type === 'user' ? 'bg-[#052E16] text-white' : 'bg-white text-emerald-600'}`}>
+                        {msg.type === 'user' ? <User size={24} /> : <Bot size={24} />}
                       </div>
-                      <p className="text-sm md:text-base font-medium leading-relaxed tracking-tight">{msg.message}</p>
+                      <div className={`p-5 md:p-8 rounded-[24px] md:rounded-[40px] max-w-[85%] md:max-w-[80%] shadow-2xl relative ${msg.type === 'user'
+                        ? 'bg-[#052E16] text-white rounded-tr-none shadow-emerald-900/10'
+                        : 'bg-white/80 backdrop-blur-xl text-[#052E16] rounded-tl-none border border-emerald-50 shadow-emerald-900/5'
+                        }`}>
+                        <div className={`flex items-center gap-2 mb-2 md:mb-3 opacity-30 ${msg.type === 'user' ? 'justify-end' : ''}`}>
+                          <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em]">{msg.agent}</span>
+                        </div>
+                        <p className="text-sm md:text-base font-medium leading-relaxed tracking-tight">{msg.message}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
 
-                {isTyping && (
-                  <div className="flex gap-4 md:gap-6 animate-fadeIn">
-                    <div className="w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-[20px] bg-white text-emerald-600 flex items-center justify-center shadow-lg border border-emerald-50 animate-pulse">
-                      <Bot size={24} />
+                  {isTyping && (
+                    <div className="flex gap-4 md:gap-6 animate-fadeIn">
+                      <div className="w-10 h-10 md:w-14 md:h-14 rounded-lg md:rounded-[20px] bg-white text-emerald-600 flex items-center justify-center shadow-lg border border-emerald-50 animate-pulse">
+                        <Bot size={24} />
+                      </div>
+                      <div className="bg-white/60 backdrop-blur-md p-4 md:p-6 rounded-[24px] md:rounded-[32px] rounded-tl-none flex gap-1.5 md:gap-2 border border-emerald-50 items-center">
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-bounce"></div>
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                        <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                      </div>
                     </div>
-                    <div className="bg-white/60 backdrop-blur-md p-4 md:p-6 rounded-[24px] md:rounded-[32px] rounded-tl-none flex gap-1.5 md:gap-2 border border-emerald-50 items-center">
-                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-bounce"></div>
-                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.2s]"></div>
-                      <div className="w-1.5 h-1.5 md:w-2 md:h-2 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.4s]"></div>
-                    </div>
-                  </div>
-                )}
-                <div ref={chatEndRef} className="h-4 md:h-10" />
-              </>
-            )}
+                  )}
+                  <div ref={chatEndRef} className="h-4 md:h-10" />
+                </>
+              )}
+            </div>
           </div>
 
           {/* Elite Input Area */}
           <div className="p-4 md:p-10 bg-white/40 backdrop-blur-2xl border-t border-emerald-50/50">
-            <form onSubmit={handleSendMessage} className="max-w-4xl mx-auto flex gap-3 md:gap-4">
+            <form onSubmit={(e) => handleSendMessage(e)} className="max-w-4xl mx-auto flex gap-3 md:gap-4">
               <div className="relative flex-grow group">
                 <div className="absolute inset-y-0 left-4 md:left-6 flex items-center pointer-events-none text-emerald-400 group-focus-within:text-emerald-600 transition-colors">
                   <Sparkles size={20} />

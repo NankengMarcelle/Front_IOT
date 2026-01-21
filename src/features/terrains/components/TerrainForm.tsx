@@ -66,7 +66,7 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
   };
 
   return (
-    <div className="bg-white rounded-[40px] p-8 sm:p-12 shadow-2xl border border-emerald-100 relative overflow-hidden max-w-2xl mx-auto w-full">
+    <div className="bg-white rounded-[32px] md:rounded-[40px] p-6 md:p-12 shadow-2xl border border-emerald-100 relative overflow-hidden max-w-2xl mx-auto w-full">
       {/* Decorative background element - Refined */}
       <div className="absolute top-0 right-0 w-80 h-80 bg-gradient-to-br from-emerald-50 to-teal-50 rounded-full blur-3xl -mr-32 -mt-32 opacity-60 pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-50 rounded-full blur-2xl -ml-20 -mb-20 opacity-40 pointer-events-none" />

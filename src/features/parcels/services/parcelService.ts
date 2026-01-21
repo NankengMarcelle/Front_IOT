@@ -18,7 +18,6 @@ export const parcelService = {
             let allParcels: Parcelle[] = [];
 
             // 2. Pour chaque terrain, récupérer les parcelles
-            // Note: Idéalement, le backend devrait avoir un endpoint /parcelles/all
             for (const terrain of terrains) {
                 try {
                     console.log(`Fetching parcels for terrain: ${terrain.nom} (${terrain.id})`);
@@ -32,18 +31,50 @@ export const parcelService = {
                             const measurementsRaw = await DonnEsDeCapteursService.getMeasurementsByParcelleApiV1SensorDataSensorDataParcelleParcelleIdGet(
                                 p.id,
                                 0,
-                                1 // On essaie de récupérer la plus récente
+                                1
                             ) as any;
                             const measurements = Array.isArray(measurementsRaw) ? measurementsRaw : (measurementsRaw.data || []);
 
-                            // On suppose que l'API renvoie la plus récente en premier ou unique
                             if (measurements && measurements.length > 0) {
-                                // stats = measurements[0];
                                 stats = measurements[0];
                             }
                         } catch (e) {
-                            // Pas de mesure ou 403, on ignore silencieusement
-                            // console.warn(`Impossible de récupérer les mesures pour parcelle ${p.id}`, e);
+                            // Pas de mesure ou 403, on ignore
+                        }
+
+                        // 4. Récupérer les capteurs assignés (permet l'affichage même sans mesures)
+                        let capteursListe = "";
+                        try {
+                            const assignmentsRaw = await CapteursService.getAssignmentsApiV1CapteursAssignmentsAllGet() as any;
+                            const assignments = assignmentsRaw.data || [];
+                            const parcelAssignments = assignments.filter((a: any) => a.parcelle_id === p.id && !a.date_desassignation);
+
+                            if (parcelAssignments.length > 0) {
+                                const codes = await Promise.all(parcelAssignments.map(async (a: any) => {
+                                    try {
+                                        const capteurResponse = await CapteursService.readCapteurApiV1CapteursCapteurIdGet(a.capteur_id) as any;
+                                        // L'API peut retourner soit directement l'objet, soit { data: {...} }
+                                        const capteur = capteurResponse.data || capteurResponse;
+                                        return capteur.code;
+                                    } catch (err) {
+                                        return "";
+                                    }
+                                }));
+                                capteursListe = codes.filter(Boolean).join(', ');
+                            } else if (stats.capteur_id) {
+                                const capteurResponse = await CapteursService.readCapteurApiV1CapteursCapteurIdGet(stats.capteur_id) as any;
+                                const capteur = capteurResponse.data || capteurResponse;
+                                capteursListe = capteur.code;
+                            }
+                        } catch (e) {
+                            // Erreur lors de la récupération des assignations
+                            if (stats.capteur_id) {
+                                try {
+                                    const capteurResponse = await CapteursService.readCapteurApiV1CapteursCapteurIdGet(stats.capteur_id) as any;
+                                    const capteur = capteurResponse.data || capteurResponse;
+                                    capteursListe = capteur.code;
+                                } catch { }
+                            }
                         }
 
                         return {
@@ -61,14 +92,7 @@ export const parcelService = {
                             ph: stats.ph || 0,
                             culturePredite: "Maïs",
                             hasMeasurements: !!(stats.id),
-                            capteursListe: stats.capteur_id ? await (async () => {
-                                try {
-                                    const c = await CapteursService.readCapteurApiV1CapteursCapteurIdGet(stats.capteur_id!);
-                                    return c.code;
-                                } catch (e) {
-                                    return "";
-                                }
-                            })() : ""
+                            capteursListe: capteursListe
                         };
                     }));
 

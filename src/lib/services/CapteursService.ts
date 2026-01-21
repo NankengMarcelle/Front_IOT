@@ -189,4 +189,29 @@ export class CapteursService {
             },
         });
     }
+
+    /**
+     * Lister toutes les assignations actives
+     * Récupère la liste de toutes les assignations actives entre capteurs et parcelles.
+     * @param skip
+     * @param limit
+     * @returns any Successful Response
+     * @throws ApiError
+     */
+    public static getAssignmentsApiV1CapteursAssignmentsAllGet(
+        skip?: number,
+        limit: number = 100,
+    ): CancelablePromise<any> {
+        return __request(OpenAPI, {
+            method: 'GET',
+            url: '/api/v1/capteurs/assignments/all',
+            query: {
+                'skip': skip,
+                'limit': limit,
+            },
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
 }
