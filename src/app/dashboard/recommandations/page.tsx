@@ -24,14 +24,26 @@ export default function RecommandationsPage() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const prevMessagesLength = useRef(0);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
   useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, isTyping]);
+    // Scroll only if messages are added to an existing conversation
+    // This prevents jumpy scrolling when selecting a new parcel
+    if (messages.length > prevMessagesLength.current && prevMessagesLength.current > 0) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+    prevMessagesLength.current = messages.length;
+  }, [messages]);
+
+  useEffect(() => {
+    if (isTyping) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [isTyping]);
 
   useEffect(() => {
     const loadParcelles = async () => {

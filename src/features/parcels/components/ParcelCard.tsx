@@ -296,10 +296,11 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
                       </span>
                       <button
                         onClick={() => handleUnassign(c.trim())}
-                        className="p-1 text-slate-300 hover:text-rose-500 transition-colors"
+                        className="ml-1 flex items-center gap-1.5 px-2 py-1 bg-indigo-50 hover:bg-rose-100 text-slate-400 hover:text-rose-600 rounded-md transition-all duration-300 group/btn"
                         title="Désassigner"
                       >
-                        <Unlink className="w-2.5 h-2.5" />
+                        <span className="text-[9px] font-bold">Désassigner</span>
+                        <Unlink className="w-3 h-3" />
                       </button>
                     </div>
                   ))
@@ -333,9 +334,11 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
                         <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{c.trim()}</span>
                         <button
                           onClick={() => handleUnassign(c.trim())}
-                          className="p-1.5 bg-white text-slate-300 hover:text-rose-500 rounded-lg shadow-sm transition-all"
+                          className="ml-1 flex items-center gap-1.5 px-2 py-1 bg-indigo-50 hover:bg-rose-100 text-slate-400 hover:text-rose-600 rounded-md transition-all duration-300 group/btn"
+                          title="Désassigner"
                         >
-                          <Unlink className="w-3.5 h-3.5" />
+                          <span className="text-[9px] font-bold">Désassigner</span>
+                          <Unlink className="w-3 h-3" />
                         </button>
                       </div>
                     ))}

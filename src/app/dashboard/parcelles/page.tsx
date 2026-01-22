@@ -5,8 +5,8 @@ import ParcelCard from "@/features/parcels/components/ParcelCard";
 import ParcelForm from "@/features/parcels/components/ParcelForm";
 import { parcelService } from "@/features/parcels/services/parcelService";
 import { terrainService } from "@/features/terrains/services/terrainService";
-import { sensorService } from "@/features/sensors/services/sensorService";
 import { useTranslation } from "@/providers/TranslationProvider";
+import { CapteursService } from "@/lib";
 import { useConfirmDialog } from "@/components/ConfirmDialog";
 import { Plus, Grid3x3, Search, Layout, ChevronRight } from "lucide-react";
 
@@ -27,8 +27,6 @@ export default function ParcellesPage() {
       setTerrains(terrainsData);
 
       const flattenedParcelles: any = await parcelService.getParcelles();
-      // const sensors: any = await sensorService.getSensors(); // Retiré car cause 403 Forbidden
-
       setParcelles(flattenedParcelles);
       setView("list");
     } catch (error) {
@@ -38,10 +36,20 @@ export default function ParcellesPage() {
     }
   };
 
-  const handleDelete = async (id: number | string) => {
+  const handleDelete = async (parcel: any) => {
+    let message = 'Êtes-vous sûr de vouloir supprimer cette parcelle ? Cette action est irréversible.';
+    let sensorsToUnassign: string[] = [];
+
+    if (parcel.capteursListe) {
+      sensorsToUnassign = parcel.capteursListe.split(',').map((s: string) => s.trim()).filter((s: string) => s);
+      if (sensorsToUnassign.length > 0) {
+        message = `Cette parcelle possède ${sensorsToUnassign.length} capteur(s) assigné(s). Ils seront automatiquement désassignés avant la suppression. Voulez-vous continuer ?`;
+      }
+    }
+
     const confirmed = await confirm({
       title: 'Supprimer la parcelle',
-      message: 'Êtes-vous sûr de vouloir supprimer cette parcelle ? Cette action est irréversible.',
+      message: message,
       confirmText: 'Supprimer',
       cancelText: 'Annuler',
       type: 'danger'
@@ -50,11 +58,22 @@ export default function ParcellesPage() {
     if (!confirmed) return;
 
     try {
-      await parcelService.deleteParcelle(id);
+      if (sensorsToUnassign.length > 0) {
+        // Unassign sensors before deleting the parcel
+        for (const sensorCode of sensorsToUnassign) {
+          try {
+            await CapteursService.desassignCapteurApiV1CapteursDesassignPost(parcel.code, sensorCode);
+          } catch (unassignError) {
+            console.error(`Error unassigning sensor ${sensorCode}:`, unassignError);
+            // We might want to continue anyway or stop. Here we continue.
+          }
+        }
+      }
+
+      await parcelService.deleteParcelle(parcel.id);
       loadData();
     } catch (error) {
       console.error("Error deleting parcel:", error);
-      // On pourrait aussi utiliser un toast ici au lieu d'alert
       await confirm({
         title: 'Erreur',
         message: 'Impossible de supprimer la parcelle.',
@@ -64,7 +83,9 @@ export default function ParcellesPage() {
     }
   };
 
-  useEffect(() => { loadData(); }, []);
+  useEffect(() => {
+    loadData();
+  }, []);
 
   const getTerrainName = (id: string | number) => {
     const terrain = terrains.find(tr => String(tr.id) === String(id));
@@ -160,7 +181,7 @@ export default function ParcellesPage() {
                         setSelectedParcel(p);
                         setView("form");
                       }}
-                      onDelete={() => handleDelete(p.id)}
+                      onDelete={() => handleDelete(p)}
                     />
                   ))}
                 </div>
