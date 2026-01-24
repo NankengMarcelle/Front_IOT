@@ -177,7 +177,10 @@ export default function FarmerDashboard() {
               <div className="space-y-6">
                 <div className="flex items-center justify-between px-4">
                   <h3 className="text-xl md:text-2xl font-black text-[#052E16] tracking-tight">Performance Parcelles</h3>
-                  <button className="text-emerald-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-transform">
+                  <button
+                    onClick={() => router.push('/dashboard/parcelles')}
+                    className="text-emerald-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-transform"
+                  >
                     Voir Tout <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>

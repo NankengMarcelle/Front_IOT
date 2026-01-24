@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { parcelService } from "@/features/parcels/services/parcelService";
 import { predictionService } from "@/features/predictions/services/predictionService";
 import { useTranslation } from "@/providers/TranslationProvider";
@@ -9,6 +9,8 @@ import { BrainCircuit, CheckCircle, Loader2, Sparkles, Sprout, MapPin, ChevronRi
 
 export default function PredictionsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialParcelId = searchParams.get('parcelId');
   const { t } = useTranslation();
   const [parcelles, setParcelles] = useState<any[]>([]);
   const [selectedParcelId, setSelectedParcelId] = useState("");
@@ -16,18 +18,6 @@ export default function PredictionsPage() {
   const [loading, setLoading] = useState(false);
   const [isApplied, setIsApplied] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  useEffect(() => {
-    const loadParcelles = async () => {
-      try {
-        const data: any = await parcelService.getParcelles();
-        setParcelles(data);
-      } catch (error) {
-        console.error("Erreur chargement", error);
-      }
-    };
-    loadParcelles();
-  }, []);
 
   const handleSelectParcel = async (id: string) => {
     if (selectedParcelId === id) {
@@ -49,6 +39,23 @@ export default function PredictionsPage() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const loadParcelles = async () => {
+      try {
+        const data: any = await parcelService.getParcelles();
+        setParcelles(data);
+
+        // Auto-select and trigger prediction if parcelId is in URL
+        if (initialParcelId && data.find((p: any) => String(p.id) === initialParcelId)) {
+          handleSelectParcel(initialParcelId);
+        }
+      } catch (error) {
+        console.error("Erreur chargement", error);
+      }
+    };
+    loadParcelles();
+  }, [initialParcelId]);
 
   const handleApply = async () => {
     if (!selectedParcelId || !prediction) return;

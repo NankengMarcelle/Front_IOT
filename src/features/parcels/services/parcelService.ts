@@ -61,21 +61,15 @@ export const parcelService = {
                                     }
                                 }));
                                 capteursListe = codes.filter(Boolean).join(', ');
-                            } else if (stats.capteur_id) {
-                                const capteurResponse = await CapteursService.readCapteurApiV1CapteursCapteurIdGet(stats.capteur_id) as any;
-                                const capteur = capteurResponse.data || capteurResponse;
-                                capteursListe = capteur.code;
                             }
                         } catch (e) {
                             // Erreur lors de la récupération des assignations
-                            if (stats.capteur_id) {
-                                try {
-                                    const capteurResponse = await CapteursService.readCapteurApiV1CapteursCapteurIdGet(stats.capteur_id) as any;
-                                    const capteur = capteurResponse.data || capteurResponse;
-                                    capteursListe = capteur.code;
-                                } catch { }
-                            }
+                            console.error("Error fetching assignments:", e);
                         }
+
+                        // 5. Récupérer la culture éventuellement enregistrée localement
+                        const savedPredictions = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem('simulated_predictions') || '{}' : '{}');
+                        const savedCulture = savedPredictions[p.id];
 
                         return {
                             id: p.id,
@@ -90,7 +84,7 @@ export const parcelService = {
                             humidite: stats.humidity || 0,
                             temperature: stats.temperature || 0,
                             ph: stats.ph || 0,
-                            culturePredite: "Maïs",
+                            culturePredite: savedCulture || "Non définie",
                             hasMeasurements: !!(stats.id),
                             capteursListe: capteursListe
                         };

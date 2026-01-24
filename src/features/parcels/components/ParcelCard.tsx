@@ -12,9 +12,13 @@ import {
   Plus,
   Unlink,
   AlertCircle,
-  X
+  X,
+  Sparkles,
+  Loader2,
+  RefreshCw
 } from "lucide-react";
 import { CapteursService } from "@/lib";
+import { predictionService } from "@/features/predictions/services/predictionService";
 import { toast } from "sonner";
 import { useConfirmDialog } from "@/components/ConfirmDialog";
 
@@ -24,6 +28,32 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
   const [sensorCode, setSensorCode] = useState("");
   const [isAssigning, setIsAssigning] = useState(false);
   const [assignError, setAssignError] = useState("");
+  const [localPrediction, setLocalPrediction] = useState<string | null>(null);
+  const [isPredicting, setIsPredicting] = useState(false);
+
+  const handleQuickPredict = async () => {
+    setIsPredicting(true);
+    try {
+      const result: any = await predictionService.getPrediction(parcel.id);
+      setLocalPrediction(result.culture);
+
+      // Sauvegarder la prédiction dans localStorage pour persistance
+      const savedPredictions = JSON.parse(localStorage.getItem('simulated_predictions') || '{}');
+      savedPredictions[parcel.id] = result.culture;
+      localStorage.setItem('simulated_predictions', JSON.stringify(savedPredictions));
+
+      toast.success(`Analyse terminée : ${result.culture}`);
+
+      // Rafraîchir les parcelles pour mettre à jour l'affichage
+      setTimeout(() => {
+        window.location.reload();
+      }, 1500);
+    } catch (error: any) {
+      toast.error(error.message || "Erreur lors de la prédiction");
+    } finally {
+      setIsPredicting(false);
+    }
+  };
 
   const stats = {
     azote: parcel.azote || 0,
@@ -96,7 +126,11 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
     try {
       await CapteursService.desassignCapteurApiV1CapteursDesassignPost(parcel.code, cCode);
       toast.success("Capteur désassigné avec succès.", { id: toastId });
-      if (onRefresh) onRefresh();
+
+      // Petit délai pour laisser le backend se mettre à jour
+      setTimeout(() => {
+        if (onRefresh) onRefresh();
+      }, 500);
     } catch (err: any) {
 
       // Extraire le message d'erreur
@@ -241,43 +275,70 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
             </div>
 
             {/* Sensor Matrix */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-4 p-4 bg-emerald-50/50 rounded-3xl border border-emerald-100">
-                <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform">
-                  <Thermometer className="w-5 h-5" />
+            <div className="grid grid-cols-3 gap-2 md:gap-3">
+              {[
+                { l: 'Temp Sol', v: `${stats.temperature}°C`, i: <Thermometer className="w-4 h-4" />, c: 'text-rose-500' },
+                { l: 'Humidité', v: `${stats.humidite}%`, i: <Droplets className="w-4 h-4" />, c: 'text-sky-500' },
+                { l: 'pH Sol', v: stats.ph, i: <FlaskConical className="w-4 h-4" />, c: 'text-amber-500' }
+              ].map((item, idx) => (
+                <div key={idx} className="flex flex-col items-center justify-center p-2.5 md:p-3 bg-emerald-50/40 rounded-2xl border border-emerald-100/50 hover:bg-white transition-colors">
+                  <div className={`p-1.5 bg-white rounded-lg shadow-sm ${item.c} mb-1.5`}>
+                    {item.i}
+                  </div>
+                  <p className="text-[7px] md:text-[8px] text-[#052E16]/40 font-black uppercase tracking-widest text-center whitespace-nowrap">{item.l}</p>
+                  <p className="text-[10px] md:text-xs font-black text-[#052E16] tracking-tighter">{item.v}</p>
                 </div>
-                <div>
-                  <p className="text-[9px] text-[#052E16]/40 font-black uppercase tracking-widest">Temp Sol</p>
-                  <p className="text-sm font-black text-[#052E16] tracking-tighter">{stats.temperature}°C</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-4 p-4 bg-emerald-50/50 rounded-3xl border border-emerald-100">
-                <div className="w-10 h-10 bg-white rounded-xl shadow-sm flex items-center justify-center text-sky-500 group-hover:scale-110 transition-transform">
-                  <Droplets className="w-5 h-5" />
-                </div>
-                <div>
-                  <p className="text-[9px] text-[#052E16]/40 font-black uppercase tracking-widest">Humidité</p>
-                  <p className="text-sm font-black text-[#052E16] tracking-tighter">{stats.humidite}%</p>
-                </div>
-              </div>
+              ))}
             </div>
 
-            {/* AI Prediction Hub */}
-            <div className="relative group/pred p-8 rounded-[36px] bg-[#F8FAF9] border border-emerald-50 text-center overflow-hidden transition-all hover:bg-emerald-50">
+            {/* AI Prediction Hub - Direct ML Integration */}
+            <div className="relative group/pred p-6 md:p-8 rounded-[32px] md:rounded-[40px] bg-[#F8FAF9] border border-emerald-50 text-center overflow-hidden transition-all hover:bg-emerald-50 hover:border-emerald-200 shadow-sm">
               <div className="absolute -right-8 -bottom-8 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl transition-transform group-hover/pred:scale-150"></div>
 
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 mb-3">
-                  <TrendingUp className="w-4 h-4 text-emerald-600" />
-                  <p className="text-[10px] font-black text-emerald-900/40 uppercase tracking-[0.2em]">Crop Predictor AI</p>
+                  <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+                  <p className="text-[9px] font-black text-emerald-900/40 uppercase tracking-[0.2em]">IA de Recommandation</p>
                 </div>
-                <p className="text-4xl font-black text-[#052E16] tracking-tighter drop-shadow-sm leading-none mb-3">
-                  {parcel.culturePredite || "Maïs"}
+
+                <p className="text-3xl md:text-4xl font-black text-[#052E16] tracking-tighter drop-shadow-sm leading-none mb-4">
+                  {localPrediction || parcel.culturePredite || "À analyser"}
                 </p>
-                {parcel.confiance && (
-                  <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
-                    {parcel.confiance}% Fiabilité
-                  </span>
+
+                {isPredicting ? (
+                  <div className="flex flex-col items-center gap-2 py-2">
+                    <Loader2 className="w-5 h-5 text-emerald-600 animate-spin" />
+                    <p className="text-[8px] font-black text-emerald-900/40 uppercase tracking-widest">Analyse en cours...</p>
+                  </div>
+                ) : (localPrediction || (parcel.culturePredite && parcel.culturePredite !== "Non définie")) ? (
+                  <div className="flex flex-col items-center gap-3">
+                    <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
+                      Prediction Optimale
+                    </span>
+                    <div className="flex gap-4">
+                      <button
+                        onClick={handleQuickPredict}
+                        className="text-[8px] font-black text-emerald-900/30 uppercase tracking-widest hover:text-emerald-600 transition-colors flex items-center gap-1"
+                      >
+                        <RefreshCw className="w-2.5 h-2.5" />
+                        Refaire l'analyse
+                      </button>
+                      <button
+                        onClick={() => window.location.href = `/dashboard/predictions?parcelId=${parcel.id}`}
+                        className="text-[8px] font-black text-emerald-900/30 uppercase tracking-widest hover:text-emerald-600 transition-colors"
+                      >
+                        Détails →
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handleQuickPredict}
+                    className="w-full bg-[#052E16] text-white py-3 rounded-2xl font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-xl shadow-emerald-900/5"
+                  >
+                    <Sparkles className="w-3 h-3 text-lime-400" />
+                    Prédire la Culture
+                  </button>
                 )}
               </div>
             </div>

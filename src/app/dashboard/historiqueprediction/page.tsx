@@ -189,7 +189,7 @@ export default function HistoriquePredictionPage() {
                                             </div>
                                         </div>
 
-                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 md:gap-8 flex-grow max-w-2xl px-2">
+                                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 md:gap-8 flex-grow max-w-2xl px-2">
                                             <div className="space-y-1">
                                                 <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
                                                     <Thermometer className="w-3 h-3 text-rose-500" /> Temper.
@@ -210,9 +210,21 @@ export default function HistoriquePredictionPage() {
                                             </div>
                                             <div className="space-y-1">
                                                 <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Activity className="w-3 h-3 text-orange-500" /> Phosph. (P)
+                                                    <Activity className="w-3 h-3 text-orange-500" /> Phos. (P)
                                                 </div>
                                                 <p className="text-sm font-black text-[#052E16]">{m.phosphore}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
+                                                    <Activity className="w-3 h-3 text-purple-500" /> Potas. (K)
+                                                </div>
+                                                <p className="text-sm font-black text-[#052E16]">{m.potassium}</p>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
+                                                    <Activity className="w-3 h-3 text-amber-500" /> pH Sol
+                                                </div>
+                                                <p className="text-sm font-black text-[#052E16]">{m.ph}</p>
                                             </div>
                                         </div>
 

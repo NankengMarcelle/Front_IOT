@@ -31,19 +31,11 @@ export default function RecommandationsPage() {
   }, []);
 
   useEffect(() => {
-    // Scroll only if messages are added to an existing conversation
-    // This prevents jumpy scrolling when selecting a new parcel
-    if (messages.length > prevMessagesLength.current && prevMessagesLength.current > 0) {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Petit scroll vers le bas uniquement lors de l'ajout de nouveaux messages
+    if (messages.length > 0) {
+      chatEndRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
     }
-    prevMessagesLength.current = messages.length;
-  }, [messages]);
-
-  useEffect(() => {
-    if (isTyping) {
-      chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [isTyping]);
+  }, [messages.length]);
 
   useEffect(() => {
     const loadParcelles = async () => {
@@ -78,9 +70,39 @@ export default function RecommandationsPage() {
     }
 
     setSelectedParcel(parcel);
+    if (window.innerWidth < 1024) setIsSidebarOpen(false);
+
+    // Charger les messages sauvegardés pour cette parcelle depuis sessionStorage
+    const savedMessages = sessionStorage.getItem(`chat_messages_${id}`);
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+        setLoading(false);
+
+        // Charger quand même les données du sol en arrière-plan
+        sensorDataService.getMeasurementsByParcelle(parcel.id).then(measurements => {
+          const latest = measurements[0];
+          if (latest) {
+            setLatestSoilData({
+              N: latest.azote || 0,
+              P: latest.phosphore || 0,
+              K: latest.potassium || 0,
+              temperature: latest.temperature || 0,
+              humidity: latest.humidity || 0,
+              ph: latest.ph || 0
+            });
+          }
+        }).catch(err => console.error("Error loading soil data:", err));
+
+        return; // Sortir ici si on a des messages sauvegardés
+      } catch (e) {
+        console.error("Error loading saved messages:", e);
+      }
+    }
+
+    // Si pas de messages sauvegardés, continuer avec le message d'accueil
     setMessages([]);
     setLoading(true);
-    if (window.innerWidth < 1024) setIsSidebarOpen(false);
 
     try {
       const measurements = await sensorDataService.getMeasurementsByParcelle(parcel.id);
@@ -97,21 +119,28 @@ export default function RecommandationsPage() {
         };
         setLatestSoilData(soilData);
 
-        const recommendations: any = await recommendationService.getRecommendations(parcel.id, parcel.culturePredite || "Maïs");
+        // Message d'accueil au lieu d'appeler l'API immédiatement
+        const cultureName = parcel.culturePredite && parcel.culturePredite !== "Non définie"
+          ? parcel.culturePredite
+          : "cette parcelle";
 
-        if (recommendations && recommendations.length > 0) {
-          setMessages(recommendations.map((r: any) => ({
-            agent: r.agent,
-            message: r.message,
-            type: "bot"
-          })));
-        }
-      } else {
-        setMessages([{
-          agent: "Expert Agrotank",
-          message: "Aucune donnée de capteur disponible pour cette parcelle. Veuillez installer des capteurs pour obtenir des recommandations.",
+        const welcomeMessages = [{
+          agent: "Système Expert",
+          message: `Bonjour ! Je suis votre assistant agronomique pour ${cultureName}. Posez-moi vos questions sur l'irrigation, la fertilisation, les maladies, ou tout autre sujet agricole.`,
           type: "bot"
-        }]);
+        }];
+
+        setMessages(welcomeMessages);
+        sessionStorage.setItem(`chat_messages_${id}`, JSON.stringify(welcomeMessages));
+      } else {
+        const noDataMessages = [{
+          agent: "Assistant",
+          message: "Aucune donnée de capteur disponible pour cette parcelle. Vous pouvez quand même me poser vos questions agricoles !",
+          type: "bot"
+        }];
+
+        setMessages(noDataMessages);
+        sessionStorage.setItem(`chat_messages_${id}`, JSON.stringify(noDataMessages));
       }
     } catch (error) {
       console.error("Error fetching recommendations:", error);
@@ -124,21 +153,47 @@ export default function RecommandationsPage() {
     if (e) e.preventDefault();
     const textToSend = customMessage || inputMessage;
 
-    if (!textToSend.trim() || !selectedParcel || !latestSoilData) return;
+    if (!textToSend.trim() || !selectedParcel) return;
 
     if (!customMessage) setInputMessage("");
-    setMessages(prev => [...prev, { agent: t('recommandations.user_label'), message: textToSend, type: "user" }]);
+    const userMessage = { agent: t('recommandations.user_label'), message: textToSend, type: "user" };
+    setMessages(prev => {
+      const updated = [...prev, userMessage];
+      // Sauvegarder immédiatement le message utilisateur
+      if (selectedParcel) {
+        sessionStorage.setItem(`chat_messages_${selectedParcel.id}`, JSON.stringify(updated));
+      }
+      return updated;
+    });
     setIsTyping(true);
 
     try {
-      const res: any = await recommendationService.askQuestion(selectedParcel.id, textToSend);
-      setMessages(prev => [...prev, {
-        agent: res.agent,
-        message: res.message || "Je n'ai pas pu générer de réponse spécifique.",
-        type: "bot"
-      }]);
+      const res: any = await recommendationService.askQuestion(
+        selectedParcel.id,
+        textToSend,
+        selectedParcel.culturePredite
+      );
+      setMessages(prev => {
+        const updated = [...prev, {
+          agent: res.agent,
+          message: res.message || "Je n'ai pas pu générer de réponse spécifique.",
+          type: "bot"
+        }];
+        // Sauvegarder dans sessionStorage
+        sessionStorage.setItem(`chat_messages_${selectedParcel.id}`, JSON.stringify(updated));
+        return updated;
+      });
     } catch (error) {
       console.error("Error in AI chat:", error);
+      setMessages(prev => {
+        const updated = [...prev, {
+          agent: "Système",
+          message: "Désolé, une erreur s'est produite. Veuillez réessayer.",
+          type: "bot"
+        }];
+        sessionStorage.setItem(`chat_messages_${selectedParcel.id}`, JSON.stringify(updated));
+        return updated;
+      });
     } finally {
       setIsTyping(false);
     }
