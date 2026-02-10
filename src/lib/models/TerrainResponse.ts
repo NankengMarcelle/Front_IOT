@@ -11,5 +11,6 @@ export type TerrainResponse = {
     nombre_parcelles?: (number | null);
     created_at: string;
     updated_at: string;
+    superficie?: number;
 };
 

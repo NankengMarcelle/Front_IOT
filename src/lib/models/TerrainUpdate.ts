@@ -5,5 +5,6 @@
 export type TerrainUpdate = {
     nom?: (string | null);
     description?: (string | null);
+    superficie?: number;
 };
 

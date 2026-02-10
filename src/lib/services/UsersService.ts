@@ -41,6 +41,27 @@ export class UsersService {
             },
         });
     }
+
+    /**
+     * Update Notification Settings
+     * Met a jour les modes de notification de l'utilisateur connecte
+     * @param requestBody
+     * @returns UserResponse Successful Response
+     * @throws ApiError
+     */
+    public static updateNotificationSettingsApiV1UsersMeNotificationSettingsPut(
+        requestBody: string[],
+    ): CancelablePromise<UserResponse> {
+        return __request(OpenAPI, {
+            method: 'PUT',
+            url: '/api/v1/users/me/notification-settings',
+            body: requestBody,
+            mediaType: 'application/json',
+            errors: {
+                422: `Validation Error`,
+            },
+        });
+    }
     /**
      * Get All Users
      * Recupere tous les utilisateurs (Admin uniquement)

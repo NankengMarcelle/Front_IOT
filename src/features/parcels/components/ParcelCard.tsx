@@ -9,25 +9,17 @@ import {
   Cpu,
   MapPin,
   TrendingUp,
-  Plus,
-  Unlink,
-  AlertCircle,
-  X,
   Sparkles,
   Loader2,
-  RefreshCw
+  RefreshCw,
+  Signal
 } from "lucide-react";
-import { CapteursService } from "@/lib";
 import { predictionService } from "@/features/predictions/services/predictionService";
 import { toast } from "sonner";
 import { useConfirmDialog } from "@/components/ConfirmDialog";
 
 export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRefresh }: any) {
   const { confirm } = useConfirmDialog();
-  const [showAssignModal, setShowAssignModal] = useState(false);
-  const [sensorCode, setSensorCode] = useState("");
-  const [isAssigning, setIsAssigning] = useState(false);
-  const [assignError, setAssignError] = useState("");
   const [localPrediction, setLocalPrediction] = useState<string | null>(null);
   const [isPredicting, setIsPredicting] = useState(false);
 
@@ -68,144 +60,8 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
     return `${Math.min((value / max) * 100, 100)}%`;
   };
 
-  const handleAssign = async () => {
-    if (!sensorCode.trim()) return;
-    setIsAssigning(true);
-    setAssignError("");
-    const toastId = toast.loading("Assignation du capteur...");
-    try {
-      await CapteursService.assignCapteurApiV1CapteursAssignPost(parcel.code, sensorCode);
-      toast.success("Capteur assigné avec succès !", { id: toastId });
-      setShowAssignModal(false);
-      setSensorCode("");
-      if (onRefresh) onRefresh();
-    } catch (err: any) {
-
-      // Extraire le message d'erreur de différentes structures possibles
-      let errorMsg = "Impossible d'assigner le capteur.";
-
-      // Essayer différentes structures de réponse d'erreur
-      if (err.body?.detail) {
-        errorMsg = err.body.detail;
-      } else if (err.body?.message) {
-        errorMsg = err.body.message;
-      } else if (err.message) {
-        errorMsg = err.message;
-      } else if (typeof err.body === 'string') {
-        errorMsg = err.body;
-      }
-
-      // Messages personnalisés pour des cas spécifiques
-      if (errorMsg.toLowerCase().includes('already assigned') || errorMsg.toLowerCase().includes('déjà assigné')) {
-        errorMsg = `Le capteur ${sensorCode} est déjà assigné à une autre parcelle.`;
-      } else if (errorMsg.toLowerCase().includes('not found') || errorMsg.toLowerCase().includes('introuvable')) {
-        errorMsg = `Le capteur ${sensorCode} n'existe pas dans le système.`;
-      } else if (errorMsg.toLowerCase().includes('invalid') || errorMsg.toLowerCase().includes('invalide')) {
-        errorMsg = `Le code ${sensorCode} n'est pas valide.`;
-      }
-
-      setAssignError(errorMsg);
-      toast.error(errorMsg, { id: toastId });
-    } finally {
-      setIsAssigning(false);
-    }
-  };
-
-  const handleUnassign = async (cCode: string) => {
-    const confirmed = await confirm({
-      title: 'Désassigner le capteur',
-      message: `Êtes-vous sûr de vouloir désassigner le capteur ${cCode} de cette parcelle ?`,
-      confirmText: 'Désassigner',
-      cancelText: 'Annuler',
-      type: 'danger'
-    });
-
-    if (!confirmed) return;
-
-    const toastId = toast.loading("Désassignation...");
-    try {
-      await CapteursService.desassignCapteurApiV1CapteursDesassignPost(parcel.code, cCode);
-      toast.success("Capteur désassigné avec succès.", { id: toastId });
-
-      // Petit délai pour laisser le backend se mettre à jour
-      setTimeout(() => {
-        if (onRefresh) onRefresh();
-      }, 500);
-    } catch (err: any) {
-
-      // Extraire le message d'erreur
-      let errorMsg = "Erreur lors de la désassignation.";
-
-      if (err.body?.detail) {
-        errorMsg = err.body.detail;
-      } else if (err.body?.message) {
-        errorMsg = err.body.message;
-      } else if (err.message) {
-        errorMsg = err.message;
-      } else if (typeof err.body === 'string') {
-        errorMsg = err.body;
-      }
-
-      // Messages personnalisés
-      if (errorMsg.toLowerCase().includes('not found') || errorMsg.toLowerCase().includes('introuvable')) {
-        errorMsg = `Le capteur ${cCode} n'est pas assigné à cette parcelle.`;
-      } else if (errorMsg.toLowerCase().includes('not assigned') || errorMsg.toLowerCase().includes('pas assigné')) {
-        errorMsg = `Le capteur ${cCode} n'est pas assigné à cette parcelle.`;
-      }
-
-      toast.error(errorMsg, { id: toastId });
-    }
-  };
-
   return (
     <div className="group bg-white rounded-[32px] md:rounded-[48px] border border-emerald-50 shadow-sm md:hover:shadow-[0_48px_80px_-20px_rgba(0,0,0,0.08)] md:hover:-translate-y-4 transition-all duration-700 flex flex-col overflow-hidden relative">
-
-      {/* Assign Modal Overlay */}
-      {showAssignModal && (
-        <div className="absolute inset-0 z-[100] bg-white/95 backdrop-blur-sm p-8 flex flex-col items-center justify-center animate-in fade-in duration-300">
-          <button
-            onClick={() => { setShowAssignModal(false); setAssignError(""); }}
-            className="absolute top-6 right-6 p-2 text-slate-400 hover:text-rose-500 transition-colors"
-          >
-            <X className="w-6 h-6" />
-          </button>
-
-          <div className="w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center text-emerald-600 mb-6">
-            <Cpu className="w-8 h-8" />
-          </div>
-
-          <h4 className="text-xl font-black text-slate-800 mb-2">Assigner un capteur</h4>
-          <p className="text-xs text-slate-400 font-bold uppercase tracking-widest mb-8 text-center">Entrez le code unique du matériel</p>
-
-          <div className="w-full space-y-4">
-            <input
-              type="text"
-              value={sensorCode}
-              onChange={(e) => setSensorCode(e.target.value)}
-              placeholder="Ex: SN-8820-X"
-              className="w-full bg-slate-50 border-2 border-slate-100 rounded-2xl px-6 py-4 text-center text-lg font-black text-slate-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
-              autoCapitalize="none"
-              autoCorrect="off"
-              autoFocus
-            />
-
-            {assignError && (
-              <div className="flex items-center gap-2 text-[10px] text-rose-500 font-black justify-center">
-                <AlertCircle className="w-3 h-3" />
-                {assignError}
-              </div>
-            )}
-
-            <button
-              onClick={handleAssign}
-              disabled={isAssigning || !sensorCode.trim()}
-              className="w-full bg-emerald-900 text-white py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] hover:bg-emerald-800 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-            >
-              {isAssigning ? <Activity className="w-4 h-4 animate-spin" /> : <span>Confirmer l'assignation</span>}
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Visual Header with Overlay */}
       <div className="relative h-48 overflow-hidden">
@@ -345,35 +201,28 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
 
             {/* Hardware Status */}
             <div className="flex items-center gap-4 px-2 mt-auto">
-              <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-[#052E16]/20">
-                <Cpu className="w-4 h-4" />
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {parcel.capteursListe ? (
-                  parcel.capteursListe.split(',').map((c: string, i: number) => (
-                    <div key={i} className="flex items-center gap-1 bg-white border border-emerald-50 pl-3 pr-1 py-1 rounded-lg">
-                      <span className="text-[8px] font-black text-[#052E16]/40 uppercase tracking-widest">
-                        {c.trim()}
-                      </span>
-                      <button
-                        onClick={() => handleUnassign(c.trim())}
-                        className="ml-1 flex items-center gap-1.5 px-2 py-1 bg-indigo-50 hover:bg-rose-100 text-slate-400 hover:text-rose-600 rounded-md transition-all duration-300 group/btn"
-                        title="Désassigner"
-                      >
-                        <span className="text-[9px] font-bold">Désassigner</span>
-                        <Unlink className="w-3 h-3" />
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <button
-                    onClick={() => setShowAssignModal(true)}
-                    className="text-[8px] font-black text-emerald-600 uppercase tracking-widest flex items-center gap-1 hover:text-emerald-700 transition-colors"
-                  >
-                    <Plus className="w-3 h-3" /> Assigner un capteur
-                  </button>
-                )}
-              </div>
+              {parcel.capteursListe ? (
+                <div className="flex items-center gap-2 w-full">
+                  <div className="w-8 h-8 bg-emerald-50 rounded-lg flex items-center justify-center text-emerald-600 animate-pulse">
+                    <Signal className="w-4 h-4" />
+                  </div>
+                  <div className="flex items-center gap-1 bg-white border border-emerald-50 pl-3 pr-3 py-2 rounded-xl flex-grow">
+                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse mr-2" />
+                    <span className="text-[9px] font-black text-[#052E16]/60 uppercase tracking-widest">
+                      {parcel.capteursListe}
+                    </span>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 w-full opacity-50">
+                  <div className="w-8 h-8 bg-slate-50 rounded-lg flex items-center justify-center text-slate-300">
+                    <Cpu className="w-4 h-4" />
+                  </div>
+                  <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                    Pas de signal
+                  </span>
+                </div>
+              )}
             </div>
           </>
         ) : (
@@ -383,39 +232,13 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
             </div>
             <h4 className="text-lg font-black text-slate-700">Aucune mesure</h4>
             <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-[200px]">
-              Les capteurs n'ont pas encore transmis de données pour cette parcelle. Configurez vos capteurs IoT pour voir les analyses.
+              Aucune donnée télémétrique reçue pour cette parcelle.
             </p>
-
-            <div className="pt-4 w-full">
-              {parcel.capteursListe ? (
-                <div className="space-y-4">
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {parcel.capteursListe.split(',').map((c: string, i: number) => (
-                      <div key={i} className="flex items-center gap-2 bg-slate-50 border border-slate-100 pl-4 pr-2 py-2 rounded-xl">
-                        <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{c.trim()}</span>
-                        <button
-                          onClick={() => handleUnassign(c.trim())}
-                          className="ml-1 flex items-center gap-1.5 px-2 py-1 bg-indigo-50 hover:bg-rose-100 text-slate-400 hover:text-rose-600 rounded-md transition-all duration-300 group/btn"
-                          title="Désassigner"
-                        >
-                          <span className="text-[9px] font-bold">Désassigner</span>
-                          <Unlink className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                  <p className="text-[10px] text-slate-400 font-bold italic italic">En attente de transmission...</p>
-                </div>
-              ) : (
-                <button
-                  onClick={() => setShowAssignModal(true)}
-                  className="w-full bg-emerald-50 text-emerald-700 py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center justify-center gap-3 hover:bg-emerald-100 transition-all border border-emerald-100"
-                >
-                  <Plus className="w-4 h-4" />
-                  Assigner un capteur
-                </button>
-              )}
-            </div>
+            {parcel.capteursListe ? (
+              <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl">
+                <span className="text-[10px] font-black text-slate-600 uppercase tracking-widest">{parcel.capteursListe}</span>
+              </div>
+            ) : null}
           </div>
         )}
       </div>

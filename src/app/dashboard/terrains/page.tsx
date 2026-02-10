@@ -15,6 +15,7 @@ import {
   ChevronRight,
   Map
 } from "lucide-react";
+import { useConfirmDialog } from "@/components/ConfirmDialog";
 
 export default function TerrainsPage() {
   const { t } = useTranslation();
@@ -22,6 +23,8 @@ export default function TerrainsPage() {
   const [terrains, setTerrains] = useState<any[]>([]);
   const [selectedTerrain, setSelectedTerrain] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+
+  const { confirm } = useConfirmDialog();
 
   const loadData = async () => {
     try {
@@ -41,7 +44,15 @@ export default function TerrainsPage() {
   }, [terrains]);
 
   const handleDelete = async (id: number | string) => {
-    if (confirm(t('terrains.delete_confirm'))) {
+    const isConfirmed = await confirm({
+      title: t('terrains.delete_confirm_title') || "Supprimer le terrain ?",
+      message: t('terrains.delete_confirm') || "Voulez-vous vraiment supprimer ce terrain ? Cette action est irréversible et supprimera toutes les données associées.",
+      confirmText: "Supprimer",
+      cancelText: "Annuler",
+      type: "danger"
+    });
+
+    if (isConfirmed) {
       try {
         console.log("Deleting terrain:", id);
         await terrainService.deleteTerrain(id);
@@ -166,7 +177,7 @@ export default function TerrainsPage() {
                         <div>
                           <p className="text-[8px] md:text-[9px] text-[#052E16]/30 font-black uppercase tracking-widest mb-1">Surface Totale</p>
                           <p className="text-[#052E16] font-black text-xl md:text-2xl tracking-tighter">
-                            {(t_node.superficie ?? t_node.superficie_totale ?? 0).toLocaleString()} <span className="text-[10px] font-black text-emerald-500/50">M²</span>
+                            {(t_node.superficie || 0).toLocaleString()} <span className="text-[10px] font-black text-emerald-500/50">Ha</span>
                           </p>
                         </div>
                         <div className="text-right">

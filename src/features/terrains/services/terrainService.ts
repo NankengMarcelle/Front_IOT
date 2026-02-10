@@ -25,10 +25,10 @@ export const terrainService = {
           localite_id: t.localite_id,
           description: t.description,
           nom: t.nom,
-          superficie: 0, // Pas disponible dans TerrainResponse
+          superficie: t.superficie || 0,
           pays: localite?.pays || "Non défini",
           ville: localite?.ville || "Non défini",
-          quartier: localite?.nom || "Non défini", // On utilise le nom de la localité comme quartier/zone
+          quartier: localite?.nom || "Non défini",
           nombre_parcelles: t.nombre_parcelles || 0,
           created_at: t.created_at
         };
@@ -48,7 +48,7 @@ export const terrainService = {
           {
             nom: terrain.nom,
             description: terrain.description,
-            // Autres champs update
+            superficie: terrain.superficie
           }
         );
       } else {
@@ -57,6 +57,7 @@ export const terrainService = {
           nom: terrain.nom,
           description: terrain.description || "Nouveau terrain",
           localite_id: terrain.localite_id,
+          superficie: terrain.superficie
         });
       }
     } catch (error) {

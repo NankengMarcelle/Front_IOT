@@ -42,30 +42,8 @@ export const parcelService = {
                             // Pas de mesure ou 403, on ignore
                         }
 
-                        // 4. Récupérer les capteurs assignés (permet l'affichage même sans mesures)
-                        let capteursListe = "";
-                        try {
-                            const assignmentsRaw = await CapteursService.getAssignmentsApiV1CapteursAssignmentsAllGet() as any;
-                            const assignments = assignmentsRaw.data || [];
-                            const parcelAssignments = assignments.filter((a: any) => a.parcelle_id === p.id && !a.date_desassignation);
-
-                            if (parcelAssignments.length > 0) {
-                                const codes = await Promise.all(parcelAssignments.map(async (a: any) => {
-                                    try {
-                                        const capteurResponse = await CapteursService.readCapteurApiV1CapteursCapteurIdGet(a.capteur_id) as any;
-                                        // L'API peut retourner soit directement l'objet, soit { data: {...} }
-                                        const capteur = capteurResponse.data || capteurResponse;
-                                        return capteur.code;
-                                    } catch (err) {
-                                        return "";
-                                    }
-                                }));
-                                capteursListe = codes.filter(Boolean).join(', ');
-                            }
-                        } catch (e) {
-                            // Erreur lors de la récupération des assignations
-                            console.error("Error fetching assignments:", e);
-                        }
+                        // 4. Capteurs: On n'affiche plus l'ID du capteur, mais un statut si des données remonte
+                        const capteursListe = stats.id ? "Monitoring Actif" : "";
 
                         // 5. Récupérer la culture éventuellement enregistrée localement
                         const savedPredictions = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem('simulated_predictions') || '{}' : '{}');
@@ -167,6 +145,18 @@ export const parcelService = {
             );
         } catch (error) {
             console.error("Erreur updateParcel:", error);
+            throw error;
+        }
+    },
+
+    /**
+     * RÉCUPÉRER PARCELLES PAR TERRAIN
+     */
+    getParcelsByTerrain: async (terrainId: string) => {
+        try {
+            return await ParcellesService.getParcellesByTerrainApiV1ParcellesParcellesTerrainTerrainIdGet(terrainId);
+        } catch (error) {
+            console.error("Erreur getParcelsByTerrain:", error);
             throw error;
         }
     }

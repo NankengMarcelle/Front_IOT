@@ -11,6 +11,8 @@ export type UserResponse = {
     telephone: (string | null);
     role: UserRole_Output;
     avatar?: (string | null);
+    notification_modes?: string[];
+    recommendation_frequency?: string;
     date_inscription: string;
     dernier_acces?: (string | null);
     created_at: string;

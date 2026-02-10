@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { terrainService } from "../../terrains/services/terrainService";
 import { parcelService } from "../services/parcelService";
 import { Tag, MapPin, Ruler, X, ChevronDown, AlignLeft, Sprout } from "lucide-react";
@@ -8,6 +8,7 @@ import { toast } from "sonner";
 export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
   const [loading, setLoading] = useState(false);
   const [terrainsExistants, setTerrainsExistants] = useState<any[]>([]);
+  const [existingParcels, setExistingParcels] = useState<any[]>([]);
   const [error, setError] = useState("");
 
   const [formData, setFormData] = useState(initialData ? {
@@ -36,6 +37,43 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
     loadData();
   }, []);
 
+  // Fetch existing parcels when a terrain is selected to calculate remaining surface
+  useEffect(() => {
+    const fetchParcels = async () => {
+      if (!formData.terrain_id) {
+        setExistingParcels([]);
+        return;
+      }
+      try {
+        const parcels = await parcelService.getParcelsByTerrain(formData.terrain_id);
+        setExistingParcels(Array.isArray(parcels) ? parcels : (parcels as any).data || []);
+      } catch (err) {
+        console.error("Error fetching parcels for terrain:", err);
+      }
+    };
+    fetchParcels();
+  }, [formData.terrain_id]);
+
+  const terrainStats = useMemo(() => {
+    if (!formData.terrain_id) return null;
+    const terrain = terrainsExistants.find(t => t.id === formData.terrain_id);
+    if (!terrain) return null;
+
+    const terrainSurface = Number(terrain.superficie || 0);
+    // Sum of existing parcels EXCEPT the one currently being edited (if editing)
+    const existingOccupied = existingParcels
+      .filter(p => !initialData || p.id !== initialData.id)
+      .reduce((sum, p) => sum + Number(p.superficie || 0), 0);
+
+    const remaining = Math.max(0, terrainSurface - existingOccupied);
+
+    return {
+      total: terrainSurface,
+      occupied: existingOccupied,
+      remaining: remaining
+    };
+  }, [formData.terrain_id, terrainsExistants, existingParcels, initialData]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -44,6 +82,11 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
 
     if (superficieSaisie <= 0) {
       setError("La superficie doit être un nombre positif.");
+      return;
+    }
+
+    if (terrainStats && superficieSaisie > terrainStats.remaining) {
+      setError(`La superficie dépasse l'espace disponible (${terrainStats.remaining.toFixed(2)} Ha restants sur ${terrainStats.total} Ha).`);
       return;
     }
 
@@ -135,6 +178,17 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
                 </select>
                 <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none group-hover:text-emerald-500 transition-colors" />
               </div>
+
+              {/* Surface info feedback */}
+              {formData.terrain_id && terrainStats && (
+                <div className="ml-2 flex items-center gap-2 text-xs font-bold">
+                  <span className="text-slate-400">Surface Terrain: {terrainStats.total} Ha</span>
+                  <span className="text-slate-300">•</span>
+                  <span className={terrainStats.remaining < 1 ? "text-amber-500" : "text-emerald-500"}>
+                    Disponible: {terrainStats.remaining.toFixed(2)} Ha
+                  </span>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -178,12 +232,20 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
                   type="number"
                   step="0.01"
                   placeholder="0.0"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-[24px] px-6 py-5 text-slate-800 font-bold outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50/50 transition-all text-lg"
+                  className={`w-full bg-slate-50 border-2 rounded-[24px] px-6 py-5 text-slate-800 font-bold outline-none focus:bg-white focus:ring-4 transition-all text-lg ${terrainStats && Number(formData.superficie) > terrainStats.remaining
+                    ? 'border-rose-200 focus:border-rose-500 focus:ring-rose-50/50 text-rose-600'
+                    : 'border-slate-100 focus:border-emerald-500 focus:ring-emerald-50/50'
+                    }`}
                   value={formData.superficie}
                   onChange={(e) => setFormData({ ...formData, superficie: e.target.value })}
                   required
                 />
               </div>
+              {terrainStats && Number(formData.superficie) > terrainStats.remaining && (
+                <p className="text-rose-500 text-xs font-bold ml-2 mt-1">
+                  Attention : Dépasse la surface disponible ({terrainStats.remaining.toFixed(2)} Ha)
+                </p>
+              )}
             </div>
 
             {/* Description */}

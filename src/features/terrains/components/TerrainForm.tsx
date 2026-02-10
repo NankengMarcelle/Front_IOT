@@ -13,10 +13,18 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
     nom: initialData.nom,
     localite_id: initialData.localite_id || "",
     description: initialData.description || "",
+    superficie: initialData.superficie || "",
   } : {
     nom: "",
     localite_id: "",
     description: "",
+    superficie: "",
+  });
+
+  const [errors, setErrors] = useState({
+    nom: "",
+    localite_id: "",
+    superficie: ""
   });
 
   useEffect(() => {
@@ -31,12 +39,35 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
     fetchLocalites();
   }, []);
 
+  const validate = () => {
+    let isValid = true;
+    const newErrors = { nom: "", localite_id: "", superficie: "" };
+
+    if (!formData.nom || formData.nom.length < 3) {
+      newErrors.nom = "Le nom doit contenir au moins 3 caractères.";
+      isValid = false;
+    }
+
+    if (!formData.localite_id) {
+      newErrors.localite_id = "Veuillez sélectionner une localité.";
+      isValid = false;
+    }
+
+    const surfaceValue = Number(formData.superficie);
+    if (!surfaceValue || surfaceValue <= 0) {
+      newErrors.superficie = "La superficie doit être supérieur à 0.";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.localite_id) {
-      const msg = "Veuillez sélectionner une localité.";
-      toast.error(msg);
+    if (!validate()) {
+      toast.error("Veuillez corriger les erreurs du formulaire.");
       return;
     }
 
@@ -47,6 +78,7 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
         nom: formData.nom,
         localite_id: formData.localite_id,
         description: formData.description || null,
+        superficie: Number(formData.superficie),
       };
 
       if (initialData?.id) {
@@ -107,11 +139,15 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
               <div className="relative group">
                 <input
                   placeholder="Ex: Plantation de la Vallée"
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-[24px] px-6 py-5 text-slate-800 font-bold outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50/50 transition-all text-lg placeholder:text-slate-300"
+                  className={`w-full bg-slate-50 border-2 rounded-[24px] px-6 py-5 text-slate-800 font-bold outline-none focus:bg-white focus:ring-4 transition-all text-lg placeholder:text-slate-300 ${errors.nom ? 'border-rose-200 focus:border-rose-500 focus:ring-rose-50/50' : 'border-slate-100 focus:border-emerald-500 focus:ring-emerald-50/50'}`}
                   value={formData.nom}
-                  onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, nom: e.target.value });
+                    if (errors.nom) setErrors({ ...errors, nom: "" });
+                  }}
                   required
                 />
+                {errors.nom && <p className="text-rose-500 text-xs mt-2 font-bold ml-2">{errors.nom}</p>}
               </div>
             </div>
 
@@ -122,9 +158,12 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
               </label>
               <div className="relative group">
                 <select
-                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-[24px] pl-6 pr-12 py-5 text-slate-800 font-bold outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50/50 transition-all appearance-none cursor-pointer text-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                  className={`w-full bg-slate-50 border-2 rounded-[24px] pl-6 pr-12 py-5 text-slate-800 font-bold outline-none focus:bg-white focus:ring-4 transition-all appearance-none cursor-pointer text-lg disabled:opacity-60 disabled:cursor-not-allowed ${errors.localite_id ? 'border-rose-200 focus:border-rose-500 focus:ring-rose-50/50' : 'border-slate-100 focus:border-emerald-500 focus:ring-emerald-50/50'}`}
                   value={formData.localite_id}
-                  onChange={(e) => setFormData({ ...formData, localite_id: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, localite_id: e.target.value });
+                    if (errors.localite_id) setErrors({ ...errors, localite_id: "" });
+                  }}
                   required
                   disabled={!!initialData}
                 >
@@ -136,6 +175,30 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
                   ))}
                 </select>
                 <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none group-hover:text-emerald-500 transition-colors" />
+                {errors.localite_id && <p className="text-rose-500 text-xs mt-2 font-bold ml-2">{errors.localite_id}</p>}
+              </div>
+            </div>
+
+            {/* Superficie */}
+            <div className="space-y-3">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 flex items-center gap-2">
+                <AlignLeft className="w-3 h-3" /> Superficie (Hectares)
+              </label>
+              <div className="relative group">
+                <input
+                  type="number"
+                  placeholder="Ex: 50"
+                  step="0.01"
+                  min="0"
+                  className={`w-full bg-slate-50 border-2 rounded-[24px] px-6 py-5 text-slate-800 font-bold outline-none focus:bg-white focus:ring-4 transition-all text-lg placeholder:text-slate-300 ${errors.superficie ? 'border-rose-200 focus:border-rose-500 focus:ring-rose-50/50' : 'border-slate-100 focus:border-emerald-500 focus:ring-emerald-50/50'}`}
+                  value={formData.superficie}
+                  onChange={(e) => {
+                    setFormData({ ...formData, superficie: e.target.value });
+                    if (errors.superficie) setErrors({ ...errors, superficie: "" });
+                  }}
+                  required
+                />
+                {errors.superficie && <p className="text-rose-500 text-xs mt-2 font-bold ml-2">{errors.superficie}</p>}
               </div>
             </div>
 
@@ -157,10 +220,10 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
           <div className="bg-emerald-50/50 rounded-[24px] p-6 border border-emerald-100/50">
             <h4 className="text-emerald-800 font-bold text-sm mb-1 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Note Automatique
+              Analyse Satellite & Capteurs
             </h4>
             <p className="text-emerald-600/80 text-xs leading-relaxed">
-              La superficie, la pente et les caractéristiques du sol seront calculées automatiquement via les données des capteurs et la cartographie satellite une fois le terrain créé.
+              La pente et les caractéristiques précises du sol seront affinées automatiquement via les données des capteurs et la cartographie satellite une fois le terrain créé.
             </p>
           </div>
 
