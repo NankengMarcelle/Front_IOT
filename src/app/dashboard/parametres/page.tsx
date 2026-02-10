@@ -32,9 +32,12 @@ export default function ParametresPage() {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const user = await UsersService.getMyProfileApiV1UsersMeGet();
+        const response: any = await UsersService.getMyProfileApiV1UsersMeGet();
 
-        if (user.notification_modes) {
+        // Handle API wrapper if present
+        const user = response.data || response;
+
+        if (user.notification_modes && Array.isArray(user.notification_modes)) {
           setActiveModes(user.notification_modes);
         } else {
           // Default Fallback
