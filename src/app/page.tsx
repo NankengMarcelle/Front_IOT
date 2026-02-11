@@ -7,8 +7,7 @@ import React, { useState, useRef, RefObject } from 'react';
 import SimpleFooter from '@/components/layout/SimpleFooter';
 
 export default function LandingPage() {
-    const { t, isLoading } = useTranslation();
-    const [language, setLanguage] = useState('fr');
+    const { t, isLoading, lang, setLang } = useTranslation();
     const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
 
     const statsRef = useRef<HTMLDivElement>(null);
@@ -26,45 +25,45 @@ export default function LandingPage() {
     const technologies = [
         {
             icon: <Radio className="w-8 h-8" />,
-            title: "Capteurs IoT",
-            desc: "Capteurs LoRaWAN mesurant N, P, K, pH, humidité, température",
-            details: "DevEUI unique • Longue portée"
+            title: t('landing.tech.iot.title'),
+            desc: t('landing.tech.iot.desc'),
+            details: t('landing.tech.iot.details')
         },
         {
             icon: <Brain className="w-8 h-8" />,
-            title: "Intelligence IA",
-            desc: "Algorithme Random Forest pour une précision maximale",
-            details: "ML Avancé • Analyse 360°"
+            title: t('landing.tech.ai.title'),
+            desc: t('landing.tech.ai.desc'),
+            details: t('landing.tech.ai.details')
         },
         {
             icon: <Cloud className="w-8 h-8" />,
-            title: "Cloud Scalable",
-            desc: "Traitement des données en temps réel sur infrastructure cloud",
-            details: "Haute Disponibilité"
+            title: t('landing.tech.cloud.title'),
+            desc: t('landing.tech.cloud.desc'),
+            details: t('landing.tech.cloud.details')
         }
     ];
 
     const stats = [
-        { value: "40%", label: "De Rendement En Plus", color: "text-emerald-500" },
-        { value: "30%", label: "D'Économie d'Eau", color: "text-lime-500" },
-        { value: "24/7", label: "Sûreté & Surveillance", color: "text-[#052E16]" }
+        { value: "40%", label: t('landing.stats.yield'), color: "text-emerald-500" },
+        { value: "30%", label: t('landing.stats.water'), color: "text-lime-500" },
+        { value: "24/7", label: t('landing.stats.security'), color: "text-[#052E16]" }
     ];
 
     const features = [
         {
             icon: <Target className="w-8 h-8" />,
-            title: "Agriculture de Précision",
-            desc: "Apportez exactement ce que votre terre demande, au bon moment."
+            title: t('landing.features.precision.title'),
+            desc: t('landing.features.precision.desc')
         },
         {
             icon: <Zap className="w-8 h-8" />,
-            title: "Réactions Instantanées",
-            desc: "Soyez alerté en temps réel pour prévenir tout risque sur vos cultures."
+            title: t('landing.features.speed.title'),
+            desc: t('landing.features.speed.desc')
         },
         {
             icon: <Layout className="w-8 h-8" />,
-            title: "Interface Intuitive",
-            desc: "Une gestion simplifiée accessible depuis n'importe quel appareil."
+            title: t('landing.features.interface.title'),
+            desc: t('landing.features.interface.desc')
         }
     ];
 
@@ -73,14 +72,14 @@ export default function LandingPage() {
         { code: 'en', name: 'English', flag: '🇺🇸' }
     ];
 
-    const currentLanguage = languages.find(lang => lang.code === language);
+    const currentLanguage = languages.find(langObj => langObj.code === lang);
 
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white">
                 <div className="flex flex-col items-center gap-4">
                     <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-[#052E16] font-black uppercase tracking-widest text-[10px]">Chargement...</p>
+                    <p className="text-[#052E16] font-black uppercase tracking-widest text-[10px]">{t('common.loading')}</p>
                 </div>
             </div>
         );
@@ -105,8 +104,8 @@ export default function LandingPage() {
                     </Link>
 
                     <div className="hidden md:flex items-center gap-10">
-                        <button onClick={() => scrollToSection(solutionRef)} className="text-[#052E16]/60 hover:text-emerald-600 font-black text-[10px] uppercase tracking-widest transition-colors">La Solution</button>
-                        <button onClick={() => scrollToSection(featuresRef)} className="text-[#052E16]/60 hover:text-emerald-600 font-black text-[10px] uppercase tracking-widest transition-colors">Expertise</button>
+                        <button onClick={() => scrollToSection(solutionRef)} className="text-[#052E16]/60 hover:text-emerald-600 font-black text-[10px] uppercase tracking-widest transition-colors">{t('landing.nav.solution')}</button>
+                        <button onClick={() => scrollToSection(featuresRef)} className="text-[#052E16]/60 hover:text-emerald-600 font-black text-[10px] uppercase tracking-widest transition-colors">{t('landing.nav.expertise')}</button>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -120,20 +119,20 @@ export default function LandingPage() {
                             </button>
                             {showLanguageDropdown && (
                                 <div className="absolute top-full right-0 mt-2 w-48 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-emerald-50 overflow-hidden animate-fadeIn p-2 z-50">
-                                    {languages.map((lang) => (
+                                    {languages.map((langObj) => (
                                         <button
-                                            key={lang.code}
-                                            onClick={() => { setLanguage(lang.code); setShowLanguageDropdown(false); }}
+                                            key={langObj.code}
+                                            onClick={() => { setLang(langObj.code as 'en' | 'fr'); setShowLanguageDropdown(false); }}
                                             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-50 transition-all font-black text-[10px] uppercase tracking-widest text-[#052E16]"
                                         >
-                                            {lang.flag} {lang.name}
+                                            {langObj.flag} {langObj.name}
                                         </button>
                                     ))}
                                 </div>
                             )}
                         </div>
                         <Link href="/login" className="px-6 py-2.5 bg-[#052E16] text-white rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg active:scale-95">
-                            login
+                            {t('nav.login')}
                         </Link>
                     </div>
                 </div>
@@ -151,14 +150,14 @@ export default function LandingPage() {
                                 </div>
 
                                 <h1 className="text-4xl xs:text-5xl sm:text-7xl md:text-8xl font-black text-[#052E16] mb-8 leading-[0.9] tracking-tighter">
-                                    Cultivez le <br />
+                                    {t('landing.hero.title_line1')} <br />
                                     <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-emerald-500 to-lime-500">
-                                        Futur Digital.
+                                        {t('landing.hero.title_line2')}
                                     </span>
                                 </h1>
 
                                 <p className="text-xl text-emerald-900/60 font-medium max-w-xl mb-12 leading-relaxed">
-                                    Dépassez les méthodes traditionnelles. Connectez vos sols à une intelligence prédictive qui révolutionne chaque récolte.
+                                    {t('landing.hero.subtitle')}
                                 </p>
 
                                 <div className="flex flex-col sm:flex-row gap-6">
@@ -167,14 +166,14 @@ export default function LandingPage() {
                                         className="group relative px-10 py-5 bg-[#052E16] text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_-15px_rgba(5,46,22,0.3)] flex items-center justify-center gap-3"
                                     >
                                         <Play className="w-4 h-4 fill-current" />
-                                        Notre vision
+                                        {t('landing.hero.cta.vision')}
                                     </Link>
 
                                     <button
                                         onClick={() => scrollToSection(solutionRef)}
                                         className="px-10 py-5 bg-white border-2 border-emerald-100 text-[#052E16] rounded-[24px] font-black uppercase tracking-widest text-[10px] transition-all hover:border-emerald-500 hover:bg-emerald-50 flex items-center justify-center gap-3"
                                     >
-                                        Voir plus
+                                        {t('landing.hero.cta.more')}
                                         <ArrowRight className="w-4 h-4" />
                                     </button>
                                 </div>
@@ -233,18 +232,18 @@ export default function LandingPage() {
                         </div>
 
                         <div className="space-y-10">
-                            <span className="text-emerald-600 font-black text-xs uppercase tracking-[0.4em]">Notre Vocation</span>
+                            <span className="text-emerald-600 font-black text-xs uppercase tracking-[0.4em]">{t('landing.solution.vocation')}</span>
                             <h2 className="text-4xl xs:text-5xl sm:text-7xl font-black text-[#052E16] leading-[0.9] tracking-tighter">
-                                Ne plus jamais<br />marcher à l'aveugle.
+                                {t('landing.solution.title_line1')}<br />{t('landing.solution.title_line2')}
                             </h2>
                             <p className="text-emerald-900/60 text-xl font-medium leading-relaxed">
-                                L'agronomie traditionnelle est un art. Nous en faisons une science exact, propulsée par des capteurs de pointe qui scrutent l'invisible pour vous.
+                                {t('landing.solution.desc')}
                             </p>
 
                             <div className="space-y-6">
                                 {[
-                                    { t: "Données Brutes vers Insight", d: "Transformez vos mesures N-P-K en recommandations concrètes." },
-                                    { t: "Anticipation Climatique", d: "Prédiction Random Forest intégrant les flux météo à 7 jours." }
+                                    { t: t('landing.solution.points.point1.title'), d: t('landing.solution.points.point1.desc') },
+                                    { t: t('landing.solution.points.point2.title'), d: t('landing.solution.points.point2.desc') }
                                 ].map((item, idx) => (
                                     <div key={idx} className="flex gap-6 items-start">
                                         <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 shrink-0">
@@ -265,8 +264,8 @@ export default function LandingPage() {
                 <section ref={featuresRef} className="py-32 bg-white relative">
                     <div className="max-w-7xl mx-auto px-6">
                         <div className="text-center mb-24">
-                            <span className="text-emerald-600 font-black text-xs uppercase tracking-[0.4em] mb-4 block">Expertise Technique</span>
-                            <h2 className="text-4xl xs:text-6xl font-black text-[#052E16] tracking-tighter">Une Armée de Précision.</h2>
+                            <span className="text-emerald-600 font-black text-xs uppercase tracking-[0.4em] mb-4 block">{t('landing.features.section_label')}</span>
+                            <h2 className="text-4xl xs:text-6xl font-black text-[#052E16] tracking-tighter">{t('landing.features.section_title')}</h2>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
@@ -302,7 +301,7 @@ export default function LandingPage() {
                         <div className="grid lg:grid-cols-2 gap-24 items-center">
                             <div className="space-y-12">
                                 <h2 className="text-4xl xs:text-5xl sm:text-7xl font-black text-white leading-[0.9] tracking-tighter">
-                                    Une Infrastructure<br />Infrangible.
+                                    {t('landing.infra.title_line1')}<br />{t('landing.infra.title_line2')}
                                 </h2>
                                 <div className="space-y-8">
                                     {technologies.map((tech, idx) => (
@@ -322,15 +321,15 @@ export default function LandingPage() {
                             <div className="relative">
                                 <div className="bg-white/90 backdrop-blur-2xl rounded-[64px] p-16 text-center border border-white/20 shadow-2xl relative overflow-hidden">
                                     <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
-                                    <h3 className="text-4xl font-black text-[#052E16] tracking-tighter mb-6 underline decoration-lime-500 decoration-8 underline-offset-8">Commencez Aujourd'hui.</h3>
-                                    <p className="text-emerald-900/60 text-lg font-medium mb-12">Gratuit pendant 14 jours. Pas de carte bancaire requise.</p>
+                                    <h3 className="text-4xl font-black text-[#052E16] tracking-tighter mb-6 underline decoration-lime-500 decoration-8 underline-offset-8">{t('landing.cta.title')}</h3>
+                                    <p className="text-emerald-900/60 text-lg font-medium mb-12">{t('landing.cta.subtitle')}</p>
                                     <div className="flex flex-col gap-4">
                                         <Link href="/register" className="px-10 py-5 bg-[#052E16] text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-[0_20px_40px_-10px_rgba(5,46,22,0.4)] relative group/btn overflow-hidden">
-                                            <span className="relative z-10">Rejoindre l'aventure</span>
+                                            <span className="relative z-10">{t('landing.cta.button_main')}</span>
                                             <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-lime-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500"></div>
                                         </Link>
                                         <Link href="/demo" className="px-10 py-5 bg-white border-2 border-emerald-100 text-[#052E16] rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-50 hover:border-emerald-500 transition-all">
-                                            Notre vision
+                                            {t('landing.hero.cta.vision')}
                                         </Link>
                                     </div>
                                 </div>

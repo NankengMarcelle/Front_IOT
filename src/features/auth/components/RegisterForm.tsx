@@ -6,8 +6,10 @@ import { Leaf, User, Phone, Mail, Lock, ArrowRight, ArrowLeft, Loader2, CheckCir
 import { validatePassword, passwordsMatch } from '@/lib/utils/passwordValidator';
 import { authService } from '@/features/auth/services/authService';
 import { toast } from "sonner";
+import { useTranslation } from '@/providers/TranslationProvider';
 
 export default function RegisterForm({ role }: { role: string | null }) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -46,7 +48,7 @@ export default function RegisterForm({ role }: { role: string | null }) {
 
     // Validation
     if (!formData.prenom.trim() || !formData.nom.trim()) {
-      const msg = "Veuillez remplir votre prénom et votre nom";
+      const msg = t('auth.register.error_fields');
       setErrors(prev => ({ ...prev, general: msg }));
       toast.error(msg);
       return;
@@ -60,14 +62,14 @@ export default function RegisterForm({ role }: { role: string | null }) {
     }
 
     if (!passwordsMatch(formData.password, formData.confirmPassword)) {
-      const msg = "Les mots de passe ne correspondent pas";
+      const msg = t('auth.register.error_passwords_match');
       setErrors(prev => ({ ...prev, confirmPassword: msg }));
       toast.error(msg);
       return;
     }
 
     setLoading(true);
-    const toastId = toast.loading("Création de votre compte...");
+    const toastId = toast.loading(t('auth.register.toast_loading'));
 
     try {
       await authService.register({
@@ -78,12 +80,12 @@ export default function RegisterForm({ role }: { role: string | null }) {
         password: formData.password
       }, isAdmin);
 
-      toast.success("Compte créé avec succès ! Bienvenue.", { id: toastId });
+      toast.success(t('auth.register.toast_success'), { id: toastId });
       setLoading(false);
       window.location.href = '/login';
     } catch (error: any) {
       console.error("Registration failed:", error);
-      const errorMsg = error.message || "L'inscription a échoué";
+      const errorMsg = error.message || t('auth.register.registration_failed');
       setErrors(prev => ({ ...prev, general: errorMsg }));
       toast.error(errorMsg, { id: toastId });
     } finally {
@@ -102,8 +104,10 @@ export default function RegisterForm({ role }: { role: string | null }) {
           <Link href="/" className="inline-flex p-3 bg-white rounded-2xl shadow-sm mb-6 border border-emerald-50 hover:scale-110 transition-transform">
             <Leaf className="w-8 h-8 text-emerald-600" />
           </Link>
-          <h1 className="text-2xl sm:text-3xl font-black text-[#052E16] tracking-tighter">Créer un compte</h1>
-          <p className="text-emerald-900/40 text-[10px] font-black uppercase tracking-[0.2em] mt-2">Étape {step} sur 2</p>
+          <h1 className="text-2xl sm:text-3xl font-black text-[#052E16] tracking-tighter">{t('auth.register.title')}</h1>
+          <p className="text-emerald-900/40 text-[10px] font-black uppercase tracking-[0.2em] mt-2">
+            {t('auth.register.step').replace('{{step}}', step.toString())}
+          </p>
         </div>
 
         {/* Progress Dots */}
@@ -125,7 +129,7 @@ export default function RegisterForm({ role }: { role: string | null }) {
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Prénom</label>
+                  <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">{t('auth.register.firstname')}</label>
                   <div className="relative group/input">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
                       <User className="w-5 h-5" />
@@ -135,14 +139,14 @@ export default function RegisterForm({ role }: { role: string | null }) {
                       name="prenom"
                       value={formData.prenom}
                       onChange={handleInputChange}
-                      placeholder="Prénom"
+                      placeholder={t('auth.register.firstname')}
                       className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-4 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Nom</label>
+                  <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">{t('auth.register.lastname')}</label>
                   <div className="relative group/input">
                     <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
                       <User className="w-5 h-5" />
@@ -152,7 +156,7 @@ export default function RegisterForm({ role }: { role: string | null }) {
                       name="nom"
                       value={formData.nom}
                       onChange={handleInputChange}
-                      placeholder="Nom"
+                      placeholder={t('auth.register.lastname')}
                       className="w-full bg-white/60 border border-white/40 rounded-[20px] pl-12 pr-4 py-4 outline-none focus:bg-white focus:border-emerald-500/50 focus:shadow-[0_10px_20px_-10px_rgba(16,185,129,0.1)] transition-all font-medium text-[#052E16] placeholder:text-[#052E16]/20"
                     />
                   </div>
@@ -160,7 +164,7 @@ export default function RegisterForm({ role }: { role: string | null }) {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Téléphone</label>
+                <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">{t('auth.register.phone')}</label>
                 <div className="relative group/input">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
                     <Phone className="w-5 h-5" />
@@ -182,7 +186,7 @@ export default function RegisterForm({ role }: { role: string | null }) {
                 className="group relative w-full bg-[#052E16] text-white font-black py-4 rounded-[20px] shadow-[0_20px_40px_-10px_rgba(5,46,22,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98] mt-4 text-xs uppercase tracking-[0.2em] overflow-hidden"
               >
                 <span className="relative z-10 flex items-center justify-center gap-3">
-                  Continuer
+                  {t('auth.register.continue')}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-lime-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -192,7 +196,7 @@ export default function RegisterForm({ role }: { role: string | null }) {
             /* ÉTAPE 2 : Identifiants & Sécurité */
             <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
               <div className="space-y-2">
-                <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Email</label>
+                <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">{t('auth.register.email_label')}</label>
                 <div className="relative group/input">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
                     <Mail className="w-5 h-5" />
@@ -209,7 +213,7 @@ export default function RegisterForm({ role }: { role: string | null }) {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Mot de passe</label>
+                <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">{t('auth.register.password_label')}</label>
                 <div className="relative group/input">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
                     <Lock className="w-5 h-5" />
@@ -238,7 +242,7 @@ export default function RegisterForm({ role }: { role: string | null }) {
               </div>
 
               <div className="space-y-2">
-                <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Confirmer</label>
+                <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">{t('auth.register.confirm_password_label')}</label>
                 <div className="relative group/input">
                   <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
                     <CheckCircle2 className="w-5 h-5" />
@@ -284,7 +288,7 @@ export default function RegisterForm({ role }: { role: string | null }) {
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : (
                       <>
-                        S'inscrire
+                        {t('auth.register.submit')}
                         <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                       </>
                     )}
@@ -297,8 +301,8 @@ export default function RegisterForm({ role }: { role: string | null }) {
         </form>
 
         <div className="mt-10 text-[10px] font-black uppercase tracking-widest relative z-10">
-          <span className="text-[#052E16]/40">Déjà un compte ? </span>
-          <Link href={`/login?role=${role}`} className="text-emerald-600 hover:text-emerald-700 transition-colors">Se connecter</Link>
+          <span className="text-[#052E16]/40">{t('auth.register.already_have_account')}</span>
+          <Link href={`/login?role=${role}`} className="text-emerald-600 hover:text-emerald-700 transition-colors">{t('auth.login.submit')}</Link>
         </div>
       </div>
 
@@ -309,7 +313,7 @@ export default function RegisterForm({ role }: { role: string | null }) {
           className="inline-flex items-center gap-2 px-6 py-3 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl text-[#052E16] hover:bg-white hover:shadow-lg transition-all font-black text-[10px] uppercase tracking-[0.2em]"
         >
           <ArrowLeft className="w-3 h-3" />
-          Retour à l'accueil
+          {t('auth.login.back_to_home')}
         </Link>
       </div>
     </div>

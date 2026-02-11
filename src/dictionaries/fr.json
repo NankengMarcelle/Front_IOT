@@ -4,11 +4,14 @@
     "lang": "FR"
   },
   "nav": {
-    "dashboard": "Tableau de bord",
+    "dashboard": "Tableau de Bord",
     "terrains": "Terrains",
     "parcelles": "Parcelles",
     "sensors": "Capteurs",
+    "history": "Historique",
+    "ia_chat": "IA Chat",
     "profile": "Profil",
+    "settings": "Paramètres",
     "about": "À propos",
     "login": "Connexion",
     "logout": "Déconnexion",
@@ -46,7 +49,21 @@
     "superficie": "Superficie",
     "modify": "Modifier",
     "delete": "Supprimer",
-    "delete_confirm": "Voulez-vous supprimer ce terrain ?"
+    "delete_confirm": "Voulez-vous supprimer ce terrain ?",
+    "patrimoine_foncier": "Patrimoine Foncier",
+    "your_title": "Vos",
+    "exploitations_title": "Exploitations.",
+    "search_placeholder": "Localiser un site...",
+    "add_terrain": "Ajouter Terrain",
+    "no_terrain_title": "Aucun terrain enregistré",
+    "no_terrain_desc": "L'aventure commence par une simple coordonnée. Enregistrez votre premier site pour démarrer l'analyse.",
+    "total_surface": "Surface Totale",
+    "typology": "Typologie",
+    "edit_title": "Modifier le Terrain",
+    "new_title": "Nouveau Terrain",
+    "delete_confirm_title": "Supprimer le terrain ?",
+    "delete_confirm_desc": "Voulez-vous vraiment supprimer ce terrain ? Cette action est irréversible et supprimera toutes les données associées.",
+    "delete_error": "Impossible de supprimer ce terrain. Assurez-vous qu'il ne contient aucune parcelle ou donnée liée."
   },
   "parcelles_list": {
     "title": "Mes Parcelles",
@@ -54,16 +71,42 @@
     "no_parcelles": "Pas de parcelle pour l'instant",
     "delete_confirm": "Supprimer ?",
     "analysis_ongoing": "Analyse en cours",
-    "no_sensor": "Aucun capteur"
+    "no_sensor": "Aucun capteur",
+    "delete_confirm_desc": "Êtes-vous sûr de vouloir supprimer cette parcelle ? Cette action est irréversible.",
+    "delete_confirm_sensors": "Cette parcelle possède {{count}} capteur(s) assigné(s). Ils seront automatiquement désassignés avant la suppression. Voulez-vous continuer ?",
+    "delete_title": "Supprimer la parcelle",
+    "edit_title": "Éditer la Parcelle",
+    "new_title": "Nouvelle Parcelle",
+    "segmentation_agricole": "Segmentation Agricole",
+    "your_title": "Vos",
+    "units_title": "Unités de Culture.",
+    "search_placeholder": "Chercher une unité...",
+    "no_parcel_title": "Aucune parcelle définie",
+    "no_parcel_desc": "Divisez vos terrains pour une gestion ultra-précise et commencez à recevoir vos premiers rapports IA.",
+    "unknown_terrain": "Terrain Inconnu"
   },
   "history": {
-    "title": "Historique des Analyses",
+    "title": "Historique",
     "subtitle": "Suivi temporel des recommandations IA",
     "total": "Total",
     "no_analysis": "Aucune analyse n'a encore été effectuée.",
     "date_column": "Date d'analyse",
     "parcel_column": "Parcelle",
-    "culture_column": "Culture Recommandée"
+    "culture_column": "Culture Recommandée",
+    "unknown_parcel": "Parcelle Inconnue",
+    "transmission_logs": "Logs de Transmission",
+    "global_title": "Global.",
+    "search_placeholder": "Chercher...",
+    "measurements": "Mesures",
+    "predictions": "Prédictions",
+    "no_data_found": "Aucune donnée trouvée",
+    "no_data_desc": "Les données s'afficheront ici dès qu'elles seront disponibles.",
+    "temperature_label": "Temper.",
+    "humidity_label": "Humid.",
+    "nitrogen_label": "Azote (N)",
+    "phosphorus_label": "Phos. (P)",
+    "potassium_label": "Potas. (K)",
+    "ph_label": "pH Sol"
   },
   "activities": {
     "title": "Journal d'activités"
@@ -83,23 +126,141 @@
     "success": "Profil mis à jour !",
     "langLabel": "Langue"
   },
+  "common": {
+    "loading": "Chargement...",
+    "expert_agro": "Expert Agro"
+  },
   "landing": {
+    "nav": {
+      "solution": "La Solution",
+      "expertise": "Expertise"
+    },
+    "hero": {
+      "title_line1": "Cultivez le",
+      "title_line2": "Futur Digital.",
+      "subtitle": "Dépassez les méthodes traditionnelles. Connectez vos sols à une intelligence prédictive qui révolutionne chaque récolte.",
+      "cta": {
+        "vision": "Notre vision",
+        "more": "Voir plus"
+      }
+    },
+    "stats": {
+      "yield": "De Rendement En Plus",
+      "water": "D'Économie d'Eau",
+      "security": "Sûreté & Surveillance"
+    },
+    "solution": {
+      "vocation": "Notre Vocation",
+      "title_line1": "Ne plus jamais",
+      "title_line2": "marcher à l'aveugle.",
+      "desc": "L'agronomie traditionnelle est un art. Nous en faisons une science exact, propulsée par des capteurs de pointe qui scrutent l'invisible pour vous.",
+      "points": {
+        "point1": {
+          "title": "Données Brutes vers Insight",
+          "desc": "Transformez vos mesures N-P-K en recommandations concrètes."
+        },
+        "point2": {
+          "title": "Anticipation Climatique",
+          "desc": "Prédiction Random Forest intégrant les flux météo à 7 jours."
+        }
+      }
+    },
+    "features": {
+      "section_label": "Expertise Technique",
+      "section_title": "Une Armée de Précision.",
+      "precision": {
+        "title": "Agriculture de Précision",
+        "desc": "Apportez exactement ce que votre terre demande, au bon moment."
+      },
+      "speed": {
+        "title": "Réactions Instantanées",
+        "desc": "Soyez alerté en temps réel pour prévenir tout risque sur vos cultures."
+      },
+      "interface": {
+        "title": "Interface Intuitive",
+        "desc": "Une gestion simplifiée accessible depuis n'importe quel appareil."
+      }
+    },
+    "infra": {
+      "title_line1": "Une Infrastructure",
+      "title_line2": "Infrangible."
+    },
+    "tech": {
+      "iot": {
+        "title": "Capteurs IoT",
+        "desc": "Capteurs LoRaWAN mesurant N, P, K, pH, humidité, température",
+        "details": "DevEUI unique • Longue portée"
+      },
+      "ai": {
+        "title": "Intelligence IA",
+        "desc": "Algorithme Random Forest pour une précision maximale",
+        "details": "ML Avancé • Analyse 360°"
+      },
+      "cloud": {
+        "title": "Cloud Scalable",
+        "desc": "Traitement des données en temps réel sur infrastructure cloud",
+        "details": "Haute Disponibilité"
+      }
+    },
+    "cta": {
+      "title": "Commencez Aujourd'hui.",
+      "subtitle": "Gratuit pendant 14 jours. Pas de carte bancaire requise.",
+      "button_main": "Rejoindre l'aventure"
+    },
     "hero_title": "Cultiver l'Avenir",
     "hero_subtitle": "Smart Agro combine la sagesse de la terre et la puissance de la technologie pour une agriculture plus durable et performante.",
     "mission_title": "Notre Mission",
     "mission_p1": "Chez <strong>Smart Agro</strong>, nous pensons que chaque agriculteur mérite d'avoir une vision précise de ses cultures. En utilisant des capteurs IoT de pointe et des algorithmes d'IA, nous transformons les données du sol en décisions concrètes.",
     "mission_p2": "Notre objectif est de maximiser vos rendements tout en optimisant l'utilisation des ressources naturelles comme l'eau et les nutriments.",
-    "features": {
-      "sustainability_title": "Durabilité",
-      "sustainability_desc": "Préserver le sol pour les générations futures.",
-      "iot_title": "Innovation IoT",
-      "iot_desc": "Suivi en temps réel de vos parcelles.",
-      "ai_title": "Intelligence Artificielle",
-      "ai_desc": "Prédictions précises pour chaque type de culture."
-    },
     "team_title": "Notre équipe",
     "cta_title": "Prêt à optimiser vos cultures ?",
     "cta_button": "Commencer maintenant"
+  },
+  "auth": {
+    "login": {
+      "title": "Bon retour",
+      "subtitle": "Connectez-vous à votre écosystème",
+      "email_label": "Email",
+      "password_label": "Mot de passe",
+      "admin_code_label": "Code Administrateur",
+      "submit": "Se connecter",
+      "loading": "Authentification...",
+      "forgot_password": "Mot de passe oublié ?",
+      "create_account": "Créer un compte",
+      "back_to_home": "Retour à l'accueil",
+      "error_admin_code": "Code de sécurité administrateur incorrect.",
+      "toast_loading": "Connexion en cours...",
+      "toast_success": "Connexion réussie ! Bienvenue.",
+      "invalid_credentials": "Identifiants invalides"
+    },
+    "register": {
+      "title": "Créer un compte",
+      "step": "Étape {{step}} sur 2",
+      "firstname": "Prénom",
+      "lastname": "Nom",
+      "phone": "Téléphone",
+      "email_label": "Email",
+      "password_label": "Mot de passe",
+      "confirm_password_label": "Confirmer",
+      "submit": "S'inscrire",
+      "continue": "Continuer",
+      "already_have_account": "Déjà un compte ? ",
+      "toast_loading": "Création de votre compte...",
+      "toast_success": "Compte créé avec succès ! Bienvenue.",
+      "error_fields": "Veuillez remplir votre prénom et votre nom",
+      "error_passwords_match": "Les mots de passe ne correspondent pas",
+      "registration_failed": "L'inscription a échoué"
+    },
+    "forgot_password": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Récupérez l'accès à votre compte",
+      "email_label": "Email de récupération",
+      "submit": "Envoyer le lien",
+      "loading": "Envoi du lien...",
+      "success_msg": "Un lien de réinitialisation a été envoyé à {{email}}.",
+      "back_to_login": "Retour à la connexion",
+      "toast_loading": "Envoi du lien..."
+    }
   },
   "roles": {
     "agronomist": "Agronome & Fondatrice",
@@ -123,10 +284,16 @@
     "newsletter_desc": "Alertes météo, conseils culturaux et nouveautés Smart Agro.",
     "email_placeholder": "Votre email",
     "subscribe": "S'abonner",
-    "rights": "© 2025 Smart Agro – Tous droits réservés.",
+    "rights": "© 2026 Smart Agro – Tous droits réservés.",
     "terms": "Conditions d'utilisation",
     "privacy": "Confidentialité",
-    "legal": "Mentions légales"
+    "legal": "Mentions légales",
+    "secure_node": "Nœud Sécurisé",
+    "secure_desc": "Votre connexion est cryptée par le protocole SmartAgro Secure v2.",
+    "resources": "Ressources",
+    "global_service": "Global Service 24/7",
+    "tech_support": "Support Technique",
+    "system_status": "Système Opérationnel"
   },
   "predictions": {
     "title": "Assistant IA",
@@ -151,5 +318,62 @@
     "input_placeholder": "Écrivez votre question ici...",
     "user_label": "Moi",
     "select_parcel": "Parcelle pour chat"
+  },
+  "dashboard": {
+    "live_status": "Live Dashboard",
+    "welcome_msg": "Bonjour,",
+    "welcome_sub": "Cultivons Plus.",
+    "pdf_stats": "Statistiques PDF",
+    "sites_explored": "Sites Explorés",
+    "active": "Actives",
+    "global_health": "Santé Globale",
+    "avg_score": "Score Moyen",
+    "interactive_analysis": "Analyse Interactive",
+    "analysis_desc": "Visualisez les tendances N-P-K, pH et climat sur 6 mois.",
+    "no_history": "Aucune donnée historique disponible pour le moment.",
+    "parcel_performance": "Performance Parcelles",
+    "see_all": "Voir Tout",
+    "soil_health": "Santé Sol",
+    "no_parcels_display": "Aucune parcelle à afficher",
+    "quick_alerts": "Alertes Rapides",
+    "see_details": "Voir les Détails",
+    "weather_sensors": "Météo & Capteurs",
+    "current_temp": "Temp Actuelle",
+    "humidity_label": "Humidité",
+    "condition_label": "Condition",
+    "nutrients": {
+      "nitrogen": "N (Azote)",
+      "phosphorus": "P (Phos)",
+      "potassium": "K (Potas)",
+      "ph": "pH",
+      "temperature": "Temp",
+      "nitrogen_unit": "Azote (mg/kg)",
+      "phosphorus_unit": "Phosphore (mg/kg)",
+      "potassium_unit": "Potassium (mg/kg)",
+      "ph_unit": "pH",
+      "temperature_unit": "Temp (°C)",
+      "humidity_unit": "Humidité (%)"
+    },
+    "alerts": {
+      "irrigation_advised": "Irrigation Conseillée",
+      "high_heat": "Forte Chaleur",
+      "acid_soil": "Sol Acide",
+      "optimal_conditions": "Conditions Optimales"
+    },
+    "weather_conditions": {
+      "unknown": "Inconnu",
+      "cloudy": "Nuageux",
+      "dry_hot": "Sec & Chaud",
+      "humid": "Humide",
+      "cool": "Frais"
+    },
+    "status": {
+      "excellent": "Excellent",
+      "stable": "Stable",
+      "warning": "Attention",
+      "optimal": "Optimal",
+      "medium": "Moyen",
+      "critical": "Critique"
+    }
   }
 }

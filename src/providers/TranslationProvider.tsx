@@ -11,12 +11,14 @@ interface TranslationContextType {
     dict: Dictionary | null;
     t: (key: string) => string;
     isLoading: boolean;
+    lang: 'en' | 'fr';
+    setLang: (lang: 'en' | 'fr') => void;
 }
 
 const TranslationContext = createContext<TranslationContextType | undefined>(undefined);
 
 export function TranslationProvider({ children }: { children: ReactNode }) {
-    const { lang } = useLanguageStore();
+    const { lang, setLang } = useLanguageStore();
     const [dict, setDict] = useState<Dictionary | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -57,7 +59,7 @@ export function TranslationProvider({ children }: { children: ReactNode }) {
     };
 
     return (
-        <TranslationContext.Provider value={{ dict, t, isLoading }}>
+        <TranslationContext.Provider value={{ dict, t, isLoading, lang, setLang }}>
             {children}
         </TranslationContext.Provider>
     );

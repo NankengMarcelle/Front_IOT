@@ -97,7 +97,8 @@ export default function FarmerDashboard() {
 
     // Helper to get month name
     const getMonthName = (dateStr: string) => {
-      return new Date(dateStr).toLocaleDateString('fr-FR', { month: 'short' });
+      const locale = t('welcome.lang') === 'FR' ? 'fr-FR' : 'en-US';
+      return new Date(dateStr).toLocaleDateString(locale, { month: 'short' });
     };
 
     // Group by month
@@ -164,31 +165,31 @@ export default function FarmerDashboard() {
     const alertsList = [];
 
     if (latest.humidity < 40) {
-      alertsList.push({ type: 'warning', icon: Droplets, text: "Irrigation Conseillée", color: "text-orange-500" });
+      alertsList.push({ type: 'warning', icon: Droplets, text: "dashboard.alerts.irrigation_advised", color: "text-orange-500" });
     }
     if (latest.temperature > 30) {
-      alertsList.push({ type: 'danger', icon: Thermometer, text: "Forte Chaleur", color: "text-rose-500" });
+      alertsList.push({ type: 'danger', icon: Thermometer, text: "dashboard.alerts.high_heat", color: "text-rose-500" });
     }
     if (latest.ph < 5.5) {
-      alertsList.push({ type: 'info', icon: Activity, text: "Sol Acide", color: "text-amber-500" });
+      alertsList.push({ type: 'info', icon: Activity, text: "dashboard.alerts.acid_soil", color: "text-amber-500" });
     }
 
     if (alertsList.length === 0) {
-      alertsList.push({ type: 'success', icon: TrendingUp, text: "Conditions Optimales", color: "text-emerald-500" });
+      alertsList.push({ type: 'success', icon: TrendingUp, text: "dashboard.alerts.optimal_conditions", color: "text-emerald-500" });
     }
     return alertsList;
   }, [measurements]);
 
   // Latest Weather
   const latestWeather = useMemo(() => {
-    if (measurements.length === 0) return { temp: "--", humidity: "--", condition: "Inconnu" };
+    if (measurements.length === 0) return { temp: "--", humidity: "--", condition: "dashboard.weather_conditions.unknown" };
     const sorted = [...measurements].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
     const latest = sorted[0];
 
-    let condition = "Nuageux";
-    if (latest.humidity < 40 && latest.temperature > 25) condition = "Sec & Chaud";
-    else if (latest.humidity > 80) condition = "Humide";
-    else if (latest.temperature < 15) condition = "Frais";
+    let condition = "dashboard.weather_conditions.cloudy";
+    if (latest.humidity < 40 && latest.temperature > 25) condition = "dashboard.weather_conditions.dry_hot";
+    else if (latest.humidity > 80) condition = "dashboard.weather_conditions.humid";
+    else if (latest.temperature < 15) condition = "dashboard.weather_conditions.cool";
 
     return {
       temp: `${Math.round(latest.temperature)}°c`,
@@ -214,7 +215,7 @@ export default function FarmerDashboard() {
       return {
         ...p,
         score: Math.round(score),
-        status: score > 75 ? "Optimal" : score > 50 ? "Moyen" : "Critique"
+        status: score > 75 ? "dashboard.status.optimal" : score > 50 ? "dashboard.status.medium" : "dashboard.status.critical"
       };
     }).sort((a, b) => b.score - a.score);
   }, [parcelles, measurements, stats.healthScore]);
@@ -234,18 +235,18 @@ export default function FarmerDashboard() {
             <div>
               <div className="inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full mb-4 border border-emerald-100">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
-                <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">Live Dashboard</span>
+                <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">{t('dashboard.live_status')}</span>
               </div>
               <h1 className="text-4xl md:text-5xl lg:text-5xl font-black text-[#052E16] tracking-tighter leading-[0.9]">
-                Bonjour,<br />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Cultivons Plus.</span>
+                {t('dashboard.welcome_msg')}<br />
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">{t('dashboard.welcome_sub')}</span>
               </h1>
             </div>
 
             <div className="flex items-center gap-4">
               <button className="flex-1 md:flex-none flex items-center justify-center gap-3 px-6 py-4 bg-emerald-50 rounded-[20px] md:rounded-[24px] border border-emerald-100 hover:bg-emerald-100 transition-all group">
                 <Activity className="w-5 h-5 text-emerald-600 group-hover:rotate-12 transition-transform" />
-                <span className="text-[#052E16] font-black text-[10px] uppercase tracking-widest">Statistiques PDF</span>
+                <span className="text-[#052E16] font-black text-[10px] uppercase tracking-widest">{t('dashboard.pdf_stats')}</span>
               </button>
             </div>
           </div>
@@ -254,28 +255,28 @@ export default function FarmerDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 mb-12 md:mb-16">
             <MetricCard
               icon={<MapIcon />}
-              title="Terrains"
+              title={t('nav.terrains')}
               value={stats.nbTerrains}
               trend="+0"
-              label="Sites Explorés"
+              label={t('dashboard.sites_explored')}
               onClick={() => router.push('/dashboard/terrains')}
               gradient="from-emerald-50 to-white"
             />
             <MetricCard
               icon={<LayoutGrid />}
-              title="Parcelles"
+              title={t('nav.parcelles')}
               value={stats.nbParcelles}
               trend="+0%"
-              label="Actives"
+              label={t('dashboard.active')}
               onClick={() => router.push('/dashboard/parcelles')}
               gradient="from-lime-50 to-white"
             />
             <MetricCard
               icon={<BrainCircuit />}
-              title="Santé Globale"
+              title={t('dashboard.global_health')}
               value={`${stats.healthScore}%`}
-              trend={stats.healthScore > 80 ? "Excellent" : stats.healthScore > 50 ? "Stable" : "Attention"}
-              label="Score Moyen"
+              trend={stats.healthScore > 80 ? t('dashboard.status.excellent') : stats.healthScore > 50 ? t('dashboard.status.stable') : t('dashboard.status.warning')}
+              label={t('dashboard.avg_score')}
               onClick={() => router.push('/dashboard/historiqueprediction')}
               gradient="from-slate-50 to-white"
             />
@@ -287,10 +288,9 @@ export default function FarmerDashboard() {
               <div className="bg-white rounded-[32px] md:rounded-[48px] p-6 md:p-10 border border-emerald-50 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.06)] hover:shadow-[0_48px_80px_-20px_rgba(0,0,0,0.1)] transition-all overflow-hidden">
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-6 mb-8 md:mb-10">
                   <div className="md:w-1/3">
-                    <h3 className="text-xl md:text-2xl font-black text-[#052E16] tracking-tight">Analyse Interactive</h3>
+                    <h3 className="text-xl md:text-2xl font-black text-[#052E16] tracking-tight">{t('dashboard.interactive_analysis')}</h3>
                     <p className="text-[#052E16]/40 text-[10px] font-black uppercase tracking-widest mt-1">
-                      Visualisez les tendances N-P-K, pH et climat sur 6 mois.
-                    </p>
+                      {t('dashboard.analysis_desc')}                 </p>
                   </div>
 
                   {/* Interactive Legend */}
@@ -299,39 +299,39 @@ export default function FarmerDashboard() {
                       active={visibleSeries.N}
                       onClick={() => toggleSeries('N')}
                       color="bg-emerald-500"
-                      label="N (Azote)"
+                      label={t('dashboard.nutrients.nitrogen')}
                     />
                     <InteractiveLegendItem
                       active={visibleSeries.P}
                       onClick={() => toggleSeries('P')}
                       color="bg-orange-500"
-                      label="P (Phos)"
+                      label={t('dashboard.nutrients.phosphorus')}
                     />
                     <InteractiveLegendItem
                       active={visibleSeries.K}
                       onClick={() => toggleSeries('K')}
                       color="bg-purple-500"
-                      label="K (Potas)"
+                      label={t('dashboard.nutrients.potassium')}
                     />
                     <InteractiveLegendItem
                       active={visibleSeries.ph}
                       onClick={() => toggleSeries('ph')}
                       color="bg-amber-500"
-                      label="pH"
+                      label={t('dashboard.nutrients.ph')}
                       variant="line"
                     />
                     <InteractiveLegendItem
                       active={visibleSeries.humidity}
                       onClick={() => toggleSeries('humidity')}
                       color="bg-sky-500"
-                      label="Humidité"
+                      label={t('dashboard.humidity_label')}
                       variant="line"
                     />
                     <InteractiveLegendItem
                       active={visibleSeries.temperature}
                       onClick={() => toggleSeries('temperature')}
                       color="bg-rose-500"
-                      label="Temp"
+                      label={t('dashboard.nutrients.temperature')}
                       variant="line"
                     />
                   </div>
@@ -379,25 +379,25 @@ export default function FarmerDashboard() {
                         />
 
                         {visibleSeries.N && (
-                          <Area yAxisId="left" type="monotone" dataKey="N" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorN)" name="Azote (mg/kg)" />
+                          <Area yAxisId="left" type="monotone" dataKey="N" stroke="#10b981" strokeWidth={3} fillOpacity={1} fill="url(#colorN)" name={t('dashboard.nutrients.nitrogen_unit')} />
                         )}
                         {visibleSeries.P && (
-                          <Area yAxisId="left" type="monotone" dataKey="P" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#colorP)" name="Phosphore (mg/kg)" />
+                          <Area yAxisId="left" type="monotone" dataKey="P" stroke="#f97316" strokeWidth={3} fillOpacity={1} fill="url(#colorP)" name={t('dashboard.nutrients.phosphorus_unit')} />
                         )}
                         {visibleSeries.K && (
-                          <Area yAxisId="left" type="monotone" dataKey="K" stroke="#a855f7" strokeWidth={3} fillOpacity={1} fill="url(#colorK)" name="Potassium (mg/kg)" />
+                          <Area yAxisId="left" type="monotone" dataKey="K" stroke="#a855f7" strokeWidth={3} fillOpacity={1} fill="url(#colorK)" name={t('dashboard.nutrients.potassium_unit')} />
                         )}
 
                         {visibleSeries.humidity && (
-                          <Line yAxisId="left" type="monotone" dataKey="humidity" stroke="#0ea5e9" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3, fill: '#0ea5e9' }} name="Humidité (%)" />
+                          <Line yAxisId="left" type="monotone" dataKey="humidity" stroke="#0ea5e9" strokeWidth={2} strokeDasharray="5 5" dot={{ r: 3, fill: '#0ea5e9' }} name={t('dashboard.nutrients.humidity_unit')} />
                         )}
 
                         {visibleSeries.temperature && (
-                          <Line yAxisId="right" type="monotone" dataKey="temperature" stroke="#f43f5e" strokeWidth={2} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} name="Temp (°C)" />
+                          <Line yAxisId="right" type="monotone" dataKey="temperature" stroke="#f43f5e" strokeWidth={2} dot={{ r: 4, strokeWidth: 2 }} activeDot={{ r: 6 }} name={t('dashboard.nutrients.temperature_unit')} />
                         )}
 
                         {visibleSeries.ph && (
-                          <Line yAxisId="right" type="monotone" dataKey="ph" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4, fill: '#fff', stroke: '#f59e0b', strokeWidth: 2 }} name="pH" />
+                          <Line yAxisId="right" type="monotone" dataKey="ph" stroke="#f59e0b" strokeWidth={3} dot={{ r: 4, fill: '#fff', stroke: '#f59e0b', strokeWidth: 2 }} name={t('dashboard.nutrients.ph_unit')} />
                         )}
 
                       </ComposedChart>
@@ -405,7 +405,7 @@ export default function FarmerDashboard() {
                   ) : (
                     <div className="h-full flex flex-col items-center justify-center text-center p-8 border-2 border-dashed border-emerald-50 rounded-3xl">
                       <Activity className="w-10 h-10 text-emerald-100 mb-4" />
-                      <p className="text-[#052E16]/40 font-medium">Aucune donnée historique disponible pour le moment.</p>
+                      <p className="text-[#052E16]/40 font-medium">{t('dashboard.no_history')}</p>
                     </div>
                   )}
                 </div>
@@ -414,12 +414,12 @@ export default function FarmerDashboard() {
               {/* Table Section */}
               <div className="space-y-6">
                 <div className="flex items-center justify-between px-4">
-                  <h3 className="text-xl md:text-2xl font-black text-[#052E16] tracking-tight">Performance Parcelles</h3>
+                  <h3 className="text-xl md:text-2xl font-black text-[#052E16] tracking-tight">{t('dashboard.parcel_performance')}</h3>
                   <button
                     onClick={() => router.push('/dashboard/parcelles')}
                     className="text-emerald-600 font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:translate-x-1 transition-transform"
                   >
-                    Voir Tout <ChevronRight className="w-4 h-4" />
+                    {t('dashboard.see_all')} <ChevronRight className="w-4 h-4" />
                   </button>
                 </div>
 
@@ -438,17 +438,17 @@ export default function FarmerDashboard() {
                       <div className="flex items-center justify-between sm:justify-end gap-6 md:gap-12">
                         <div className="text-left sm:text-right">
                           <p className="text-[#052E16] font-black text-lg md:text-xl mb-1">{p.score}%</p>
-                          <p className="text-[#052E16]/40 text-[9px] font-black uppercase tracking-widest">Santé Sol</p>
+                          <p className="text-[#052E16]/40 text-[9px] font-black uppercase tracking-widest">{t('dashboard.soil_health')}</p>
                         </div>
                         <div className={`px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full font-black text-[9px] uppercase tracking-widest border border-current opacity-70`}>
-                          {p.status}
+                          {t(p.status)}
                         </div>
                       </div>
                     </div>
                   ))}
                   {parcelles.length === 0 && !loading && (
                     <div className="p-12 text-center bg-[#F8FAF9] rounded-[32px] border border-dashed border-emerald-100">
-                      <p className="text-[#052E16]/40 text-[10px] font-black uppercase tracking-widest">Aucune parcelle à afficher</p>
+                      <p className="text-[#052E16]/40 text-[10px] font-black uppercase tracking-widest">{t('dashboard.no_parcels_display')}</p>
                     </div>
                   )}
                 </div>
@@ -460,32 +460,32 @@ export default function FarmerDashboard() {
               {/* Quick Actions */}
               <div className="bg-[#052E16] rounded-[32px] md:rounded-[48px] p-8 md:p-10 text-white relative overflow-hidden group shadow-2xl">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/20 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-[2s]"></div>
-                <h3 className="text-xl md:text-2xl font-black tracking-tight mb-6 md:mb-8">Alertes Rapides</h3>
+                <h3 className="text-xl md:text-2xl font-black tracking-tight mb-6 md:mb-8">{t('dashboard.quick_alerts')}</h3>
                 <div className="space-y-4">
                   {alerts.map((alert, idx) => (
                     <div key={idx} className="p-4 md:p-5 bg-white/5 backdrop-blur-xl rounded-[20px] md:rounded-[28px] border border-white/10 flex items-center gap-4 md:gap-5 hover:bg-white/10 transition-all cursor-pointer">
                       <alert.icon className={`w-5 h-5 md:w-6 md:h-6 ${alert.color}`} />
-                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">{alert.text}</span>
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest">{t(alert.text)}</span>
                     </div>
                   ))}
                 </div>
                 <button className="w-full mt-8 md:mt-10 py-5 bg-emerald-500 rounded-[24px] md:rounded-[28px] font-black uppercase tracking-widest text-[9px] md:text-[10px] shadow-xl hover:bg-emerald-400 transition-all active:scale-95">
-                  Voir les Détails
+                  {t('dashboard.see_details')}
                 </button>
               </div>
 
               {/* Mini Health Status */}
               <div className="bg-slate-50 rounded-[32px] md:rounded-[48px] p-8 md:p-10 border border-emerald-50">
-                <h3 className="text-lg md:text-xl font-black text-[#052E16] tracking-tight mb-6 md:mb-8">Météo & Capteurs</h3>
+                <h3 className="text-lg md:text-xl font-black text-[#052E16] tracking-tight mb-6 md:mb-8">{t('dashboard.weather_sensors')}</h3>
                 <div className="grid grid-cols-2 gap-4">
                   {[
-                    { l: 'Temp Actuelle', v: latestWeather.temp, i: <Thermometer /> },
-                    { l: 'Humidité', v: latestWeather.humidity, i: <Droplets /> },
-                    { l: 'Condition', v: latestWeather.condition, i: <CloudSun />, span: true }
+                    { l: t('dashboard.current_temp'), v: latestWeather.temp, i: <Thermometer /> },
+                    { l: t('dashboard.humidity_label'), v: latestWeather.humidity, i: <Droplets /> },
+                    { l: t('dashboard.condition_label'), v: latestWeather.condition, i: <CloudSun />, span: true }
                   ].map((item, id) => (
                     <div key={id} className={`bg-white p-4 md:p-6 rounded-[24px] md:rounded-[32px] border border-emerald-50 text-center ${item.span ? 'col-span-2' : ''}`}>
                       <div className="flex justify-center text-emerald-500 mb-3">{item.i}</div>
-                      <p className="text-xl md:text-2xl font-black text-[#052E16]">{item.v}</p>
+                      <p className="text-xl md:text-2xl font-black text-[#052E16]">{item.v === latestWeather.condition ? t(item.v) : item.v}</p>
                       <p className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-[#052E16]/40">{item.l}</p>
                     </div>
                   ))}

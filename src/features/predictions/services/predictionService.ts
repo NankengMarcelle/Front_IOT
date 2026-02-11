@@ -5,60 +5,51 @@ const PREDICTION_API_URL = process.env.NEXT_PUBLIC_PREDICTION_API_URL || 'https:
 export const predictionService = {
   /**
    * Envoie une requête au backend pour analyser une parcelle avec le modèle réel
+   * Utilise le nouvel endpoint qui nécessite uniquement l'ID de la parcelle
    */
   getPrediction: async (parcelId: string) => {
     try {
-      // 1. Récupérer les dernières mesures de la parcelle
-      const measurementsRaw = await DonnEsDeCapteursService.getMeasurementsByParcelleApiV1SensorDataSensorDataParcelleParcelleIdGet(
-        parcelId,
-        0,
-        1
-      ) as any;
-      const measurements = Array.isArray(measurementsRaw) ? measurementsRaw : (measurementsRaw.data || []);
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://iot-soil-backend.onrender.com';
 
-      if (!measurements || measurements.length === 0) {
-        throw new Error("Aucune donnée de capteur disponible pour cette parcelle. Veuillez d'abord assigner un capteur et attendre les premières mesures.");
-      }
-
-      const lastData = measurements[0];
-
-      // 2. Préparer le payload pour l'API de prédiction
-      // L'API attend : N, P, K, temperature, humidity, ph
-      const sample = {
-        N: lastData.azote || 0,
-        P: lastData.phosphore || 0,
-        K: lastData.potassium || 0,
-        temperature: lastData.temperature || 0,
-        humidity: lastData.humidity || 0,
-        ph: lastData.ph || 6.5 // Valeur par défaut si non disponible
-      };
-
-      // 3. Appeler l'API réelle via proxy (/api/predict)
-      const response = await fetch('/api/predict', {
+      // Appeler le nouvel endpoint qui utilise automatiquement les dernières mesures
+      const response = await fetch(`${API_BASE_URL}/api/v1/recommendations/parcelle/${parcelId}/predict-crop`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ samples: [sample] })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          region: "Centre",
+          query: "Quelle culture recommandez-vous pour cette parcelle ?"
+        })
       });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Erreur lors de la prédiction IA");
+        throw new Error(errorData.detail || "Erreur lors de la prédiction IA");
       }
 
       const result = await response.json();
 
-      // L'API retourne un objet avec recommended_crop, confidence, etc.
-      // Format: { recommended_crop: 'haricot', confidence: 1, ... }
-      const predictedCrop = result.recommended_crop || result[0] || "Non déterminé";
-      const confidence = result.confidence ? Math.round(result.confidence * 100) : null;
+      // L'API retourne un objet avec recommended_crop, confidence_score, justification, etc.
+      const predictedCrop = result.recommended_crop || "Non déterminé";
+      const confidence = result.confidence_score ? Math.round(result.confidence_score * 100) : null;
+      const justification = result.justification || result.expert_details?.final_response || "";
 
       return {
         culture: predictedCrop,
-        raison: `Basé sur les niveaux de NPK (${sample.N}-${sample.P}-${sample.K}), la température (${sample.temperature}°C) et l'humidité (${sample.humidity}%) détectés.`,
-        rendement: confidence ? `${confidence}% de confiance` : "Calculé par IA"
+        raison: justification || `Culture recommandée basée sur l'analyse des données de capteurs.`,
+        rendement: confidence ? `${confidence}% de confiance` : "Calculé par IA",
+        mlDetails: result.ml_details,
+        expertDetails: result.expert_details
       };
     } catch (error: any) {
       console.error("Prediction Error:", error);
+
+      // Message d'erreur plus explicite
+      if (error.message.includes('404')) {
+        throw new Error("Aucune donnée de capteur disponible pour cette parcelle. Veuillez d'abord assigner un capteur et attendre les premières mesures.");
+      }
+
       throw error;
     }
   },

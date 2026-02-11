@@ -4,8 +4,10 @@ import { useState, FormEvent } from 'react';
 import Link from 'next/link';
 import { Leaf, Mail, ArrowRight, ArrowLeft, Send, CheckCircle2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useTranslation } from '@/providers/TranslationProvider';
 
 export default function ForgotPasswordForm({ role }: { role: string | null }) {
+  const { t } = useTranslation();
   const [isSent, setIsSent] = useState(false);
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -13,7 +15,7 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const toastId = toast.loading("Envoi du lien...");
+    const toastId = toast.loading(t('auth.forgot_password.toast_loading'));
 
     // Simulation envoi
     setTimeout(() => {
@@ -36,9 +38,9 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
             <Leaf className="w-8 h-8 text-emerald-600" />
           </Link>
           <h1 className="text-3xl font-black text-[#052E16] tracking-tighter mb-2">
-            Mot de passe oublié
+            {t('auth.forgot_password.title')}
           </h1>
-          <p className="text-emerald-900/40 text-sm font-medium">Récupérez l'accès à votre compte</p>
+          <p className="text-emerald-900/40 text-sm font-medium">{t('auth.forgot_password.subtitle')}</p>
         </div>
 
         {isSent ? (
@@ -47,20 +49,20 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
               <CheckCircle2 className="w-10 h-10 text-emerald-600" />
             </div>
             <p className="text-[#052E16] font-bold text-lg mb-8 leading-relaxed">
-              Un lien de réinitialisation a été envoyé à <span className="text-emerald-600">{email}</span>.
+              {t('auth.forgot_password.success_msg').replace('{{email}}', email)}
             </p>
             <Link
               href={`/login?role=${role}`}
               className="inline-flex items-center gap-2 text-emerald-600 font-black text-xs uppercase tracking-[0.2em] hover:text-emerald-700 transition-colors group"
             >
               <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Retour à la connexion
+              {t('auth.forgot_password.back_to_login')}
             </Link>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6 relative z-10">
             <div className="space-y-2">
-              <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Email de récupération</label>
+              <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">{t('auth.forgot_password.email_label')}</label>
               <div className="relative group/input">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
                   <Mail className="w-5 h-5" />
@@ -84,7 +86,7 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
               <span className="relative z-10 flex items-center justify-center gap-3">
                 {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : (
                   <>
-                    Envoyer le lien
+                    {t('auth.forgot_password.submit')}
                     <Send className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                   </>
                 )}
@@ -98,7 +100,7 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
                 className="inline-flex items-center gap-2 text-[#052E16]/40 hover:text-emerald-600 text-[10px] font-black uppercase tracking-[0.2em] transition-all"
               >
                 <ArrowLeft className="w-3 h-3" />
-                Retour à la connexion
+                {t('auth.forgot_password.back_to_login')}
               </Link>
             </div>
           </form>
@@ -112,7 +114,7 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
           className="inline-flex items-center gap-2 px-6 py-3 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl text-[#052E16] hover:bg-white hover:shadow-lg transition-all font-black text-[10px] uppercase tracking-[0.2em]"
         >
           <ArrowLeft className="w-3 h-3" />
-          Retour à l'accueil
+          {t('auth.login.back_to_home')}
         </Link>
       </div>
     </div>

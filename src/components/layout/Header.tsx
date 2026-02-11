@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useUserStore } from '@/store/useUserStore';
+import LanguageSwitcher from '@/components/ui/LanguageSwitcher';
 
 export default function DashboardHeader() {
   const { t } = useTranslation();
@@ -46,8 +47,8 @@ export default function DashboardHeader() {
     { href: "/dashboard/farmer", label: t('nav.dashboard'), icon: Home },
     { href: "/dashboard/terrains", label: t('nav.terrains'), icon: Map },
     { href: "/dashboard/parcelles", label: t('nav.parcelles'), icon: Grid3x3 },
-    { href: "/dashboard/historiqueprediction", label: "Historique", icon: RadioTower },
-    { href: "/dashboard/recommandations", label: "IA Chat", icon: Sparkles },
+    { href: "/dashboard/historiqueprediction", label: t('nav.history'), icon: RadioTower },
+    { href: "/dashboard/recommandations", label: t('nav.ia_chat'), icon: Sparkles },
   ];
 
   const getInitial = () => {
@@ -57,10 +58,10 @@ export default function DashboardHeader() {
   };
 
   const getFullName = () => {
-    if (!userInfo) return "Chargement...";
+    if (!userInfo) return t('common.loading');
     if (userInfo.name) return userInfo.name;
     const fullName = `${userInfo.prenom || ''} ${userInfo.nom || ''}`.trim();
-    return fullName || "Expert Agro";
+    return fullName || t('common.expert_agro');
   };
 
   return (
@@ -101,6 +102,8 @@ export default function DashboardHeader() {
 
         {/* Action Belt */}
         <div className="flex items-center gap-2 md:gap-4">
+          {/* Language Switcher */}
+          <LanguageSwitcher />
 
           <div className="w-px h-6 md:h-8 bg-emerald-100/50 hidden md:block"></div>
 
@@ -141,7 +144,7 @@ export default function DashboardHeader() {
                 <div className="w-8 h-8 md:w-10 md:h-10 bg-emerald-50 rounded-lg md:rounded-xl flex items-center justify-center text-emerald-600 group-hover/item:bg-[#052E16] group-hover/item:text-white transition-all">
                   <Settings size={16} />
                 </div>
-                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]">Paramètres</span>
+                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]">{t('nav.settings')}</span>
               </Link>
               <div className="h-px bg-emerald-50 my-1 md:my-2 mx-4"></div>
               <button
@@ -151,7 +154,7 @@ export default function DashboardHeader() {
                 <div className="w-8 h-8 md:w-10 md:h-10 bg-rose-50 rounded-lg md:rounded-xl flex items-center justify-center text-rose-500 group-hover/logout:bg-rose-500 group-hover/logout:text-white transition-all">
                   <LogOut size={16} />
                 </div>
-                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-rose-600">Déconnexion</span>
+                <span className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-rose-600">{t('nav.logout')}</span>
               </button>
             </div>
           </div>

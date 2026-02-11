@@ -45,10 +45,10 @@ export default function TerrainsPage() {
 
   const handleDelete = async (id: number | string) => {
     const isConfirmed = await confirm({
-      title: t('terrains.delete_confirm_title') || "Supprimer le terrain ?",
-      message: t('terrains.delete_confirm') || "Voulez-vous vraiment supprimer ce terrain ? Cette action est irréversible et supprimera toutes les données associées.",
-      confirmText: "Supprimer",
-      cancelText: "Annuler",
+      title: t('terrains.delete_confirm_title'),
+      message: t('terrains.delete_confirm_desc'),
+      confirmText: t('terrains.delete'),
+      cancelText: t('common.cancel') || "Annuler",
       type: "danger"
     });
 
@@ -59,7 +59,7 @@ export default function TerrainsPage() {
         loadData();
       } catch (error) {
         console.error("Error deleting terrain:", error);
-        alert(t('terrains.delete_error') || "Impossible de supprimer ce terrain. Assurez-vous qu'il ne contient aucune parcelle ou donnée liée.");
+        alert(t('terrains.delete_error'));
       }
     }
   };
@@ -86,7 +86,7 @@ export default function TerrainsPage() {
                   <ChevronRight className="w-5 h-5 md:w-6 md:h-6 rotate-180" />
                 </button>
                 <h2 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter">
-                  {selectedTerrain ? "Modifier le Terrain" : "Nouveau Terrain"}
+                  {selectedTerrain ? t('terrains.edit_title') : t('terrains.new_title')}
                 </h2>
               </div>
               <TerrainForm
@@ -102,11 +102,11 @@ export default function TerrainsPage() {
                 <div>
                   <div className="inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full mb-4 border border-emerald-100">
                     <Map className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">Patrimoine Foncier</span>
+                    <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">{t('terrains.patrimoine_foncier')}</span>
                   </div>
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#052E16] tracking-tighter leading-[0.9]">
-                    Vos<br />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Exploitations.</span>
+                    {t('terrains.your_title')}<br />
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">{t('terrains.exploitations_title')}</span>
                   </h1>
                 </div>
 
@@ -115,7 +115,7 @@ export default function TerrainsPage() {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                     <input
                       type="text"
-                      placeholder="Localiser un site..."
+                      placeholder={t('terrains.search_placeholder')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="bg-white border border-emerald-50 rounded-xl md:rounded-[20px] pl-12 pr-6 py-3.5 md:py-4 text-sm font-medium outline-none focus:border-emerald-500 focus:shadow-xl transition-all w-full sm:w-64"
@@ -126,7 +126,7 @@ export default function TerrainsPage() {
                     className="bg-[#052E16] text-white px-8 md:px-10 py-4 md:py-5 rounded-xl md:rounded-[24px] font-black uppercase tracking-widest text-[9px] md:text-[10px] hover:scale-105 transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-3"
                   >
                     <Plus className="w-4 h-4" />
-                    Ajouter Terrain
+                    {t('terrains.add_terrain')}
                   </button>
                 </div>
               </div>
@@ -136,8 +136,8 @@ export default function TerrainsPage() {
                   <div className="w-16 h-16 md:w-24 md:h-24 bg-emerald-50 rounded-2xl md:rounded-[32px] flex items-center justify-center mb-6 md:mb-8 shadow-inner">
                     <MapPin className="w-8 h-8 md:w-10 md:h-10 text-emerald-200" />
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter mb-4 px-4 text-balance">Aucun terrain enregistré</h3>
-                  <p className="text-[#052E16]/40 max-w-sm font-medium text-sm md:text-base px-6">L'aventure commence par une simple coordonnée. Enregistrez votre premier site pour démarrer l'analyse.</p>
+                  <h3 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter mb-4 px-4 text-balance">{t('terrains.no_terrain_title')}</h3>
+                  <p className="text-[#052E16]/40 max-w-sm font-medium text-sm md:text-base px-6">{t('terrains.no_terrain_desc')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
@@ -175,15 +175,15 @@ export default function TerrainsPage() {
 
                       <div className="px-8 md:px-10 py-6 md:py-8 bg-[#F8FAF9] border-t border-emerald-50 flex justify-between items-center group-hover:bg-emerald-50/50 transition-colors">
                         <div>
-                          <p className="text-[8px] md:text-[9px] text-[#052E16]/30 font-black uppercase tracking-widest mb-1">Surface Totale</p>
+                          <p className="text-[8px] md:text-[9px] text-[#052E16]/30 font-black uppercase tracking-widest mb-1">{t('terrains.total_surface')}</p>
                           <p className="text-[#052E16] font-black text-xl md:text-2xl tracking-tighter">
                             {(t_node.superficie || 0).toLocaleString()} <span className="text-[10px] font-black text-emerald-500/50">Ha</span>
                           </p>
                         </div>
                         <div className="text-right">
-                          <p className="text-[8px] md:text-[9px] text-[#052E16]/30 font-black uppercase tracking-widest mb-1">Typologie</p>
+                          <p className="text-[8px] md:text-[9px] text-[#052E16]/30 font-black uppercase tracking-widest mb-1">{t('terrains.typology')}</p>
                           <p className="text-emerald-600 font-black text-[8px] md:text-[10px] uppercase tracking-widest bg-white px-2.5 md:px-3 py-1 md:py-1.5 rounded-full border border-emerald-50 shadow-sm">
-                            {t_node.type_terrain || 'Agricole'}
+                            {t_node.type_terrain || t('common.agricultural') || 'Agricole'}
                           </p>
                         </div>
                       </div>

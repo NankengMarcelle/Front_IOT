@@ -66,11 +66,12 @@ export default function HistoriquePredictionPage() {
 
     const getParcelleName = (parcelleId: string | number) => {
         const p = parcelles.find(p => String(p.id) === String(parcelleId));
-        return p ? p.nom : "Parcelle Inconnue";
+        return p ? p.nom : t('history.unknown_parcel');
     };
 
     const formatDate = (dateStr: string) => {
-        return new Date(dateStr).toLocaleDateString('fr-FR', {
+        const locale = t('welcome.lang') === 'FR' ? 'fr-FR' : 'en-US';
+        return new Date(dateStr).toLocaleDateString(locale, {
             day: '2-digit',
             month: 'short',
             year: 'numeric',
@@ -105,11 +106,11 @@ export default function HistoriquePredictionPage() {
                         <div>
                             <div className="inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full mb-4 border border-emerald-100">
                                 <History className="w-3.5 h-3.5 text-emerald-600" />
-                                <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">Logs de Transmission</span>
+                                <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">{t('history.transmission_logs')}</span>
                             </div>
                             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-[0.9]">
-                                Historique<br />
-                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Global.</span>
+                                {t('history.title')}<br />
+                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">{t('history.global_title')}</span>
                             </h1>
                         </div>
 
@@ -118,7 +119,7 @@ export default function HistoriquePredictionPage() {
                                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                                 <input
                                     type="text"
-                                    placeholder="Chercher..."
+                                    placeholder={t('history.search_placeholder')}
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     className="bg-white border border-emerald-50 rounded-xl md:rounded-[20px] pl-12 pr-6 py-3.5 md:py-4 text-sm font-medium outline-none focus:border-emerald-500 focus:shadow-xl transition-all w-full sm:w-64 shadow-sm"
@@ -139,13 +140,13 @@ export default function HistoriquePredictionPage() {
                             onClick={() => setActiveTab('measurements')}
                             className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'measurements' ? 'bg-[#052E16] text-white' : 'bg-emerald-50 text-[#052E16] opacity-40 hover:opacity-100'}`}
                         >
-                            <RadioTower size={14} /> Mesures
+                            <RadioTower size={14} /> {t('history.measurements')}
                         </button>
                         <button
                             onClick={() => setActiveTab('predictions')}
                             className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'predictions' ? 'bg-[#052E16] text-white' : 'bg-emerald-50 text-[#052E16] opacity-40 hover:opacity-100'}`}
                         >
-                            <Sparkles size={14} /> Prédictions
+                            <Sparkles size={14} /> {t('history.predictions')}
                         </button>
                     </div>
 
@@ -161,8 +162,8 @@ export default function HistoriquePredictionPage() {
                             <div className="w-20 h-20 bg-emerald-50 rounded-[28px] flex items-center justify-center mb-6 shadow-inner">
                                 <History className="w-10 h-10 text-emerald-200" />
                             </div>
-                            <h3 className="text-2xl font-black text-[#052E16] tracking-tighter mb-2">Aucune donnée trouvée</h3>
-                            <p className="text-[#052E16]/40 max-w-sm font-medium">Les données s'afficheront ici dès qu'elles seront disponibles.</p>
+                            <h3 className="text-2xl font-black text-[#052E16] tracking-tighter mb-2">{t('history.no_data_found')}</h3>
+                            <p className="text-[#052E16]/40 max-w-sm font-medium">{t('history.no_data_desc')}</p>
                         </div>
                     ) : (
                         <div className="grid gap-4">
@@ -174,7 +175,7 @@ export default function HistoriquePredictionPage() {
                                             <div className="w-14 h-14 bg-[#052E16] rounded-2xl flex flex-col items-center justify-center text-white">
                                                 <Calendar className="w-4 h-4 text-lime-400 mb-0.5" />
                                                 <span className="text-[10px] font-black leading-none">{new Date(m.created_at).getDate()}</span>
-                                                <span className="text-[7px] font-black uppercase opacity-60 tracking-tighter">{new Date(m.created_at).toLocaleString('fr', { month: 'short' })}</span>
+                                                <span className="text-[7px] font-black uppercase opacity-60 tracking-tighter">{new Date(m.created_at).toLocaleString(t('welcome.lang') === 'FR' ? 'fr' : 'en', { month: 'short' })}</span>
                                             </div>
 
                                             <div>
@@ -192,37 +193,37 @@ export default function HistoriquePredictionPage() {
                                         <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 md:gap-8 flex-grow max-w-2xl px-2">
                                             <div className="space-y-1">
                                                 <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Thermometer className="w-3 h-3 text-rose-500" /> Temper.
+                                                    <Thermometer className="w-3 h-3 text-rose-500" /> {t('history.temperature_label')}
                                                 </div>
                                                 <p className="text-sm font-black text-[#052E16]">{m.temperature}°C</p>
                                             </div>
                                             <div className="space-y-1">
                                                 <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Droplets className="w-3 h-3 text-sky-500" /> Humid.
+                                                    <Droplets className="w-3 h-3 text-sky-500" /> {t('history.humidity_label')}
                                                 </div>
                                                 <p className="text-sm font-black text-[#052E16]">{m.humidity}%</p>
                                             </div>
                                             <div className="space-y-1">
                                                 <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Activity className="w-3 h-3 text-emerald-500" /> Azote (N)
+                                                    <Activity className="w-3 h-3 text-emerald-500" /> {t('history.nitrogen_label')}
                                                 </div>
                                                 <p className="text-sm font-black text-[#052E16]">{m.azote}</p>
                                             </div>
                                             <div className="space-y-1">
                                                 <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Activity className="w-3 h-3 text-orange-500" /> Phos. (P)
+                                                    <Activity className="w-3 h-3 text-orange-500" /> {t('history.phosphorus_label')}
                                                 </div>
                                                 <p className="text-sm font-black text-[#052E16]">{m.phosphore}</p>
                                             </div>
                                             <div className="space-y-1">
                                                 <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Activity className="w-3 h-3 text-purple-500" /> Potas. (K)
+                                                    <Activity className="w-3 h-3 text-purple-500" /> {t('history.potassium_label')}
                                                 </div>
                                                 <p className="text-sm font-black text-[#052E16]">{m.potassium}</p>
                                             </div>
                                             <div className="space-y-1">
                                                 <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Activity className="w-3 h-3 text-amber-500" /> pH Sol
+                                                    <Activity className="w-3 h-3 text-amber-500" /> {t('history.ph_label')}
                                                 </div>
                                                 <p className="text-sm font-black text-[#052E16]">{m.ph}</p>
                                             </div>

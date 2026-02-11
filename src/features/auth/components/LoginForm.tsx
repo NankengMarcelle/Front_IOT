@@ -6,12 +6,14 @@ import Link from 'next/link';
 import { Leaf, Mail, Lock, ShieldCheck, ArrowRight, ArrowLeft, Loader2, Eye, EyeOff } from 'lucide-react';
 import { authService } from '../services/authService';
 import { toast } from 'sonner';
+import { useTranslation } from '@/providers/TranslationProvider';
 
 interface LoginFormProps {
   role: string | null;
 }
 
 export default function LoginForm({ role }: LoginFormProps) {
+  const { t } = useTranslation();
   const router = useRouter();
   const isAdmin = role === 'admin';
   const [error, setError] = useState("");
@@ -34,26 +36,26 @@ export default function LoginForm({ role }: LoginFormProps) {
     // 1. Validation du code fixe pour l'administrateur
     if (isAdmin) {
       if (adminCode !== ADMIN_SECRET_CODE) {
-        setError("Code de sécurité administrateur incorrect.");
+        setError(t('auth.login.error_admin_code'));
         setLoading(false);
         return;
       }
     }
 
     // 2. Authentification réelle via le backend
-    const toastId = toast.loading("Connexion en cours...");
+    const toastId = toast.loading(t('auth.login.toast_loading'));
     try {
       const user = await authService.login(email, password);
 
       // 3. Vérification du rôle (optionnelle : si l'admin doit avoir un rôle spécifique)
       // L'API a déjà renvoyé le profil
 
-      toast.success("Connexion réussie ! Bienvenue.", { id: toastId });
+      toast.success(t('auth.login.toast_success'), { id: toastId });
       setLoading(false);
       router.push(isAdmin ? '/dashboard/admin' : '/dashboard/farmer');
     } catch (err: any) {
       console.error(err);
-      const errorMsg = err.message || "Identifiants invalides";
+      const errorMsg = err.message || t('auth.login.invalid_credentials');
       setError(errorMsg);
       toast.error(errorMsg, { id: toastId });
       setLoading(false);
@@ -72,9 +74,9 @@ export default function LoginForm({ role }: LoginFormProps) {
             <Leaf className="w-8 h-8 text-emerald-600" />
           </Link>
           <h1 className="text-3xl sm:text-4xl font-black text-[#052E16] tracking-tighter mb-2">
-            Bon retour
+            {t('auth.login.title')}
           </h1>
-          <p className="text-emerald-900/40 text-sm font-medium">Connectez-vous à votre écosystème</p>
+          <p className="text-emerald-900/40 text-sm font-medium">{t('auth.login.subtitle')}</p>
         </div>
 
         {/* Error Message */}
@@ -87,7 +89,7 @@ export default function LoginForm({ role }: LoginFormProps) {
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-6 relative z-10">
           {/* Email Input */}
           <div className="space-y-2">
-            <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">Email</label>
+            <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest ml-1">{t('auth.login.email_label')}</label>
             <div className="relative group/input">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
                 <Mail className="w-5 h-5" />
@@ -105,7 +107,7 @@ export default function LoginForm({ role }: LoginFormProps) {
           {/* Password Input */}
           <div className="space-y-2">
             <div className="flex justify-between items-center px-1">
-              <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest">Mot de passe</label>
+              <label className="text-[#052E16] font-black text-[10px] uppercase tracking-widest">{t('auth.login.password_label')}</label>
             </div>
             <div className="relative group/input">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 group-focus-within/input:text-emerald-600 transition-colors">
@@ -131,7 +133,7 @@ export default function LoginForm({ role }: LoginFormProps) {
           {/* Admin Code Input (Conditional) */}
           {isAdmin && (
             <div className="space-y-2 animate-in slide-in-from-top-4 duration-500">
-              <label className="text-emerald-600 font-black text-[10px] uppercase tracking-widest ml-1">Code Administrateur</label>
+              <label className="text-emerald-600 font-black text-[10px] uppercase tracking-widest ml-1">{t('auth.login.admin_code_label')}</label>
               <div className="relative group/input">
                 <div className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-600/30 group-focus-within/input:text-emerald-600 transition-colors">
                   <ShieldCheck className="w-5 h-5" />
@@ -157,11 +159,11 @@ export default function LoginForm({ role }: LoginFormProps) {
               {loading ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Authentification...
+                  {t('auth.login.loading')}
                 </>
               ) : (
                 <>
-                  Se connecter
+                  {t('auth.login.submit')}
                   <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </>
               )}
@@ -176,13 +178,13 @@ export default function LoginForm({ role }: LoginFormProps) {
             href={`/forgot-password?role=${role}`}
             className="text-[#052E16]/40 hover:text-emerald-600 transition-colors"
           >
-            Mot de passe oublié ?
+            {t('auth.login.forgot_password')}
           </Link>
           <Link
             href={`/register?role=${role}`}
             className="text-[#052E16]/40 hover:text-emerald-600 transition-colors"
           >
-            Créer un compte
+            {t('auth.login.create_account')}
           </Link>
         </div>
       </div>
@@ -194,7 +196,7 @@ export default function LoginForm({ role }: LoginFormProps) {
           className="inline-flex items-center gap-2 px-6 py-3 bg-white/60 backdrop-blur-md border border-white/40 rounded-2xl text-[#052E16] hover:bg-white hover:shadow-lg transition-all font-black text-[10px] uppercase tracking-[0.2em]"
         >
           <ArrowLeft className="w-3 h-3" />
-          Retour à l'accueil
+          {t('auth.login.back_to_home')}
         </Link>
       </div>
     </div>

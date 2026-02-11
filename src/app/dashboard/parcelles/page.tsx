@@ -37,21 +37,21 @@ export default function ParcellesPage() {
   };
 
   const handleDelete = async (parcel: any) => {
-    let message = 'Êtes-vous sûr de vouloir supprimer cette parcelle ? Cette action est irréversible.';
+    let message = t('parcelles_list.delete_confirm_desc');
     let sensorsToUnassign: string[] = [];
 
     if (parcel.capteursListe) {
       sensorsToUnassign = parcel.capteursListe.split(',').map((s: string) => s.trim()).filter((s: string) => s);
       if (sensorsToUnassign.length > 0) {
-        message = `Cette parcelle possède ${sensorsToUnassign.length} capteur(s) assigné(s). Ils seront automatiquement désassignés avant la suppression. Voulez-vous continuer ?`;
+        message = t('parcelles_list.delete_confirm_sensors').replace('{{count}}', sensorsToUnassign.length.toString());
       }
     }
 
     const confirmed = await confirm({
-      title: 'Supprimer la parcelle',
+      title: t('parcelles_list.delete_title'),
       message: message,
-      confirmText: 'Supprimer',
-      cancelText: 'Annuler',
+      confirmText: t('terrains.delete'),
+      cancelText: t('common.cancel'),
       type: 'danger'
     });
 
@@ -75,8 +75,8 @@ export default function ParcellesPage() {
     } catch (error) {
       console.error("Error deleting parcel:", error);
       await confirm({
-        title: 'Erreur',
-        message: 'Impossible de supprimer la parcelle.',
+        title: t('common.error') || 'Erreur',
+        message: t('parcelles_list.delete_error') || 'Impossible de supprimer la parcelle.',
         confirmText: 'OK',
         type: 'danger'
       });
@@ -89,7 +89,7 @@ export default function ParcellesPage() {
 
   const getTerrainName = (id: string | number) => {
     const terrain = terrains.find(tr => String(tr.id) === String(id));
-    return terrain ? terrain.nom : "Terrain inconnu";
+    return terrain ? terrain.nom : t('parcelles_list.unknown_terrain');
   };
 
   const filteredParcelles = parcelles.filter(p =>
@@ -114,7 +114,7 @@ export default function ParcellesPage() {
                   <ChevronRight className="w-5 h-5 md:w-6 md:h-6 rotate-180" />
                 </button>
                 <h2 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter">
-                  {selectedParcel ? "Éditer la Parcelle" : "Nouvelle Parcelle"}
+                  {selectedParcel ? t('parcelles_list.edit_title') : t('parcelles_list.new_title')}
                 </h2>
               </div>
               <ParcelForm initialData={selectedParcel} onSuccess={loadData} onCancel={() => setView("list")} />
@@ -126,11 +126,11 @@ export default function ParcellesPage() {
                 <div>
                   <div className="inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full mb-4 border border-emerald-100">
                     <Layout className="w-3.5 h-3.5 text-emerald-600" />
-                    <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">Segmentation Agricole</span>
+                    <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">{t('parcelles_list.segmentation_agricole')}</span>
                   </div>
                   <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-[0.9]">
-                    Vos<br />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Unités de Culture.</span>
+                    {t('parcelles_list.your_title')}<br />
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">{t('parcelles_list.units_title')}</span>
                   </h1>
                 </div>
 
@@ -139,7 +139,7 @@ export default function ParcellesPage() {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/30 w-4 h-4 group-focus-within:text-emerald-500 transition-colors" />
                     <input
                       type="text"
-                      placeholder="Chercher une unité..."
+                      placeholder={t('parcelles_list.search_placeholder')}
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       className="bg-white border border-emerald-50 rounded-xl md:rounded-[20px] pl-12 pr-6 py-3.5 md:py-4 text-sm font-medium outline-none focus:border-emerald-500 focus:shadow-xl transition-all w-full sm:w-64"
@@ -150,7 +150,7 @@ export default function ParcellesPage() {
                     className="bg-[#052E16] text-white px-8 md:px-10 py-4 md:py-5 rounded-xl md:rounded-[24px] font-black uppercase tracking-widest text-[9px] md:text-[10px] hover:scale-105 transition-all shadow-2xl active:scale-95 flex items-center justify-center gap-3"
                   >
                     <Plus className="w-4 h-4" />
-                    Nouvelle Parcelle
+                    {t('parcelles_list.new_title')}
                   </button>
                 </div>
               </div>
@@ -166,8 +166,8 @@ export default function ParcellesPage() {
                   <div className="w-16 h-16 md:w-24 md:h-24 bg-emerald-50 rounded-2xl md:rounded-[32px] flex items-center justify-center mb-6 md:mb-8 shadow-inner">
                     <Grid3x3 className="w-8 h-8 md:w-10 md:h-10 text-emerald-200" />
                   </div>
-                  <h3 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter mb-4 px-4 text-balance">Aucune parcelle définie</h3>
-                  <p className="text-[#052E16]/40 max-w-sm font-medium text-sm md:text-base px-6">Divisez vos terrains pour une gestion ultra-précise et commencez à recevoir vos premiers rapports IA.</p>
+                  <h3 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter mb-4 px-4 text-balance">{t('parcelles_list.no_parcel_title')}</h3>
+                  <p className="text-[#052E16]/40 max-w-sm font-medium text-sm md:text-base px-6">{t('parcelles_list.no_parcel_desc')}</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-10">
@@ -175,7 +175,7 @@ export default function ParcellesPage() {
                     <ParcelCard
                       key={p.id}
                       parcel={p}
-                      terrainName={terrains.find((t: any) => String(t.id) === String(p.terrainId))?.nom || "Terrain Inconnu"}
+                      terrainName={terrains.find((t: any) => String(t.id) === String(p.terrainId))?.nom || t('parcelles_list.unknown_terrain')}
                       onRefresh={loadData}
                       onEdit={() => {
                         setSelectedParcel(p);
