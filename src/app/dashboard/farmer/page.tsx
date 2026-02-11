@@ -339,7 +339,7 @@ export default function FarmerDashboard() {
 
                 <div className="h-[300px] md:h-[400px] w-full min-h-[300px]">
                   {soilTrendData.length > 0 ? (
-                    <ResponsiveContainer width="100%" height="100%">
+                    <ResponsiveContainer width="100%" height="100%" minWidth={0} debounce={50}>
                       <ComposedChart data={soilTrendData} margin={{ top: 20, right: 0, bottom: 0, left: 0 }}>
                         <defs>
                           <linearGradient id="colorN" x1="0" y1="0" x2="0" y2="1">

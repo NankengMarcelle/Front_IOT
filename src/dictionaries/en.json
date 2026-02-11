@@ -128,7 +128,8 @@
   },
   "common": {
     "loading": "Loading...",
-    "expert_agro": "Agro Expert"
+    "expert_agro": "Agro Expert",
+    "agricultural": "Agricultural"
   },
   "landing": {
     "nav": {

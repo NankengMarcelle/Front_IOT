@@ -11,11 +11,15 @@ export const predictionService = {
     try {
       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://iot-soil-backend.onrender.com';
 
+      // Récupérer le token pour l'authentification
+      const token = typeof window !== 'undefined' ? localStorage.getItem('smartagro_token') : '';
+
       // Appeler le nouvel endpoint qui utilise automatiquement les dernières mesures
       const response = await fetch(`${API_BASE_URL}/api/v1/recommendations/parcelle/${parcelId}/predict-crop`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify({
           region: "Centre",

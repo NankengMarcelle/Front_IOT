@@ -128,7 +128,8 @@
   },
   "common": {
     "loading": "Chargement...",
-    "expert_agro": "Expert Agro"
+    "expert_agro": "Expert Agro",
+    "agricultural": "Agricole"
   },
   "landing": {
     "nav": {
