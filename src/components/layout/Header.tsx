@@ -69,12 +69,12 @@ export default function DashboardHeader() {
       <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/40 backdrop-blur-3xl saturate-150 border border-white/40 rounded-[24px] md:rounded-[32px] px-3 md:px-8 py-2 md:py-3 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] pointer-events-auto transition-all duration-500">
 
         {/* Brand */}
-        <Link href="/dashboard/farmer" className="flex items-center gap-2 md:gap-3 group">
-          <div className="w-9 h-9 md:w-12 md:h-12 bg-[#052E16] rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-900/40 group-hover:rotate-12 transition-transform">
-            <Leaf className="w-5 h-5 md:w-7 md:h-7 text-lime-400" />
+        <Link href="/dashboard/farmer" className="flex items-center gap-1.5 md:gap-3 group">
+          <div className="w-8 h-8 md:w-12 md:h-12 bg-[#052E16] rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-900/40 group-hover:rotate-12 transition-transform">
+            <Leaf className="w-4 h-4 md:w-7 md:h-7 text-lime-400" />
           </div>
           <div className="flex flex-col">
-            <span className="hidden xs:block font-black text-[#052E16] text-lg md:text-xl tracking-tighter leading-none">SmartAgro</span>
+            <span className="font-black text-[#052E16] text-[15px] md:text-xl tracking-tighter leading-none">SmartAgro</span>
           </div>
         </Link>
 

@@ -96,11 +96,11 @@ export default function LandingPage() {
             {/* Premium Header/Nav */}
             <header className="fixed top-0 left-0 right-0 z-50 px-2 md:px-6 py-4 transition-all duration-300 backdrop-blur-md bg-white/5">
                 <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/40 backdrop-blur-2xl rounded-[24px] md:rounded-[32px] px-3 md:px-8 py-3 md:py-4 border border-white/40 shadow-sm transition-all">
-                    <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-9 h-9 md:w-10 md:h-10 bg-[#052E16] rounded-xl flex items-center justify-center group-hover:bg-[#1A4D2E] transition-all">
-                            <Leaf className="w-5 h-5 md:w-6 md:h-6 text-emerald-400" />
+                    <Link href="/" className="flex items-center gap-1.5 md:gap-2 group">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-[#052E16] rounded-xl flex items-center justify-center group-hover:bg-[#1A4D2E] transition-all">
+                            <Leaf className="w-4 h-4 md:w-6 md:h-6 text-emerald-400" />
                         </div>
-                        <span className="hidden xs:block text-[#052E16] text-lg md:text-xl font-black tracking-tighter">Smart Agro</span>
+                        <span className="text-[#052E16] text-[15px] md:text-xl font-black tracking-tighter">Smart Agro</span>
                     </Link>
 
                     <div className="hidden md:flex items-center gap-10">
