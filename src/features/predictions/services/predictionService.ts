@@ -33,11 +33,11 @@ export const predictionService = {
       }
 
       const result = await response.json();
-
+      console.log(result);
       // L'API retourne un objet avec recommended_crop, confidence_score, justification, etc.
-      const predictedCrop = result.recommended_crop || "Non déterminé";
-      const confidence = result.confidence_score ? Math.round(result.confidence_score * 100) : null;
-      const justification = result.justification || result.expert_details?.final_response || "";
+      const predictedCrop = result.data.recommended_crop || "Non déterminé";
+      const confidence = result.data.confidence_score ? Math.round(result.confidence_score * 100) : null;
+      const justification = result.data.justification || result.expert_details?.final_response || "";
 
       return {
         culture: predictedCrop,

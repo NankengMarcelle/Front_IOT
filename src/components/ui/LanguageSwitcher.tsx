@@ -24,7 +24,7 @@ export default function LanguageSwitcher() {
         <div className="relative">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex items-center gap-2 px-3 py-2 bg-white/50 hover:bg-white border border-emerald-100 rounded-xl transition-all"
+                className="flex items-center gap-2 px-2 md:px-3 py-2 bg-white/50 hover:bg-white border border-emerald-100 rounded-xl transition-all"
                 title="Change Language"
             >
                 <Globe className="w-4 h-4 text-emerald-600" />
@@ -45,8 +45,8 @@ export default function LanguageSwitcher() {
                                 key={language.code}
                                 onClick={() => handleLanguageChange(language.code)}
                                 className={`w-full flex items-center gap-3 p-3 rounded-xl transition-all ${lang === language.code
-                                        ? 'bg-emerald-50 text-emerald-600'
-                                        : 'hover:bg-slate-50 text-[#052E16]'
+                                    ? 'bg-emerald-50 text-emerald-600'
+                                    : 'hover:bg-slate-50 text-[#052E16]'
                                     }`}
                             >
                                 <span className="text-xl">{language.flag}</span>

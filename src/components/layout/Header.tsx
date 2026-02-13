@@ -66,16 +66,15 @@ export default function DashboardHeader() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-[100] px-4 md:px-6 py-4 pointer-events-none backdrop-blur-md bg-white/5">
-      <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/40 backdrop-blur-3xl saturate-150 border border-white/40 rounded-[24px] md:rounded-[32px] px-4 md:px-8 py-2 md:py-3 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] pointer-events-auto transition-all duration-500">
+      <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/40 backdrop-blur-3xl saturate-150 border border-white/40 rounded-[24px] md:rounded-[32px] px-3 md:px-8 py-2 md:py-3 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.08)] pointer-events-auto transition-all duration-500">
 
         {/* Brand */}
         <Link href="/dashboard/farmer" className="flex items-center gap-2 md:gap-3 group">
-          <div className="w-10 h-10 md:w-12 md:h-12 bg-[#052E16] rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-900/40 group-hover:rotate-12 transition-transform">
+          <div className="w-9 h-9 md:w-12 md:h-12 bg-[#052E16] rounded-xl md:rounded-2xl flex items-center justify-center text-white shadow-xl shadow-emerald-900/40 group-hover:rotate-12 transition-transform">
             <Leaf className="w-5 h-5 md:w-7 md:h-7 text-lime-400" />
           </div>
           <div className="flex flex-col">
-            <span className="font-black text-[#052E16] text-lg md:text-xl tracking-tighter leading-none">SmartAgro</span>
-            <span className="hidden xs:block text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em] text-[#052E16]/30">Elite Intelligence</span>
+            <span className="hidden xs:block font-black text-[#052E16] text-lg md:text-xl tracking-tighter leading-none">SmartAgro</span>
           </div>
         </Link>
 
@@ -101,17 +100,17 @@ export default function DashboardHeader() {
         </nav>
 
         {/* Action Belt */}
-        <div className="flex items-center gap-2 md:gap-4">
+        <div className="flex items-center gap-1.5 md:gap-4">
           {/* Language Switcher */}
           <LanguageSwitcher />
 
-          <div className="w-px h-6 md:h-8 bg-emerald-100/50 hidden md:block"></div>
+          <div className="w-px h-6 md:h-8 bg-emerald-100/50 hidden sm:block"></div>
 
           {/* Profile Hub */}
           <div className="relative group/profile">
             <button
               onClick={() => setIsProfileOpen(!isProfileOpen)}
-              className="flex items-center gap-2 md:gap-3 p-1 md:p-1.5 bg-slate-50/50 rounded-xl md:rounded-2xl hover:bg-white transition-all border border-transparent hover:border-emerald-100"
+              className="flex items-center gap-1.5 md:gap-3 p-1 md:p-1.5 bg-slate-50/50 rounded-xl md:rounded-2xl hover:bg-white transition-all border border-transparent hover:border-emerald-100"
             >
               <div className="w-8 h-8 md:w-10 md:h-10 bg-[#052E16] rounded-lg md:rounded-xl flex items-center justify-center text-white font-black text-[10px] md:text-xs shadow-lg">
                 {getInitial()}

@@ -94,13 +94,13 @@ export default function LandingPage() {
             </div>
 
             {/* Premium Header/Nav */}
-            <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4 transition-all duration-300 backdrop-blur-md bg-white/5">
-                <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/40 backdrop-blur-2xl rounded-[32px] px-8 py-4 border border-white/40 shadow-sm">
+            <header className="fixed top-0 left-0 right-0 z-50 px-2 md:px-6 py-4 transition-all duration-300 backdrop-blur-md bg-white/5">
+                <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/40 backdrop-blur-2xl rounded-[24px] md:rounded-[32px] px-3 md:px-8 py-3 md:py-4 border border-white/40 shadow-sm transition-all">
                     <Link href="/" className="flex items-center gap-2 group">
-                        <div className="w-10 h-10 bg-[#052E16] rounded-xl flex items-center justify-center group-hover:bg-[#1A4D2E] transition-all">
-                            <Leaf className="w-6 h-6 text-emerald-400" />
+                        <div className="w-9 h-9 md:w-10 md:h-10 bg-[#052E16] rounded-xl flex items-center justify-center group-hover:bg-[#1A4D2E] transition-all">
+                            <Leaf className="w-5 h-5 md:w-6 md:h-6 text-emerald-400" />
                         </div>
-                        <span className="text-[#052E16] text-xl font-black tracking-tighter">Smart Agro</span>
+                        <span className="hidden xs:block text-[#052E16] text-lg md:text-xl font-black tracking-tighter">Smart Agro</span>
                     </Link>
 
                     <div className="hidden md:flex items-center gap-10">
@@ -108,11 +108,11 @@ export default function LandingPage() {
                         <button onClick={() => scrollToSection(featuresRef)} className="text-[#052E16]/60 hover:text-emerald-600 font-black text-[10px] uppercase tracking-widest transition-colors">{t('landing.nav.expertise')}</button>
                     </div>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-4">
                         <div className="relative group/lang">
                             <button
                                 onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-                                className="flex items-center gap-2 px-4 py-2 bg-emerald-50 rounded-2xl hover:bg-emerald-100 transition-all font-black text-[10px] uppercase tracking-widest text-emerald-700"
+                                className="flex items-center gap-1.5 px-3 md:px-4 py-2 bg-emerald-50 rounded-2xl hover:bg-emerald-100 transition-all font-black text-[10px] uppercase tracking-widest text-emerald-700"
                             >
                                 <span>{currentLanguage?.flag}</span>
                                 <ChevronDown className={`w-3 h-3 transition-transform ${showLanguageDropdown ? 'rotate-180' : ''}`} />
@@ -131,7 +131,7 @@ export default function LandingPage() {
                                 </div>
                             )}
                         </div>
-                        <Link href="/login" className="px-6 py-2.5 bg-[#052E16] text-white rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg active:scale-95">
+                        <Link href="/login" className="px-4 md:px-6 py-2.5 bg-[#052E16] text-white rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg active:scale-95">
                             {t('nav.login')}
                         </Link>
                     </div>

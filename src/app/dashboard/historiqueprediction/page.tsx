@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { DonnEsDeCapteursService, ParcellesService, RecommandationsService } from "@/lib";
+import { DonnEsDeCapteursService } from "@/lib";
 import { parcelService } from "@/features/parcels/services/parcelService";
 import {
     History,
@@ -14,7 +14,6 @@ import {
     Activity,
     ChevronRight,
     RefreshCw,
-    Sparkles,
     RadioTower
 } from "lucide-react";
 import { useTranslation } from "@/providers/TranslationProvider";
@@ -22,11 +21,9 @@ import { useTranslation } from "@/providers/TranslationProvider";
 export default function HistoriquePredictionPage() {
     const { t } = useTranslation();
     const [measurements, setMeasurements] = useState<any[]>([]);
-    const [recommendations, setRecommendations] = useState<any[]>([]);
     const [parcelles, setParcelles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
-    const [activeTab, setActiveTab] = useState<'measurements' | 'predictions'>('measurements');
 
     const ensureArray = (data: any) => {
         if (Array.isArray(data)) return data;
@@ -37,22 +34,17 @@ export default function HistoriquePredictionPage() {
     const loadData = async () => {
         try {
             setLoading(true);
-            const [measurementsRaw, parcellesData, recommendationsRaw] = await Promise.all([
+            const [measurementsRaw, parcellesData] = await Promise.all([
                 DonnEsDeCapteursService.getAllMeasurementsApiV1SensorDataSensorDataGet(),
-                parcelService.getParcelles(),
-                RecommandationsService.getAllRecommendationsApiV1RecommendationsGet()
+                parcelService.getParcelles()
             ]);
 
             const measurementsData = ensureArray(measurementsRaw);
-            const recommendationsData = ensureArray(recommendationsRaw);
 
             setParcelles(parcellesData);
-            setRecommendations(recommendationsData.sort((a: any, b: any) =>
-                new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-            ));
             setMeasurements(measurementsData.sort((a: any, b: any) =>
                 new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-            ));
+            ).slice(0, 10));
         } catch (error) {
             console.error("Error loading data:", error);
         } finally {
@@ -80,15 +72,10 @@ export default function HistoriquePredictionPage() {
         });
     };
 
-    const filteredData = activeTab === 'measurements'
-        ? measurements.filter(m =>
-            getParcelleName(m.parcelle_id).toLowerCase().includes(searchTerm.toLowerCase()) ||
-            m.capteur_id?.toLowerCase().includes(searchTerm.toLowerCase())
-        )
-        : recommendations.filter(r =>
-            getParcelleName(r.parcelle_id).toLowerCase().includes(searchTerm.toLowerCase()) ||
-            r.titre?.toLowerCase().includes(searchTerm.toLowerCase())
-        );
+    const filteredData = measurements.filter(m =>
+        getParcelleName(m.parcelle_id).toLowerCase().includes(searchTerm.toLowerCase()) ||
+        m.capteur_id?.toLowerCase().includes(searchTerm.toLowerCase())
+    );
 
     return (
         <div className="min-h-screen bg-white relative overflow-hidden">
@@ -134,20 +121,14 @@ export default function HistoriquePredictionPage() {
                         </div>
                     </div>
 
-                    {/* Tabs */}
-                    <div className="flex gap-4 mb-8">
-                        <button
-                            onClick={() => setActiveTab('measurements')}
-                            className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'measurements' ? 'bg-[#052E16] text-white' : 'bg-emerald-50 text-[#052E16] opacity-40 hover:opacity-100'}`}
-                        >
-                            <RadioTower size={14} /> {t('history.measurements')}
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('predictions')}
-                            className={`px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 ${activeTab === 'predictions' ? 'bg-[#052E16] text-white' : 'bg-emerald-50 text-[#052E16] opacity-40 hover:opacity-100'}`}
-                        >
-                            <Sparkles size={14} /> {t('history.predictions')}
-                        </button>
+                    {/* Section Label */}
+                    <div className="flex items-center gap-2 mb-8">
+                        <div className="p-2 bg-[#052E16] text-white rounded-lg">
+                            <RadioTower size={14} />
+                        </div>
+                        <h2 className="font-black text-[10px] uppercase tracking-[0.2em] text-[#052E16] opacity-60">
+                            {t('history.measurements')}
+                        </h2>
                     </div>
 
                     {/* List/Table */}
@@ -167,106 +148,73 @@ export default function HistoriquePredictionPage() {
                         </div>
                     ) : (
                         <div className="grid gap-4">
-                            {activeTab === 'measurements' ? (
-                                filteredData.map((m) => (
-                                    <div key={m.id} className="group bg-white/80 backdrop-blur-xl p-6 rounded-[32px] border border-emerald-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                            {filteredData.map((m) => (
+                                <div key={m.id} className="group bg-white/80 backdrop-blur-xl p-6 rounded-[32px] border border-emerald-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-6">
 
-                                        <div className="flex items-center gap-5">
-                                            <div className="w-14 h-14 bg-[#052E16] rounded-2xl flex flex-col items-center justify-center text-white">
-                                                <Calendar className="w-4 h-4 text-lime-400 mb-0.5" />
-                                                <span className="text-[10px] font-black leading-none">{new Date(m.created_at).getDate()}</span>
-                                                <span className="text-[7px] font-black uppercase opacity-60 tracking-tighter">{new Date(m.created_at).toLocaleString(t('welcome.lang') === 'FR' ? 'fr' : 'en', { month: 'short' })}</span>
-                                            </div>
-
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[8px] font-black uppercase tracking-widest rounded-md border border-emerald-100">
-                                                        ID: {m.capteur_id?.substring(0, 8)}...
-                                                    </span>
-                                                    <span className="text-[10px] text-slate-400 font-bold">•</span>
-                                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{formatDate(m.created_at)}</span>
-                                                </div>
-                                                <h4 className="text-xl font-black text-[#052E16] tracking-tight">{getParcelleName(m.parcelle_id)}</h4>
-                                            </div>
+                                    <div className="flex items-center gap-5">
+                                        <div className="w-14 h-14 bg-[#052E16] rounded-2xl flex flex-col items-center justify-center text-white">
+                                            <Calendar className="w-4 h-4 text-lime-400 mb-0.5" />
+                                            <span className="text-[10px] font-black leading-none">{new Date(m.created_at).getDate()}</span>
+                                            <span className="text-[7px] font-black uppercase opacity-60 tracking-tighter">{new Date(m.created_at).toLocaleString(t('welcome.lang') === 'FR' ? 'fr' : 'en', { month: 'short' })}</span>
                                         </div>
 
-                                        <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 md:gap-8 flex-grow max-w-2xl px-2">
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Thermometer className="w-3 h-3 text-rose-500" /> {t('history.temperature_label')}
-                                                </div>
-                                                <p className="text-sm font-black text-[#052E16]">{m.temperature}°C</p>
+                                        <div>
+                                            <div className="flex items-center gap-2 mb-1">
+                                                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[8px] font-black uppercase tracking-widest rounded-md border border-emerald-100">
+                                                    ID: {m.capteur_id?.substring(0, 8)}...
+                                                </span>
+                                                <span className="text-[10px] text-slate-400 font-bold">•</span>
+                                                <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{formatDate(m.created_at)}</span>
                                             </div>
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Droplets className="w-3 h-3 text-sky-500" /> {t('history.humidity_label')}
-                                                </div>
-                                                <p className="text-sm font-black text-[#052E16]">{m.humidity}%</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Activity className="w-3 h-3 text-emerald-500" /> {t('history.nitrogen_label')}
-                                                </div>
-                                                <p className="text-sm font-black text-[#052E16]">{m.azote}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Activity className="w-3 h-3 text-orange-500" /> {t('history.phosphorus_label')}
-                                                </div>
-                                                <p className="text-sm font-black text-[#052E16]">{m.phosphore}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Activity className="w-3 h-3 text-purple-500" /> {t('history.potassium_label')}
-                                                </div>
-                                                <p className="text-sm font-black text-[#052E16]">{m.potassium}</p>
-                                            </div>
-                                            <div className="space-y-1">
-                                                <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
-                                                    <Activity className="w-3 h-3 text-amber-500" /> {t('history.ph_label')}
-                                                </div>
-                                                <p className="text-sm font-black text-[#052E16]">{m.ph}</p>
-                                            </div>
+                                            <h4 className="text-xl font-black text-[#052E16] tracking-tight">{getParcelleName(m.parcelle_id)}</h4>
                                         </div>
-
-                                        <button className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-[#052E16]/20 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-all self-end md:self-center">
-                                            <ChevronRight size={20} />
-                                        </button>
-
                                     </div>
-                                ))
-                            ) : (
-                                filteredData.map((r) => (
-                                    <div key={r.id} className="group bg-white/80 backdrop-blur-xl p-6 rounded-[32px] border border-emerald-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 flex flex-col md:flex-row md:items-center justify-between gap-6">
 
-                                        <div className="flex items-center gap-5">
-                                            <div className="w-14 h-14 bg-emerald-600 rounded-2xl flex flex-col items-center justify-center text-white">
-                                                <Sparkles className="w-5 h-5 text-lime-400" />
+                                    <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 md:gap-8 flex-grow max-w-2xl px-2">
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
+                                                <Thermometer className="w-3 h-3 text-rose-500" /> {t('history.temperature_label')}
                                             </div>
-
-                                            <div>
-                                                <div className="flex items-center gap-2 mb-1">
-                                                    <span className="text-[10px] text-emerald-600 font-black uppercase tracking-widest">{getParcelleName(r.parcelle_id)}</span>
-                                                    <span className="text-[10px] text-slate-400 font-bold">•</span>
-                                                    <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{formatDate(r.created_at)}</span>
-                                                </div>
-                                                <h4 className="text-xl font-black text-[#052E16] tracking-tight">{r.titre}</h4>
+                                            <p className="text-sm font-black text-[#052E16]">{m.temperature}°C</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
+                                                <Droplets className="w-3 h-3 text-sky-500" /> {t('history.humidity_label')}
                                             </div>
+                                            <p className="text-sm font-black text-[#052E16]">{m.humidity}%</p>
                                         </div>
-
-                                        <div className="flex-grow max-w-xl">
-                                            <p className="text-sm font-medium text-[#052E16]/60 line-clamp-2 leading-relaxed">
-                                                {r.description}
-                                            </p>
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
+                                                <Activity className="w-3 h-3 text-emerald-500" /> {t('history.nitrogen_label')}
+                                            </div>
+                                            <p className="text-sm font-black text-[#052E16]">{m.azote}</p>
                                         </div>
-
-                                        <button className="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 self-end md:self-center">
-                                            <ChevronRight size={20} />
-                                        </button>
-
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
+                                                <Activity className="w-3 h-3 text-orange-500" /> {t('history.phosphorus_label')}
+                                            </div>
+                                            <p className="text-sm font-black text-[#052E16]">{m.phosphore}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
+                                                <Activity className="w-3 h-3 text-purple-500" /> {t('history.potassium_label')}
+                                            </div>
+                                            <p className="text-sm font-black text-[#052E16]">{m.potassium}</p>
+                                        </div>
+                                        <div className="space-y-1">
+                                            <div className="flex items-center gap-2 text-[#052E16]/30 uppercase text-[8px] font-black tracking-widest">
+                                                <Activity className="w-3 h-3 text-amber-500" /> {t('history.ph_label')}
+                                            </div>
+                                            <p className="text-sm font-black text-[#052E16]">{m.ph}</p>
+                                        </div>
                                     </div>
-                                ))
-                            )}
+
+                                    <button className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center text-[#052E16]/20 group-hover:bg-emerald-50 group-hover:text-emerald-600 transition-all self-end md:self-center">
+                                        <ChevronRight size={20} />
+                                    </button>
+
+                                </div>
+                            ))}
                         </div>
                     )}
                 </div>
