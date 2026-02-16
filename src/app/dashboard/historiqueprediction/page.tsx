@@ -34,17 +34,41 @@ export default function HistoriquePredictionPage() {
     const loadData = async () => {
         try {
             setLoading(true);
-            const [measurementsRaw, parcellesData] = await Promise.all([
-                DonnEsDeCapteursService.getAllMeasurementsApiV1SensorDataSensorDataGet(),
-                parcelService.getParcelles()
-            ]);
-
-            const measurementsData = ensureArray(measurementsRaw);
-
+            // 1. Récupérer les parcelles de l'utilisateur
+            const parcellesData = await parcelService.getParcelles();
             setParcelles(parcellesData);
-            setMeasurements(measurementsData.sort((a: any, b: any) =>
+
+            if (parcellesData.length === 0) {
+                setMeasurements([]);
+                return;
+            }
+
+            // 2. Pour chaque parcelle, récupérer les mesures
+            const allMeasurementsPromises = parcellesData.map(p =>
+                DonnEsDeCapteursService.getMeasurementsByParcelleApiV1SensorDataSensorDataParcelleParcelleIdGet(
+                    String(p.id),
+                    0,
+                    50 // On récupère un nombre raisonnable par parcelle
+                ).catch(err => {
+                    console.error(`Error fetching measurements for parcel ${p.id}:`, err);
+                    return [];
+                })
+            );
+
+            const measurementsResults = await Promise.all(allMeasurementsPromises);
+
+            // 3. Aplatir et agréger toutes les mesures
+            const aggregatedMeasurements: any[] = [];
+            measurementsResults.forEach(res => {
+                const data = ensureArray(res);
+                aggregatedMeasurements.push(...data);
+            });
+
+            // 4. Trier par date décroissante et limiter les résultats globaux
+            setMeasurements(aggregatedMeasurements.sort((a: any, b: any) =>
                 new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-            ).slice(0, 10));
+            ).slice(0, 50));
+
         } catch (error) {
             console.error("Error loading data:", error);
         } finally {
