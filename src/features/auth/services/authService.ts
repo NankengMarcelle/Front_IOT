@@ -90,13 +90,22 @@ export const authService = {
         }
     },
 
-    updateProfile: async (data: { nom?: string, prenom?: string, telephone?: string, avatar?: string }) => {
+    updateProfile: async (data: {
+        nom?: string,
+        prenom?: string,
+        telephone?: string,
+        avatar?: string,
+        notification_modes?: string[],
+        recommendation_frequency?: string
+    }) => {
         try {
             const response = await UsersService.updateMyProfileApiV1UsersMePut({
                 nom: data.nom,
                 prenom: data.prenom,
                 telephone: data.telephone,
-                avatar: data.avatar
+                avatar: data.avatar,
+                notification_modes: data.notification_modes,
+                recommendation_frequency: data.recommendation_frequency
             }) as any;
             const user = response.data || response;
             const userDetails = { ...user, token: localStorage.getItem(TOKEN_KEY) };

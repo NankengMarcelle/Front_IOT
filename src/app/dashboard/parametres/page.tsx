@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { UsersService } from '@/lib';
+import { authService } from '@/features/auth/services/authService';
 import { toast } from 'sonner';
 import {
   Settings,
@@ -18,7 +19,7 @@ import {
 } from 'lucide-react';
 
 type NotificationMethod = 'email' | 'sms' | 'whatsapp' | 'telegram';
-type Frequency = 'hebdo' | 'mensuel' | 'trimestriel' | 'none';
+type Frequency = 'weekly' | 'monthly' | 'quarterly' | 'none';
 
 export default function ParametresPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function ParametresPage() {
 
   // Settings state: list of active notification modes
   const [activeModes, setActiveModes] = useState<string[]>([]);
-  const [frequency, setFrequency] = useState<Frequency>('hebdo');
+  const [frequency, setFrequency] = useState<Frequency>('weekly');
 
   useEffect(() => {
     const loadSettings = async () => {
@@ -75,14 +76,11 @@ export default function ParametresPage() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      // Update Notification Settings
-      await UsersService.updateNotificationSettingsApiV1UsersMeNotificationSettingsPut(activeModes);
-
-      // Note: Recommendation frequency might need its own endpoint or be part of user update
-      // user requested specific update for notification modes only for now.
-      // If frequency needs to be saved to backend, we'd need another call or update user profile.
-      // For now, let's persist frequency in local storage as before or assume it's handled if added to API later.
-      localStorage.setItem('recommendation_frequency', frequency);
+      // Met à jour le profil avec les nouveaux modes de notification et la fréquence
+      await authService.updateProfile({
+        notification_modes: activeModes,
+        recommendation_frequency: frequency
+      });
 
       toast.success("Préférences sauvegardées avec succès !");
     } catch (error) {
@@ -131,6 +129,21 @@ export default function ParametresPage() {
             </h1>
             <p className="text-[#052E16]/40 text-base md:text-lg font-medium italic">Gérez vos protocoles de communication et alertes critiques.</p>
           </div>
+
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full md:w-auto bg-[#052E16] text-white px-8 md:px-10 py-4 md:py-5 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-xl shadow-emerald-900/20 hover:bg-emerald-800 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 group border border-white/5"
+          >
+            {saving ? (
+              <Loader2 className="animate-spin w-5 h-5" />
+            ) : (
+              <>
+                <ShieldCheck size={20} className="text-lime-400 group-hover:rotate-12 transition-transform" />
+                Sauvegarder
+              </>
+            )}
+          </button>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
@@ -177,15 +190,6 @@ export default function ParametresPage() {
                 })}
               </div>
 
-              <div className="mt-10 md:mt-16 flex flex-col sm:flex-row items-center justify-end gap-6">
-                <button
-                  onClick={handleSave}
-                  disabled={saving}
-                  className="w-full sm:w-auto bg-[#052E16] text-white px-8 md:px-12 py-4 md:py-6 rounded-xl md:rounded-[32px] font-black text-[10px] md:text-xs uppercase tracking-widest shadow-2xl shadow-emerald-900/40 hover:bg-emerald-800 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50"
-                >
-                  {saving ? <Loader2 className="animate-spin w-5 h-5" /> : <><ShieldCheck size={20} className="text-lime-400" /> Sauvegarder</>}
-                </button>
-              </div>
             </div>
           </div>
 
@@ -209,9 +213,9 @@ export default function ParametresPage() {
 
               <div className="space-y-3">
                 {[
-                  { id: 'hebdo', label: 'Hebdomadaire' },
-                  { id: 'mensuel', label: 'Mensuel' },
-                  { id: 'trimestriel', label: 'Trimestriel' },
+                  { id: 'weekly', label: 'Hebdomadaire' },
+                  { id: 'monthly', label: 'Mensuel' },
+                  { id: 'quarterly', label: 'Trimestriel' },
                   { id: 'none', label: 'Désactivé' }
                 ].map((opt) => (
                   <button

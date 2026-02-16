@@ -7,5 +7,7 @@ export type UserUpdate = {
     prenom?: (string | null);
     telephone?: (string | null);
     avatar?: (string | null);
+    notification_modes?: string[];
+    recommendation_frequency?: string;
 };
 
