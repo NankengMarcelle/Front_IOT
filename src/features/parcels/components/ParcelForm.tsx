@@ -15,13 +15,11 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
     nom: initialData.nom,
     superficie: initialData.superficie,
     terrain_id: initialData.terrain_id || initialData.terrainId,
-    code: initialData.code || "",
     description: initialData.description || "",
   } : {
     nom: "",
     superficie: "",
     terrain_id: "",
-    code: "",
     description: "",
   });
 
@@ -97,7 +95,6 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
         nom: formData.nom,
         description: formData.description || null,
         superficie: Number(formData.superficie),
-        code: formData.code || null,
         terrainId: String(formData.terrain_id),
       };
 
@@ -191,34 +188,17 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {/* Nom */}
-              <div className="space-y-3">
-                <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Nom de la parcelle</label>
-                <div className="relative group">
-                  <input
-                    placeholder="Ex: Secteur Nord B1"
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-[24px] px-6 py-5 text-slate-800 font-bold outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50/50 transition-all text-lg"
-                    value={formData.nom}
-                    onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
-
-              {/* Code */}
-              <div className="space-y-3">
-                <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 flex items-center gap-2">
-                  <Tag className="w-3 h-3" /> Code ID
-                </label>
-                <div className="relative group">
-                  <input
-                    placeholder="Ex: PN-01"
-                    className="w-full bg-slate-50 border-2 border-slate-100 rounded-[24px] px-6 py-5 text-slate-800 font-bold outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50/50 transition-all text-lg"
-                    value={formData.code}
-                    onChange={(e) => setFormData({ ...formData, code: e.target.value })}
-                  />
-                </div>
+            {/* Nom */}
+            <div className="space-y-3">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2">Nom de la parcelle</label>
+              <div className="relative group">
+                <input
+                  placeholder="Ex: Secteur Nord B1"
+                  className="w-full bg-slate-50 border-2 border-slate-100 rounded-[24px] px-6 py-5 text-slate-800 font-bold outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50/50 transition-all text-lg"
+                  value={formData.nom}
+                  onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                  required
+                />
               </div>
             </div>
 
