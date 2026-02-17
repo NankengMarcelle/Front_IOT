@@ -4,6 +4,7 @@ import { terrainService } from "../../terrains/services/terrainService";
 import { parcelService } from "../services/parcelService";
 import { Tag, MapPin, Ruler, X, ChevronDown, AlignLeft, Sprout } from "lucide-react";
 import { toast } from "sonner";
+import SearchableSelect from "@/components/ui/SearchableSelect";
 
 export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
   const [loading, setLoading] = useState(false);
@@ -77,6 +78,11 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
     setError("");
 
     const superficieSaisie = Number(formData.superficie);
+
+    if (!formData.terrain_id) {
+      setError("Veuillez sélectionner un domaine parent.");
+      return;
+    }
 
     if (superficieSaisie <= 0) {
       setError("La superficie doit être un nombre positif.");
@@ -161,19 +167,16 @@ export default function ParcelForm({ initialData, onSuccess, onCancel }: any) {
                 <MapPin className="w-3 h-3" /> Domaine Parent
               </label>
               <div className="relative group">
-                <select
-                  disabled={!!initialData}
-                  className={`w-full border-2 border-slate-100 rounded-[24px] pl-6 pr-12 py-5 text-slate-800 font-bold outline-none focus:border-emerald-500 focus:bg-white focus:ring-4 focus:ring-emerald-50/50 transition-all appearance-none text-lg ${initialData ? 'bg-slate-50 opacity-60 cursor-not-allowed' : 'bg-slate-50 cursor-pointer'}`}
+                <SearchableSelect
+                  options={terrainsExistants.map((t) => ({
+                    id: t.id,
+                    label: t.nom,
+                  }))}
                   value={formData.terrain_id}
-                  onChange={(e) => setFormData({ ...formData, terrain_id: e.target.value })}
-                  required
-                >
-                  <option value="">Sélectionner domaine</option>
-                  {terrainsExistants.map(t => (
-                    <option key={t.id} value={t.id}>{t.nom}</option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none group-hover:text-emerald-500 transition-colors" />
+                  onChange={(val) => setFormData({ ...formData, terrain_id: val })}
+                  placeholder="Sélectionner domaine"
+                  disabled={!!initialData}
+                />
               </div>
 
               {/* Surface info feedback */}

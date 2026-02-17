@@ -4,6 +4,7 @@ import { terrainService } from "../services/terrainService";
 import { localiteService } from "../services/localiteService";
 import { ChevronDown, MapPin, AlignLeft, TreePine, X, Sprout } from "lucide-react";
 import { toast } from "sonner";
+import SearchableSelect from "@/components/ui/SearchableSelect";
 
 export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
   const [loading, setLoading] = useState(false);
@@ -157,24 +158,20 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
                 <MapPin className="w-3 h-3" /> Localisation
               </label>
               <div className="relative group">
-                <select
-                  className={`w-full bg-slate-50 border-2 rounded-[24px] pl-6 pr-12 py-5 text-slate-800 font-bold outline-none focus:bg-white focus:ring-4 transition-all appearance-none cursor-pointer text-lg disabled:opacity-60 disabled:cursor-not-allowed ${errors.localite_id ? 'border-rose-200 focus:border-rose-500 focus:ring-rose-50/50' : 'border-slate-100 focus:border-emerald-500 focus:ring-emerald-50/50'}`}
+                <SearchableSelect
+                  options={localites.map((l) => ({
+                    id: l.id,
+                    label: `${l.nom} - ${l.ville}`,
+                  }))}
                   value={formData.localite_id}
-                  onChange={(e) => {
-                    setFormData({ ...formData, localite_id: e.target.value });
+                  onChange={(val) => {
+                    setFormData({ ...formData, localite_id: val });
                     if (errors.localite_id) setErrors({ ...errors, localite_id: "" });
                   }}
-                  required
+                  placeholder="Sélectionner une zone"
                   disabled={!!initialData}
-                >
-                  <option value="">Sélectionner une zone</option>
-                  {localites.map((l) => (
-                    <option key={l.id} value={l.id}>
-                      {l.nom} - {l.ville}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="absolute right-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 pointer-events-none group-hover:text-emerald-500 transition-colors" />
+                  error={errors.localite_id}
+                />
                 {errors.localite_id && <p className="text-rose-500 text-xs mt-2 font-bold ml-2">{errors.localite_id}</p>}
               </div>
             </div>
