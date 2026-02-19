@@ -6,6 +6,7 @@ export const parcelService = {
     /**
      * RÉCUPÉRER TOUTES LES PARCELLES
      * Stratégie : Récupérer les terrains, puis pour chaque terrain récupérer ses parcelles
+     * OPTIMISÉ : Parallélisation des requêtes
      */
     getParcelles: async (): Promise<Parcelle[]> => {
         try {
@@ -15,66 +16,74 @@ export const parcelService = {
             const terrains = Array.isArray(terrainsResponse) ? terrainsResponse : (terrainsResponse.data || []);
             console.log(`Fetching parcelles: Found ${terrains.length} terrains`);
 
-            let allParcels: Parcelle[] = [];
+            if (terrains.length === 0) return [];
 
-            // 2. Pour chaque terrain, récupérer les parcelles
-            for (const terrain of terrains) {
+            // 2. Pour chaque terrain, récupérer les parcelles EN PARALLÈLE
+            const parcelsPromises = terrains.map(async (terrain: any) => {
                 try {
-                    console.log(`Fetching parcels for terrain: ${terrain.nom} (${terrain.id})`);
                     const parcellesRaw = await ParcellesService.getParcellesByTerrainApiV1ParcellesParcellesTerrainTerrainIdGet(terrain.id) as any;
                     const parcellesResponse = Array.isArray(parcellesRaw) ? parcellesRaw : (parcellesRaw.data || []);
 
-                    const enrichedParcels = await Promise.all(parcellesResponse.map(async (p: any) => {
-                        // 3. Enrichir avec les données de capteurs (Dernière mesure)
-                        let stats: Partial<SensorMeasurementsResponse> = {};
-                        try {
-                            const measurementsRaw = await DonnEsDeCapteursService.getMeasurementsByParcelleApiV1SensorDataSensorDataParcelleParcelleIdGet(
-                                p.id,
-                                0,
-                                1
-                            ) as any;
-                            const measurements = Array.isArray(measurementsRaw) ? measurementsRaw : (measurementsRaw.data || []);
-
-                            if (measurements && measurements.length > 0) {
-                                stats = measurements[0];
-                            }
-                        } catch (e) {
-                            // Pas de mesure ou 403, on ignore
-                        }
-
-                        // 4. Capteurs: On n'affiche plus l'ID du capteur, mais un statut si des données remonte
-                        const capteursListe = stats.id ? "Monitoring Actif" : "";
-
-                        // 5. Récupérer la culture éventuellement enregistrée localement
-                        const savedPredictions = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem('simulated_predictions') || '{}' : '{}');
-                        const savedCulture = savedPredictions[p.id];
-
-                        return {
-                            id: p.id,
-                            nom: p.nom,
-                            superficie: p.superficie,
-                            terrainId: terrain.id,
-                            code: p.code || 'N/A',
-                            description: p.description,
-                            azote: stats.azote || 0,
-                            phosphore: stats.phosphore || 0,
-                            potassium: stats.potassium || 0,
-                            humidite: stats.humidity || 0,
-                            temperature: stats.temperature || 0,
-                            ph: stats.ph || 0,
-                            culturePredite: savedCulture || "Non définie",
-                            hasMeasurements: !!(stats.id),
-                            capteursListe: capteursListe
-                        };
-                    }));
-
-                    allParcels = [...allParcels, ...enrichedParcels];
+                    // Ajouter l'info du terrain parent immédiatement pour éviter de la perdre
+                    return parcellesResponse.map((p: any) => ({ ...p, terrainInfo: terrain }));
                 } catch (err) {
-                    console.error(`Erreur lors de la récupération des parcelles pour terrain ${terrain.id} (${terrain.nom}):`, err);
-                    // On continue vers le prochain terrain sans crasher
+                    console.error(`Erreur récupération parcelles terrain ${terrain.id}`, err);
+                    return [];
                 }
-            }
+            });
 
+            // Attendre toutes les requêtes de parcelles
+            const parcelleGroups = await Promise.all(parcelsPromises);
+            // Aplatir le tableau de tableaux
+            const allRawParcels = parcelleGroups.flat();
+
+            console.log(`Fetching parcelles: Found ${allRawParcels.length} total raw parcels`);
+
+            // 3. Enrichir avec les données de capteurs (Dernière mesure) EN PARALLÈLE
+            const enrichedParcelsPromises = allRawParcels.map(async (p: any) => {
+                let stats: Partial<SensorMeasurementsResponse> = {};
+                try {
+                    const measurementsRaw = await DonnEsDeCapteursService.getMeasurementsByParcelleApiV1SensorDataSensorDataParcelleParcelleIdGet(
+                        p.id,
+                        0,
+                        1
+                    ) as any;
+                    const measurements = Array.isArray(measurementsRaw) ? measurementsRaw : (measurementsRaw.data || []);
+
+                    if (measurements && measurements.length > 0) {
+                        stats = measurements[0];
+                    }
+                } catch (e) {
+                    // Pas de mesure ou 403, on ignore
+                }
+
+                // 4. Capteurs: On n'affiche plus l'ID du capteur, mais un statut si des données remonte
+                const capteursListe = stats.id ? "Monitoring Actif" : "";
+
+                // 5. Récupérer la culture éventuellement enregistrée localement
+                const savedPredictions = JSON.parse(typeof window !== 'undefined' ? localStorage.getItem('simulated_predictions') || '{}' : '{}');
+                const savedCulture = savedPredictions[p.id];
+
+                return {
+                    id: p.id,
+                    nom: p.nom,
+                    superficie: p.superficie,
+                    terrainId: p.terrainInfo.id,
+                    code: p.code || 'N/A',
+                    description: p.description,
+                    azote: stats.azote || 0,
+                    phosphore: stats.phosphore || 0,
+                    potassium: stats.potassium || 0,
+                    humidite: stats.humidity || 0,
+                    temperature: stats.temperature || 0,
+                    ph: stats.ph || 0,
+                    culturePredite: savedCulture || "Non définie",
+                    hasMeasurements: !!(stats.id),
+                    capteursListe: capteursListe
+                };
+            });
+
+            const allParcels = await Promise.all(enrichedParcelsPromises);
             return allParcels;
 
         } catch (error) {

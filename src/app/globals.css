@@ -12,7 +12,6 @@
   body {
     /* Utilisation de la variable définie dans @theme */
     @apply text-agro-dark bg-white antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
     margin: 0;
     padding: 0;
   }

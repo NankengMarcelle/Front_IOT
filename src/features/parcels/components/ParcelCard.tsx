@@ -1,4 +1,5 @@
 import { useState } from "react";
+import NextImage from "next/image";
 import {
   Edit3,
   Trash2,
@@ -66,10 +67,13 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
       {/* Visual Header with Overlay */}
       <div className="relative h-48 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#052E16] to-[#1A4D2E] z-10 opacity-90 group-hover:opacity-100 transition-opacity"></div>
-        <img
+        <div className="absolute inset-0 bg-gradient-to-br from-[#052E16] to-[#1A4D2E] z-10 opacity-90 group-hover:opacity-100 transition-opacity"></div>
+        <NextImage
           src="/strawberry-field.jpg"
-          className="w-full h-full object-cover scale-110 group-hover:scale-125 transition-transform duration-[4s]"
+          fill
+          className="object-cover scale-110 group-hover:scale-125 transition-transform duration-[4s]"
           alt="Parcel"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
 
         <div className="absolute inset-0 z-20 p-8 flex flex-col justify-between">

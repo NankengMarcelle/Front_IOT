@@ -1,6 +1,7 @@
 "use client";
 
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { useTranslation } from '@/providers/TranslationProvider';
 import { ArrowRight, Leaf, Cpu, BarChart3, Shield, Zap, Target, Globe, ChevronDown, Cloud, Brain, Smartphone, Radio, FileText, ArrowLeft, Play, Layout, Users } from 'lucide-react';
 import React, { useState, useRef, RefObject } from 'react';
@@ -182,10 +183,12 @@ export default function LandingPage() {
                             <div className="relative group h-full flex items-center justify-center lg:justify-end">
                                 <div className="absolute -inset-10 bg-emerald-100/40 rounded-full blur-[100px] z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
                                 <div className="relative bg-white p-4 rounded-[56px] shadow-[0_64px_96px_-24px_rgba(0,0,0,0.12)] border border-emerald-50 transform hover:-translate-y-8 transition-all duration-700 w-full max-w-lg aspect-[5/6] overflow-hidden">
-                                    <img
+                                    <NextImage // Replaced img
                                         src="/strawberry-field.jpg"
                                         alt="Green field"
-                                        className="w-full h-full object-cover rounded-[48px] brightness-110 hover:scale-110 transition-transform duration-[2s]"
+                                        fill
+                                        className="object-cover rounded-[48px] brightness-110 hover:scale-110 transition-transform duration-[2s]"
+                                        sizes="(max-width: 768px) 100vw, 50vw"
                                     />
                                     <div className="absolute inset-x-8 bottom-8 p-8 bg-white/20 backdrop-blur-3xl rounded-[32px] border border-white/30 shadow-2xl flex items-center gap-6">
                                         <div className="w-16 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-xl">
@@ -221,9 +224,12 @@ export default function LandingPage() {
                     <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-24 items-center">
                         <div className="relative aspect-square">
                             <div className="absolute inset-0 bg-emerald-500 rounded-[56px] rotate-3 opacity-20 transform group-hover:rotate-6 transition-transform"></div>
-                            <img
+                            <NextImage // Replaced img
                                 src="/handful-soil-being-sprinkled-agricultural-land.jpg"
-                                className="relative w-full h-full object-cover rounded-[56px] shadow-2xl grayscale-[20%] hover:grayscale-0 transition-all duration-1000"
+                                alt="Soil"
+                                fill
+                                className="object-cover rounded-[56px] shadow-2xl grayscale-[20%] hover:grayscale-0 transition-all duration-1000"
+                                sizes="(max-width: 768px) 100vw, 50vw"
                             />
                             <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/40 backdrop-blur-2xl rounded-[40px] border border-white/40 shadow-xl p-8 flex flex-col justify-center">
                                 <p className="text-[#052E16] text-4xl font-black tracking-tighter">1.5M</p>
@@ -286,9 +292,12 @@ export default function LandingPage() {
                 <section ref={ctaRef} className="py-32 bg-[#052E16] relative overflow-hidden group">
                     {/* Premium CTA Background Image */}
                     <div className="absolute inset-0 z-0">
-                        <img
+                        <NextImage // Replaced img
                             src="/agriculture-healthy-food.jpg"
-                            className="w-full h-full object-cover opacity-60 transform group-hover:scale-105 transition-transform duration-[4s]"
+                            alt="Agriculture"
+                            fill
+                            className="object-cover opacity-60 transform group-hover:scale-105 transition-transform duration-[4s]"
+                            sizes="100vw"
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-[#052E16] via-[#052E16]/60 to-transparent"></div>
                     </div>
