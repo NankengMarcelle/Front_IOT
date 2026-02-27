@@ -13,13 +13,16 @@ import {
   Sparkles,
   Loader2,
   RefreshCw,
-  Signal
+  Signal,
+  History
 } from "lucide-react";
 import { predictionService } from "@/features/predictions/services/predictionService";
 import { toast } from "sonner";
 import { useConfirmDialog } from "@/components/ConfirmDialog";
+import { useTranslation } from "@/providers/TranslationProvider";
 
 export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRefresh }: any) {
+  const { t } = useTranslation();
   const { confirm } = useConfirmDialog();
   const [localPrediction, setLocalPrediction] = useState<string | null>(null);
   const [isPredicting, setIsPredicting] = useState(false);
@@ -184,6 +187,13 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
                         Refaire l'analyse
                       </button>
                       <button
+                        onClick={() => window.location.href = `/dashboard/parcelles/${parcel.id}/history`}
+                        className="text-[8px] font-black text-emerald-900/30 uppercase tracking-widest hover:text-emerald-600 transition-colors flex items-center gap-1"
+                      >
+                        <History className="w-2.5 h-2.5" />
+                        {t('parcelles_list.view_measurements')}
+                      </button>
+                      <button
                         onClick={() => window.location.href = `/dashboard/predictions?parcelId=${parcel.id}`}
                         className="text-[8px] font-black text-emerald-900/30 uppercase tracking-widest hover:text-emerald-600 transition-colors"
                       >
@@ -192,13 +202,22 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
                     </div>
                   </div>
                 ) : (
-                  <button
-                    onClick={handleQuickPredict}
-                    className="w-full bg-[#052E16] text-white py-3 rounded-2xl font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-xl shadow-emerald-900/5"
-                  >
-                    <Sparkles className="w-3 h-3 text-lime-400" />
-                    Prédire la Culture
-                  </button>
+                  <>
+                    <button
+                      onClick={handleQuickPredict}
+                      className="w-full bg-[#052E16] text-white py-3 rounded-2xl font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-xl shadow-emerald-900/5"
+                    >
+                      <Sparkles className="w-3 h-3 text-lime-400" />
+                      Prédire la Culture
+                    </button>
+                    <button
+                      onClick={() => window.location.href = `/dashboard/parcelles/${parcel.id}/history`}
+                      className="mt-4 w-full bg-white text-[#052E16] border border-emerald-100 py-3 rounded-2xl font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 hover:bg-emerald-50 transition-all"
+                    >
+                      <History className="w-3 h-3 text-emerald-600" />
+                      {t('parcelles_list.view_measurements')}
+                    </button>
+                  </>
                 )}
               </div>
             </div>

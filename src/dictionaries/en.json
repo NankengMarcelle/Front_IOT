@@ -83,7 +83,9 @@
     "search_placeholder": "Search for a unit...",
     "no_parcel_title": "No parcels defined",
     "no_parcel_desc": "Divide your land for ultra-precise management and start receiving your first AI reports.",
-    "unknown_terrain": "Unknown Terrain"
+    "unknown_terrain": "Unknown Terrain",
+    "view_measurements": "View Measurements",
+    "history_title": "Measurement History"
   },
   "history": {
     "title": "History",
@@ -307,7 +309,12 @@
     "confirm_culture": "Confirm this culture",
     "applied_success": "Successfully applied",
     "select_zone_message": "Please select a zone to start analysis.",
-    "no_parcels": "No parcels found"
+    "no_parcels": "No parcels found",
+    "other_crops": "Other potential crops",
+    "confidence": "Confidence",
+    "rank": "Rank",
+    "view_details": "View analytical details",
+    "hide_details": "Hide details"
   },
   "recommandations": {
     "title": "AI Expert Chat",

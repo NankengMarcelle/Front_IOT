@@ -33,18 +33,18 @@ export const predictionService = {
       }
 
       const result = await response.json();
-      console.log(result);
-      // L'API retourne un objet avec recommended_crop, confidence_score, justification, etc.
-      const predictedCrop = result.data.recommended_crop || "Non déterminé";
-      const confidence = result.data.confidence_score ? Math.round(result.confidence_score * 100) : null;
-      const justification = result.data.justification || result.expert_details?.final_response || "";
+      const predictionData = result.data || result;
+
+      const predictedCrop = predictionData.recommended_crop || "Non déterminé";
+      const confidence = predictionData.confidence_score ? Math.round(predictionData.confidence_score * 100) : null;
+      const justification = predictionData.justification || predictionData.expert_details?.final_response || "";
 
       return {
         culture: predictedCrop,
         raison: justification || `Culture recommandée basée sur l'analyse des données de capteurs.`,
         rendement: confidence ? `${confidence}% de confiance` : "Calculé par IA",
-        mlDetails: result.ml_details,
-        expertDetails: result.expert_details
+        mlDetails: predictionData.ml_details || result.ml_details,
+        expertDetails: predictionData.expert_details || result.expert_details
       };
     } catch (error: any) {
       console.error("Prediction Error:", error);

@@ -83,7 +83,9 @@
     "search_placeholder": "Chercher une unité...",
     "no_parcel_title": "Aucune parcelle définie",
     "no_parcel_desc": "Divisez vos terrains pour une gestion ultra-précise et commencez à recevoir vos premiers rapports IA.",
-    "unknown_terrain": "Terrain Inconnu"
+    "unknown_terrain": "Terrain Inconnu",
+    "view_measurements": "Voir les mesures",
+    "history_title": "Historique des mesures"
   },
   "history": {
     "title": "Historique",
@@ -307,7 +309,12 @@
     "confirm_culture": "Confirmer cette culture",
     "applied_success": "Appliquée avec succès",
     "select_zone_message": "Veuillez sélectionner une zone pour démarrer l'analyse.",
-    "no_parcels": "Aucune parcelle trouvée"
+    "no_parcels": "Aucune parcelle trouvée",
+    "other_crops": "Autres cultures potentielles",
+    "confidence": "Confiance",
+    "rank": "Rang",
+    "view_details": "Voir les détails analytiques",
+    "hide_details": "Masquer les détails"
   },
   "recommandations": {
     "title": "Chat Expert IA",

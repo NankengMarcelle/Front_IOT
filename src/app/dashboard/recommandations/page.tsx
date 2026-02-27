@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "next/navigation";
 import { parcelService } from "@/features/parcels/services/parcelService";
 import { terrainService } from "@/features/terrains/services/terrainService";
 import { recommendationService } from "@/features/recommendations/services/recommendationService";
@@ -12,6 +13,8 @@ import { Bot, User, Loader2, Send, Sparkles, MapPin, ChevronRight, MessageSquare
 
 export default function RecommandationsPage() {
   const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const initialParcelId = searchParams.get('parcelId');
   const [parcelles, setParcelles] = useState<any[]>([]);
   const [filteredParcelles, setFilteredParcelles] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -43,6 +46,14 @@ export default function RecommandationsPage() {
         const parcellesData = await parcelService.getParcelles();
         setParcelles(parcellesData);
         setFilteredParcelles(parcellesData);
+
+        // Auto-select parcel if parcelId is in URL
+        if (initialParcelId) {
+          const parcelToSelect = parcellesData.find(p => String(p.id) === String(initialParcelId));
+          if (parcelToSelect) {
+            handleParcelSelect(initialParcelId);
+          }
+        }
       } catch (e) {
         console.error("Error loading parcelles:", e);
       }

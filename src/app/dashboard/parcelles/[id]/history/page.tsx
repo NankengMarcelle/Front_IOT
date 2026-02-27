@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import { DonnEsDeCapteursService } from "@/lib";
 import { parcelService } from "@/features/parcels/services/parcelService";
 import {
@@ -14,14 +15,17 @@ import {
     Activity,
     ChevronRight,
     RefreshCw,
-    RadioTower
+    RadioTower,
+    ArrowLeft
 } from "lucide-react";
 import { useTranslation } from "@/providers/TranslationProvider";
 
-export default function HistoriquePredictionPage() {
+export default function ParcelHistoryPage() {
+    const { id } = useParams();
+    const router = useRouter();
     const { t } = useTranslation();
     const [measurements, setMeasurements] = useState<any[]>([]);
-    const [parcelles, setParcelles] = useState<any[]>([]);
+    const [parcel, setParcel] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
 
@@ -32,42 +36,31 @@ export default function HistoriquePredictionPage() {
     };
 
     const loadData = async () => {
+        if (!id) return;
         try {
             setLoading(true);
-            // 1. Récupérer les parcelles de l'utilisateur
-            const parcellesData = await parcelService.getParcelles();
-            setParcelles(parcellesData);
 
-            if (parcellesData.length === 0) {
-                setMeasurements([]);
-                return;
-            }
+            // 1. Fetch parcel info
+            const parcels = await parcelService.getParcelles();
+            const currentParcel = parcels.find((p: any) => String(p.id) === String(id));
+            setParcel(currentParcel);
 
-            // 2. Pour chaque parcelle, récupérer les mesures
-            const allMeasurementsPromises = parcellesData.map(p =>
-                DonnEsDeCapteursService.getMeasurementsByParcelleApiV1SensorDataSensorDataParcelleParcelleIdGet(
-                    String(p.id),
-                    0,
-                    50 // On récupère un nombre raisonnable par parcelle
-                ).catch(err => {
-                    console.error(`Error fetching measurements for parcel ${p.id}:`, err);
-                    return [];
-                })
-            );
-
-            const measurementsResults = await Promise.all(allMeasurementsPromises);
-
-            // 3. Aplatir et agréger toutes les mesures
-            const aggregatedMeasurements: any[] = [];
-            measurementsResults.forEach(res => {
-                const data = ensureArray(res);
-                aggregatedMeasurements.push(...data);
+            // 2. Fetch measurements for this parcel
+            const res = await DonnEsDeCapteursService.getMeasurementsByParcelleApiV1SensorDataSensorDataParcelleParcelleIdGet(
+                String(id),
+                0,
+                100
+            ).catch(err => {
+                console.error(`Error fetching measurements for parcel ${id}:`, err);
+                return [];
             });
 
-            // 4. Trier par date décroissante et limiter les résultats globaux
-            setMeasurements(aggregatedMeasurements.sort((a: any, b: any) =>
+            const data = ensureArray(res);
+
+            // 3. Sort by date
+            setMeasurements(data.sort((a: any, b: any) =>
                 new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
-            ).slice(0, 50));
+            ));
 
         } catch (error) {
             console.error("Error loading data:", error);
@@ -78,17 +71,7 @@ export default function HistoriquePredictionPage() {
 
     useEffect(() => {
         loadData();
-    }, []);
-
-    const getParcelleName = (parcelleId: string | number) => {
-        const p = parcelles.find(p => String(p.id) === String(parcelleId));
-        return p ? p.nom : t('history.unknown_parcel');
-    };
-
-    const getParcelleCode = (parcelleId: string | number) => {
-        const p = parcelles.find(p => String(p.id) === String(parcelleId));
-        return p ? p.code : '---';
-    };
+    }, [id]);
 
     const formatDate = (dateStr: string) => {
         const locale = t('welcome.lang') === 'FR' ? 'fr-FR' : 'en-US';
@@ -102,7 +85,6 @@ export default function HistoriquePredictionPage() {
     };
 
     const filteredData = measurements.filter(m =>
-        getParcelleName(m.parcelle_id).toLowerCase().includes(searchTerm.toLowerCase()) ||
         m.capteur_id?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
@@ -120,13 +102,20 @@ export default function HistoriquePredictionPage() {
                     {/* Header */}
                     <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-10 md:mb-16">
                         <div>
+                            <button
+                                onClick={() => router.back()}
+                                className="flex items-center gap-2 text-emerald-600 font-black uppercase tracking-widest text-[10px] mb-6 hover:translate-x-[-4px] transition-transform"
+                            >
+                                <ArrowLeft className="w-4 h-4" />
+                                {t('profile_page.cancel')}
+                            </button>
                             <div className="inline-flex items-center gap-2 bg-emerald-50 px-3 py-1.5 rounded-full mb-4 border border-emerald-100">
                                 <History className="w-3.5 h-3.5 text-emerald-600" />
-                                <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">{t('history.transmission_logs')}</span>
+                                <span className="text-emerald-800 text-[10px] font-black uppercase tracking-widest">{parcel?.nom || t('history.transmission_logs')}</span>
                             </div>
                             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-[0.9]">
-                                {t('history.title')}<br />
-                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">{t('history.global_title')}</span>
+                                {t('parcelles_list.history_title')}<br />
+                                <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">{parcel?.nom || "..."}</span>
                             </h1>
                         </div>
 
@@ -196,10 +185,12 @@ export default function HistoriquePredictionPage() {
                                                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{formatDate(m.created_at)}</span>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <h4 className="text-xl font-black text-[#052E16] tracking-tight">{getParcelleName(m.parcelle_id)}</h4>
-                                                <span className="px-2 py-0.5 bg-slate-50 text-slate-500 text-[8px] font-black uppercase tracking-widest rounded-md border border-slate-100">
-                                                    {getParcelleCode(m.parcelle_id)}
-                                                </span>
+                                                <h4 className="text-xl font-black text-[#052E16] tracking-tight">{parcel?.nom || t('history.unknown_parcel')}</h4>
+                                                {parcel?.code && (
+                                                    <span className="px-2 py-0.5 bg-slate-50 text-slate-500 text-[8px] font-black uppercase tracking-widest rounded-md border border-slate-100">
+                                                        {parcel.code}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
                                     </div>
