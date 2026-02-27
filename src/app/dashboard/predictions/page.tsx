@@ -190,6 +190,51 @@ export default function PredictionsPage() {
                         </p>
                       </div>
 
+                      {/* Top 3 Predictions */}
+                      {prediction.mlDetails?.top3_global && prediction.mlDetails.top3_global.length > 0 && (
+                        <div className="mt-8 space-y-4">
+                          <h3 className="text-sm md:text-md font-black text-[#052E16] uppercase tracking-widest flex items-center gap-2">
+                            <BrainCircuit className="w-5 h-5 text-emerald-600" />
+                            Alternatives (Top 3)
+                          </h3>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            {prediction.mlDetails.top3_global.map((item: any, idx: number) => (
+                              <div
+                                key={idx}
+                                className={`bg-white rounded-[24px] p-5 shadow-sm border ${idx === 0 ? 'border-lime-400' : 'border-emerald-50'} hover:shadow-md hover:border-emerald-200 transition-all cursor-pointer group/card relative overflow-hidden`}
+                                onClick={() => {
+                                  if (prediction) {
+                                    setPrediction({
+                                      ...prediction,
+                                      culture: item.culture,
+                                      raison: prediction.detailedJustifications?.[item.culture] || prediction.raison
+                                    });
+                                  }
+                                }}
+                              >
+                                {idx === 0 && (
+                                  <div className="absolute top-0 right-0 w-16 h-16 bg-lime-400/20 rounded-full blur-xl -translate-y-1/2 translate-x-1/2"></div>
+                                )}
+                                <div className="flex justify-between items-start mb-3 relative z-10">
+                                  <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${idx === 0 ? 'bg-lime-100 text-lime-700' : 'bg-slate-100 text-slate-500'}`}>
+                                    Rang {item.rang || (idx + 1)}
+                                  </span>
+                                  <span className="text-sm font-black text-emerald-600">
+                                    {Math.round(item.confiance_agregee || item.confiance || 0)}%
+                                  </span>
+                                </div>
+                                <h4 className="text-xl font-black text-[#052E16] tracking-tight mb-2 relative z-10">{item.culture}</h4>
+                                {prediction.detailedJustifications?.[item.culture] && (
+                                  <p className="text-xs text-[#052E16]/60 line-clamp-3 relative z-10">
+                                    {prediction.detailedJustifications[item.culture]}
+                                  </p>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className="pt-8 md:pt-10">
                         <button
                           onClick={handleApply}

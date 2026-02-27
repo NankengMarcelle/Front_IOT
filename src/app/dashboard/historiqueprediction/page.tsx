@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { DonnEsDeCapteursService } from "@/lib";
 import { parcelService } from "@/features/parcels/services/parcelService";
 import {
@@ -20,10 +21,12 @@ import { useTranslation } from "@/providers/TranslationProvider";
 
 export default function HistoriquePredictionPage() {
     const { t } = useTranslation();
+    const searchParams = useSearchParams();
+    const initialSearch = searchParams.get("search") || "";
     const [measurements, setMeasurements] = useState<any[]>([]);
     const [parcelles, setParcelles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState("");
+    const [searchTerm, setSearchTerm] = useState(initialSearch);
 
     const ensureArray = (data: any) => {
         if (Array.isArray(data)) return data;
@@ -98,7 +101,8 @@ export default function HistoriquePredictionPage() {
 
     const filteredData = measurements.filter(m =>
         getParcelleName(m.parcelle_id).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        m.capteur_id?.toLowerCase().includes(searchTerm.toLowerCase())
+        m.capteur_id?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        (parcelles.find(p => String(p.id) === String(m.parcelle_id))?.code || '').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
@@ -186,6 +190,9 @@ export default function HistoriquePredictionPage() {
                                             <div className="flex items-center gap-2 mb-1">
                                                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[8px] font-black uppercase tracking-widest rounded-md border border-emerald-100">
                                                     ID: {m.capteur_id?.substring(0, 8)}...
+                                                </span>
+                                                <span className="px-2 py-0.5 bg-lime-50 text-lime-700 text-[8px] font-black uppercase tracking-widest rounded-md border border-lime-100">
+                                                    Code: {parcelles.find(p => String(p.id) === String(m.parcelle_id))?.code || 'N/A'}
                                                 </span>
                                                 <span className="text-[10px] text-slate-400 font-bold">•</span>
                                                 <span className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{formatDate(m.created_at)}</span>

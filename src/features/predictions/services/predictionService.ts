@@ -1,6 +1,6 @@
 import { DonnEsDeCapteursService } from "@/lib";
 
-const PREDICTION_API_URL = process.env.NEXT_PUBLIC_PREDICTION_API_URL || 'https://crops-predictions.onrender.com';
+const PREDICTION_API_URL = process.env.NEXT_PUBLIC_PREDICTION_API_URL || 'http://10.179.122.83:8000';
 
 export const predictionService = {
   /**
@@ -9,7 +9,7 @@ export const predictionService = {
    */
   getPrediction: async (parcelId: string) => {
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'https://iot-soil-backend.onrender.com';
+      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
       // Récupérer le token pour l'authentification
       const token = typeof window !== 'undefined' ? localStorage.getItem('smartagro_token') : '';
@@ -34,17 +34,19 @@ export const predictionService = {
 
       const result = await response.json();
       console.log(result);
+      const responseData = result.data || result;
       // L'API retourne un objet avec recommended_crop, confidence_score, justification, etc.
-      const predictedCrop = result.data.recommended_crop || "Non déterminé";
-      const confidence = result.data.confidence_score ? Math.round(result.confidence_score * 100) : null;
-      const justification = result.data.justification || result.expert_details?.final_response || "";
+      const predictedCrop = responseData.recommended_crop || "Non déterminé";
+      const confidence = responseData.confidence_score ? Math.round(responseData.confidence_score) : null;
+      const justification = responseData.justification || responseData.expert_details?.final_response || "";
 
       return {
         culture: predictedCrop,
         raison: justification || `Culture recommandée basée sur l'analyse des données de capteurs.`,
         rendement: confidence ? `${confidence}% de confiance` : "Calculé par IA",
-        mlDetails: result.ml_details,
-        expertDetails: result.expert_details
+        mlDetails: responseData.ml_details,
+        expertDetails: responseData.expert_details,
+        detailedJustifications: responseData.detailed_justifications
       };
     } catch (error: any) {
       console.error("Prediction Error:", error);

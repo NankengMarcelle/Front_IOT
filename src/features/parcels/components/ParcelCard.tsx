@@ -13,7 +13,8 @@ import {
   Sparkles,
   Loader2,
   RefreshCw,
-  Signal
+  Signal,
+  History
 } from "lucide-react";
 import { predictionService } from "@/features/predictions/services/predictionService";
 import { toast } from "sonner";
@@ -82,6 +83,13 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
               {parcel.code || 'Unit-Ref'}
             </div>
             <div className="flex gap-2">
+              <button
+                onClick={() => window.location.href = `/dashboard/historiqueprediction?search=${parcel.code || ''}`}
+                className="w-10 h-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl flex items-center justify-center text-white hover:bg-emerald-500/50 transition-all font-black"
+                title="Historique"
+              >
+                <History className="w-4 h-4" />
+              </button>
               <button
                 onClick={onEdit}
                 className="w-10 h-10 bg-white/10 backdrop-blur-xl border border-white/20 rounded-xl flex items-center justify-center text-white hover:bg-white/20 transition-all"
