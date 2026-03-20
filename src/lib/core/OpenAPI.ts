@@ -20,9 +20,9 @@ export type OpenAPIConfig = {
 };
 
 export const OpenAPI: OpenAPIConfig = {
-    BASE: process.env.NEXT_PUBLIC_API_URL || 'https://iot-soil-backend.onrender.com',
-    VERSION: '1.0.0',
-    WITH_CREDENTIALS: false,
+    BASE: 'https://iotsoilbackend-production.up.railway.app',
+    VERSION: '0.1.0',
+    WITH_CREDENTIALS: true,
     CREDENTIALS: 'include',
     TOKEN: async () => {
         if (typeof window !== 'undefined') {

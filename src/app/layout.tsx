@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { TranslationProvider } from "@/providers/TranslationProvider";
+import { ConfirmDialogProvider } from "@/components/ConfirmDialog";
+import { Toaster } from 'sonner';
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Smart Agro",
@@ -14,10 +19,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr">
-      <body className="antialiased">
+      <body className={`${inter.className} antialiased`}>
         <TranslationProvider>
-          {children}
+          <ConfirmDialogProvider>
+            {children}
+          </ConfirmDialogProvider>
         </TranslationProvider>
+        <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
   );

@@ -3,6 +3,9 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+import DashboardHeader from "@/components/layout/Header";
+import DashboardFooter from "@/components/layout/Footer";
+
 export default function DashboardLayout({
     children,
 }: {
@@ -15,7 +18,7 @@ export default function DashboardLayout({
         const userStr = localStorage.getItem("smartagro_user");
         const token = localStorage.getItem("smartagro_token");
 
-        if (!userStr || !token) {
+        if (!userStr || userStr === "undefined" || !token) {
             router.push("/login");
         } else {
             setIsAuthorized(true);
@@ -30,5 +33,13 @@ export default function DashboardLayout({
         );
     }
 
-    return <>{children}</>;
+    return (
+        <div className="min-h-screen bg-[#F8FAF9] flex flex-col">
+            <DashboardHeader />
+            <div className="flex-1 flex flex-col pt-24">
+                {children}
+            </div>
+            <DashboardFooter />
+        </div>
+    );
 }

@@ -8,7 +8,10 @@
     "terrains": "Terrains",
     "parcelles": "Parcels",
     "sensors": "Sensors",
+    "history": "History",
+    "ia_chat": "AI Chat",
     "profile": "Profile",
+    "settings": "Settings",
     "about": "About Us",
     "login": "Login",
     "logout": "Logout",
@@ -46,7 +49,21 @@
     "superficie": "Surface Area",
     "modify": "Edit",
     "delete": "Delete",
-    "delete_confirm": "Do you want to delete this terrain?"
+    "delete_confirm": "Do you want to delete this terrain ?",
+    "patrimoine_foncier": "Land Heritage",
+    "your_title": "Your",
+    "exploitations_title": "Exploitations.",
+    "search_placeholder": "Locate a site...",
+    "add_terrain": "Add Terrain",
+    "no_terrain_title": "No terrains registered",
+    "no_terrain_desc": "The adventure begins with a simple coordinate. Register your first site to start the analysis.",
+    "total_surface": "Total Surface Area",
+    "typology": "Typology",
+    "edit_title": "Edit Terrain",
+    "new_title": "New Terrain",
+    "delete_confirm_title": "Delete terrain?",
+    "delete_confirm_desc": "Do you really want to delete this terrain? This action is irreversible and will delete all associated data.",
+    "delete_error": "Cannot delete this terrain. Make sure it does not contain any linked parcels or data."
   },
   "parcelles_list": {
     "title": "My Parcels",
@@ -54,16 +71,42 @@
     "no_parcelles": "No parcels for now",
     "delete_confirm": "Delete ?",
     "analysis_ongoing": "Analysis ongoing",
-    "no_sensor": "No sensor"
+    "no_sensor": "No sensor",
+    "delete_confirm_desc": "Are you sure you want to delete this parcel? This action is irreversible.",
+    "delete_confirm_sensors": "This parcel has {{count}} sensor(s) assigned. They will be automatically unassigned before deletion. Do you want to continue?",
+    "delete_title": "Delete parcel",
+    "edit_title": "Edit Parcel",
+    "new_title": "New Parcel",
+    "segmentation_agricole": "Agricultural Segmentation",
+    "your_title": "Your",
+    "units_title": "Culture Units.",
+    "search_placeholder": "Search for a unit...",
+    "no_parcel_title": "No parcels defined",
+    "no_parcel_desc": "Divide your land for ultra-precise management and start receiving your first AI reports.",
+    "unknown_terrain": "Unknown Terrain"
   },
   "history": {
-    "title": "Analysis History",
+    "title": "History",
     "subtitle": "Time tracking of AI recommendations",
     "total": "Total",
     "no_analysis": "No analysis has been performed yet.",
     "date_column": "Analysis Date",
     "parcel_column": "Parcel",
-    "culture_column": "Recommended Culture"
+    "culture_column": "Recommended Culture",
+    "unknown_parcel": "Unknown Parcel",
+    "transmission_logs": "Transmission Logs",
+    "global_title": "Global.",
+    "search_placeholder": "Search...",
+    "measurements": "Measurements",
+    "predictions": "Predictions",
+    "no_data_found": "No data found",
+    "no_data_desc": "Data will appear here as soon as it is available.",
+    "temperature_label": "Temper.",
+    "humidity_label": "Humid.",
+    "nitrogen_label": "Nitrogen (N)",
+    "phosphorus_label": "Phos. (P)",
+    "potassium_label": "Potas. (K)",
+    "ph_label": "Soil pH"
   },
   "activities": {
     "title": "Activity Log"
@@ -83,23 +126,142 @@
     "success": "Profile updated!",
     "langLabel": "Language"
   },
+  "common": {
+    "loading": "Loading...",
+    "expert_agro": "Agro Expert",
+    "agricultural": "Agricultural"
+  },
   "landing": {
+    "nav": {
+      "solution": "The Solution",
+      "expertise": "Expertise"
+    },
+    "hero": {
+      "title_line1": "Cultivate the",
+      "title_line2": "Digital Future.",
+      "subtitle": "Exceed traditional methods. Connect your soils to a predictive intelligence that revolutionizes every harvest.",
+      "cta": {
+        "vision": "Our vision",
+        "more": "Learn more"
+      }
+    },
+    "stats": {
+      "yield": "More Yield",
+      "water": "Water Savings",
+      "security": "Safety & Monitoring"
+    },
+    "solution": {
+      "vocation": "Our Mission",
+      "title_line1": "Never walk",
+      "title_line2": "blindly again.",
+      "desc": "Traditional agronomy is an art. We make it an exact science, powered by cutting-edge sensors that look into the invisible for you.",
+      "points": {
+        "point1": {
+          "title": "Raw Data to Insight",
+          "desc": "Transform your N-P-K measurements into concrete recommendations."
+        },
+        "point2": {
+          "title": "Climate Anticipation",
+          "desc": "Random Forest prediction integrating 7-day weather flows."
+        }
+      }
+    },
+    "features": {
+      "section_label": "Technical Expertise",
+      "section_title": "An Army of Precision.",
+      "precision": {
+        "title": "Precision Agriculture",
+        "desc": "Provide exactly what your land demands, at the right time."
+      },
+      "speed": {
+        "title": "Instant Reactions",
+        "desc": "Be alerted in real-time to prevent any risk to your crops."
+      },
+      "interface": {
+        "title": "Intuitive Interface",
+        "desc": "Simplified management accessible from any device."
+      }
+    },
+    "infra": {
+      "title_line1": "An Unbreakable",
+      "title_line2": "Infrastructure."
+    },
+    "tech": {
+      "iot": {
+        "title": "IoT Sensors",
+        "desc": "LoRaWAN sensors measuring N, P, K, pH, humidity, temperature",
+        "details": "Unique DevEUI • Long range"
+      },
+      "ai": {
+        "title": "AI Intelligence",
+        "desc": "Random Forest algorithm for maximum precision",
+        "details": "Advanced ML • 360° Analysis"
+      },
+      "cloud": {
+        "title": "Scalable Cloud",
+        "desc": "Real-time data processing on cloud infrastructure",
+        "details": "High Availability"
+      }
+    },
+    "cta": {
+      "title": "Start Today.",
+      "subtitle": "Free for 14 days. No credit card required.",
+      "button_main": "Join the Adventure"
+    },
     "hero_title": "Cultivating the Future",
     "hero_subtitle": "Smart Agro combines the wisdom of the earth with the power of technology for more sustainable and high-performing agriculture.",
     "mission_title": "Our Mission",
     "mission_p1": "At <strong>Smart Agro</strong>, we believe every farmer deserves a precise view of their crops. Using cutting-edge IoT sensors and AI algorithms, we transform soil data into concrete decisions.",
     "mission_p2": "Our goal is to maximize your yields while optimizing the use of natural resources like water and nutrients.",
-    "features": {
-      "sustainability_title": "Sustainability",
-      "sustainability_desc": "Preserving soil for future generations.",
-      "iot_title": "IoT Innovation",
-      "iot_desc": "Real-time monitoring of your parcels.",
-      "ai_title": "Artificial Intelligence",
-      "ai_desc": "Precise predictions for every crop type."
-    },
     "team_title": "Our Team",
     "cta_title": "Ready to optimize your crops?",
     "cta_button": "Get Started Now"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome back",
+      "subtitle": "Log in to your ecosystem",
+      "email_label": "Email",
+      "password_label": "Password",
+      "admin_code_label": "Admin Code",
+      "submit": "Log In",
+      "loading": "Authenticating...",
+      "forgot_password": "Forgot Password?",
+      "create_account": "Create an account",
+      "back_to_home": "Back to Home",
+      "error_admin_code": "Incorrect administrator security code.",
+      "toast_loading": "Logging in...",
+      "toast_success": "Login successful! Welcome.",
+      "invalid_credentials": "Invalid credentials"
+    },
+    "register": {
+      "title": "Create an account",
+      "step": "Step {{step}} of 2",
+      "firstname": "First Name",
+      "lastname": "Last Name",
+      "phone": "Phone",
+      "email_label": "Email",
+      "password_label": "Password",
+      "confirm_password_label": "Confirm",
+      "submit": "Register",
+      "continue": "Continue",
+      "already_have_account": "Already have an account? ",
+      "toast_loading": "Creating your account...",
+      "toast_success": "Account created successfully! Welcome.",
+      "error_fields": "Please fill in your first and last name",
+      "error_passwords_match": "Passwords do not match",
+      "registration_failed": "Registration failed"
+    },
+    "forgot_password": {
+      "title": "Forgot Password",
+      "subtitle": "Recover access to your account",
+      "email_label": "Recovery Email",
+      "submit": "Send Link",
+      "loading": "Sending link...",
+      "success_msg": "A reset link has been sent to {{email}}.",
+      "back_to_login": "Back to Login",
+      "toast_loading": "Sending link..."
+    }
   },
   "roles": {
     "agronomist": "Agronomist & Founder",
@@ -123,10 +285,16 @@
     "newsletter_desc": "Weather alerts, crop advice, and Smart Agro news.",
     "email_placeholder": "Your email",
     "subscribe": "Subscribe",
-    "rights": "© 2025 Smart Agro – All rights reserved.",
+    "rights": "© 2026 Smart Agro – All rights reserved.",
     "terms": "Terms of Use",
-    "privacy": "Privacy",
-    "legal": "Legal Notice"
+    "privacy": "Privacy Policy",
+    "legal": "Legal Notice",
+    "secure_node": "Secure Node",
+    "secure_desc": "Your connection is encrypted by the SmartAgro Secure v2 protocol.",
+    "resources": "Resources",
+    "global_service": "Global Service 24/7",
+    "tech_support": "Technical Support",
+    "system_status": "System Operational"
   },
   "predictions": {
     "title": "AI Assistant",
@@ -151,5 +319,62 @@
     "input_placeholder": "Write your question here...",
     "user_label": "Me",
     "select_parcel": "Parcel for chat"
+  },
+  "dashboard": {
+    "live_status": "Live Dashboard",
+    "welcome_msg": "Hello,",
+    "welcome_sub": "Let's Grow More.",
+    "pdf_stats": "PDF Statistics",
+    "sites_explored": "Explored Sites",
+    "active": "Active",
+    "global_health": "Global Health",
+    "avg_score": "Average Score",
+    "interactive_analysis": "Interactive Analysis",
+    "analysis_desc": "Visualize N-P-K, pH, and climate trends over 6 months.",
+    "no_history": "No historical data available at the moment.",
+    "parcel_performance": "Parcel Performance",
+    "see_all": "See All",
+    "soil_health": "Soil Health",
+    "no_parcels_display": "No parcels to display",
+    "quick_alerts": "Quick Alerts",
+    "see_details": "See Details",
+    "weather_sensors": "Weather & Sensors",
+    "current_temp": "Current Temp",
+    "humidity_label": "Humidity",
+    "condition_label": "Condition",
+    "nutrients": {
+      "nitrogen": "N (Nitrogen)",
+      "phosphorus": "P (Phos)",
+      "potassium": "K (Potas)",
+      "ph": "pH",
+      "temperature": "Temp",
+      "nitrogen_unit": "Nitrogen (mg/kg)",
+      "phosphorus_unit": "Phosphorus (mg/kg)",
+      "potassium_unit": "Potassium (mg/kg)",
+      "ph_unit": "pH",
+      "temperature_unit": "Temp (°C)",
+      "humidity_unit": "Humidity (%)"
+    },
+    "alerts": {
+      "irrigation_advised": "Irrigation Advised",
+      "high_heat": "High Heat",
+      "acid_soil": "Acid Soil",
+      "optimal_conditions": "Optimal Conditions"
+    },
+    "weather_conditions": {
+      "unknown": "Unknown",
+      "cloudy": "Cloudy",
+      "dry_hot": "Dry & Hot",
+      "humid": "Humid",
+      "cool": "Cool"
+    },
+    "status": {
+      "excellent": "Excellent",
+      "stable": "Stable",
+      "warning": "Warning",
+      "optimal": "Optimal",
+      "medium": "Medium",
+      "critical": "Critical"
+    }
   }
 }

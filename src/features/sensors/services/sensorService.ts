@@ -1,129 +1,75 @@
-// src/services/sensorService.ts
-
 import { Sensor } from "@/types/user";
-
-const getStoredSensors = () => {
-  if (typeof window !== 'undefined') {
-    const saved = localStorage.getItem('real_sensors_list');
-    return saved ? JSON.parse(saved) : [];
-  }
-  return [];
-};
-
-let mockSensors: Sensor[] = [];
-
-// URL de base de votre API (à adapter selon votre environnement)
-const API_URL = "http://localhost:5000/api/sensors"; 
+import { CapteursService, CapteurCreate, CapteurUpdate } from "@/lib";
 
 export const sensorService = {
   /**
    * RÉCUPÉRER TOUS LES CAPTEURS
    */
-  getSensors: async () => {
-    /* // --- LOGIQUE BACKEND ---
+  getSensors: async (): Promise<Sensor[]> => {
     try {
-      const response = await fetch(API_URL);
-      if (!response.ok) throw new Error("Erreur réseau");
-      return await response.json();
-    } catch (error) {
+      // Note: Endpoint Admin uniquement selon la doc, mais on tente.
+      // Si l'utilisateur n'est pas admin, cela peut échouer.
+      // Il faudrait peut-être une route "mes capteurs".
+      const response = await CapteursService.readCapteursApiV1CapteursGet() as any;
+      const data = Array.isArray(response) ? response : (response.data || []);
+
+      return data.map((c: any) => ({
+        id: c.id,
+        nom: c.nom,
+        typeMesure: "Multi-parameter", // Défaut, car non présent dans Capteur
+        parcelleId: undefined, // Non présent dans Capteur, il faudrait une autre requête pour savoir où il est assigné
+        // code: c.code,
+        // dev_eui: c.dev_eui
+      }));
+    } catch (error: any) {
+      if (error?.status === 403 || error?.body?.status === 403) {
+        console.warn("Accès aux capteurs refusé (403). Liste vide retournée.");
+        return [];
+      }
       console.error("Erreur getSensors:", error);
       return [];
     }
-    */
-
-    // --- SIMULATION ---
-    return new Promise<Sensor[]>((resolve) => {
-      mockSensors = getStoredSensors(); // On synchronise avec le stockage
-      setTimeout(() => resolve([...mockSensors]), 400);
-    });
   },
 
   /**
    * ENREGISTRER OU MODIFIER UN CAPTEUR
    */
-  saveSensor: async (sensor: Sensor) => {
-    /*
-    // --- LOGIQUE BACKEND ---
+  saveSensor: async (sensor: any) => {
     try {
-      const method = sensor.id ? "PUT" : "POST";
-      const url = sensor.id ? `${API_URL}/${sensor.id}` : API_URL;
-      
-      const response = await fetch(url, {
-        method: method,
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(sensor),
-      });
-
-      if (!response.ok) throw new Error("Erreur lors de la sauvegarde");
-      return await response.json();
+      if (sensor.id) {
+        // Update
+        return await CapteursService.updateCapteurApiV1CapteursCapteurIdPut(
+          String(sensor.id),
+          {
+            nom: sensor.nom,
+            // dev_eui et code ne sont pas modifiables facilement ici sans interface dédiée
+          }
+        );
+      } else {
+        // Create
+        return await CapteursService.createCapteurApiV1CapteursPost({
+          nom: sensor.nom,
+          dev_eui: sensor.dev_eui || "0000000000000000", // Valeur par défaut si non fournie
+          code: sensor.code || `SENSOR-${Date.now()}`,
+          date_installation: new Date().toISOString()
+        });
+      }
     } catch (error) {
       console.error("Erreur saveSensor:", error);
       throw error;
     }
-    */
-
-    // --- SIMULATION ---
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        // 1. On récupère la liste actuelle du storage pour être à jour
-        let currentSensors = getStoredSensors();
-
-        if (sensor.id) {
-          // Mise à jour
-          currentSensors = currentSensors.map((s:Sensor) => s.id === sensor.id ? { ...sensor } : s );
-        } else {
-          // Création (génération d'un ID temporaire)
-          const newSensor = { ...sensor, id: Date.now() };
-          currentSensors.push(newSensor);
-        }
-
-        // 2. CRUCIAL : On enregistre dans le localStorage sinon la liste restera vide au refresh
-        localStorage.setItem('real_sensors_list', JSON.stringify(currentSensors));
-        
-        mockSensors = currentSensors; // Mise à jour de la variable locale
-        resolve(true);
-      }, 600);
-    });
   },
 
   /**
    * SUPPRIMER UN CAPTEUR
    */
-  deleteSensor: async (id: number) => {
-    /*
-    // --- LOGIQUE BACKEND ---
+  deleteSensor: async (id: number | string) => {
     try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: "DELETE",
-      });
-      if (!response.ok) throw new Error("Erreur lors de la suppression");
+      await CapteursService.deleteCapteurApiV1CapteursCapteurIdDelete(String(id));
       return true;
     } catch (error) {
       console.error("Erreur deleteSensor:", error);
       throw error;
     }
-    */
-
-    // --- SIMULATION ---
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const currentSensors = getStoredSensors();
-        const filtered = currentSensors.filter((s:Sensor) => s.id !== id);
-        
-        // On met à jour le storage après suppression
-        localStorage.setItem('real_sensors_list', JSON.stringify(filtered));
-        mockSensors = filtered;
-        const dictionary: Record<string, string[]> = {};
-      filtered.forEach((s: Sensor) => {
-        if (!dictionary[s.parcelleId]) dictionary[s.parcelleId] = [];
-        dictionary[s.parcelleId].push(s.nom);
-      });
-      localStorage.setItem('simulated_sensors', JSON.stringify(dictionary));
-      
-      
-        
-        resolve(true);
-      }, 300);
-    });
   }
 };

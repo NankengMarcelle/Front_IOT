@@ -1,59 +1,71 @@
 "use client";
 
 import Link from 'next/link';
+import NextImage from 'next/image';
 import { useTranslation } from '@/providers/TranslationProvider';
-import Footer from '@/components/layout/Footer';
-import { ArrowRight, Leaf, Cpu, BarChart3, Shield, Zap, Users, Target, Globe, ChevronDown } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowRight, Leaf, Cpu, BarChart3, Shield, Zap, Target, Globe, ChevronDown, Cloud, Brain, Smartphone, Radio, FileText, ArrowLeft, Play, Layout, Users } from 'lucide-react';
+import React, { useState, useRef, RefObject } from 'react';
+import SimpleFooter from '@/components/layout/SimpleFooter';
 
 export default function LandingPage() {
-    const { t, isLoading } = useTranslation();
-    const [language, setLanguage] = useState('fr');
+    const { t, isLoading, lang, setLang } = useTranslation();
     const [showLanguageDropdown, setShowLanguageDropdown] = useState(false);
 
-    const team = [
-        { name: "Dr. Marie Dubois", roleKey: "agronomist", img: "https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=400&h=400&fit=crop&crop=face", expertise: "Agronomie durable" },
-        { name: "Ing. Lucas Moreau", roleKey: "engineer", img: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face", expertise: "IoT & Hardware" },
-        { name: "Dr. Sophie Laurent", roleKey: "product_manager", img: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face", expertise: "Data Science" }
-    ];
+    const statsRef = useRef<HTMLDivElement>(null);
+    const solutionRef = useRef<HTMLDivElement>(null);
+    const featuresRef = useRef<HTMLDivElement>(null);
+    const technologiesRef = useRef<HTMLDivElement>(null);
+    const ctaRef = useRef<HTMLDivElement>(null);
 
-    const features = [
+    const scrollToSection = (ref: RefObject<HTMLDivElement>) => {
+        if (ref.current) {
+            ref.current.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    const technologies = [
         {
-            icon: <Leaf className="w-8 h-8" />,
-            title: "Durabilité",
-            desc: "Préserver le sol pour les générations futures."
+            icon: <Radio className="w-8 h-8" />,
+            title: t('landing.tech.iot.title'),
+            desc: t('landing.tech.iot.desc'),
+            details: t('landing.tech.iot.details')
         },
         {
-            icon: <Cpu className="w-8 h-8" />,
-            title: "Innovation IoT",
-            desc: "Suivi en temps réel de vos parcelles."
+            icon: <Brain className="w-8 h-8" />,
+            title: t('landing.tech.ai.title'),
+            desc: t('landing.tech.ai.desc'),
+            details: t('landing.tech.ai.details')
         },
         {
-            icon: <BarChart3 className="w-8 h-8" />,
-            title: "Intelligence Artificielle",
-            desc: "Prédictions précises pour chaque type de culture."
-        },
-        {
-            icon: <Shield className="w-8 h-8" />,
-            title: "Sécurité des Données",
-            desc: "Protection avancée des données agricoles sensibles."
-        },
-        {
-            icon: <Zap className="w-8 h-8" />,
-            title: "Surveillance Continue",
-            desc: "Monitoring 24h/24 des paramètres critiques."
-        },
-        {
-            icon: <Target className="w-8 h-8" />,
-            title: "Précision Maximale",
-            desc: "Mesures exactes pour une agriculture optimisée."
+            icon: <Cloud className="w-8 h-8" />,
+            title: t('landing.tech.cloud.title'),
+            desc: t('landing.tech.cloud.desc'),
+            details: t('landing.tech.cloud.details')
         }
     ];
 
     const stats = [
-        { value: "+40%", label: "Gain de Productivité" },
-        { value: "24/7", label: "Surveillance Continue" },
-        { value: "99.8%", label: "Précision des Mesures" }
+        { value: "40%", label: t('landing.stats.yield'), color: "text-emerald-500" },
+        { value: "30%", label: t('landing.stats.water'), color: "text-lime-500" },
+        { value: "24/7", label: t('landing.stats.security'), color: "text-[#052E16]" }
+    ];
+
+    const features = [
+        {
+            icon: <Target className="w-8 h-8" />,
+            title: t('landing.features.precision.title'),
+            desc: t('landing.features.precision.desc')
+        },
+        {
+            icon: <Zap className="w-8 h-8" />,
+            title: t('landing.features.speed.title'),
+            desc: t('landing.features.speed.desc')
+        },
+        {
+            icon: <Layout className="w-8 h-8" />,
+            title: t('landing.features.interface.title'),
+            desc: t('landing.features.interface.desc')
+        }
     ];
 
     const languages = [
@@ -61,424 +73,312 @@ export default function LandingPage() {
         { code: 'en', name: 'English', flag: '🇺🇸' }
     ];
 
+    const currentLanguage = languages.find(langObj => langObj.code === lang);
+
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-agro-bg-gray">
+            <div className="min-h-screen flex items-center justify-center bg-white">
                 <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-agro-primary border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-agro-dark font-medium">Chargement...</p>
+                    <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                    <p className="text-[#052E16] font-black uppercase tracking-widest text-[10px]">{t('common.loading')}</p>
                 </div>
             </div>
         );
     }
 
-    const currentLanguage = languages.find(lang => lang.code === language);
-
     return (
-        <div className="min-h-screen flex flex-col relative overflow-hidden">
-            {/* Background decorative elements */}
+        <div className="min-h-screen flex flex-col relative overflow-hidden bg-white">
+            {/* Elite Background Glows (Matching Demo Style) */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute -top-40 -right-40 w-80 h-80 bg-agro-primary/5 rounded-full blur-3xl"></div>
-                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-[#22C55E]/5 rounded-full blur-3xl"></div>
+                <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-emerald-50 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 opacity-60"></div>
+                <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-lime-50 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 opacity-60"></div>
             </div>
 
-            {/* Logo Smart Agro en haut à gauche - RESPONSIVE FIX */}
-            <div className="absolute top-4 sm:top-6 left-3 sm:left-6 z-50 max-w-[50%]">
-                <Link href="/" className="flex items-center gap-2 sm:gap-3 group">
-                    <div className="w-8 h-8 sm:w-10 sm:h-10 bg-white/10 backdrop-blur-sm rounded-lg sm:rounded-xl flex items-center justify-center border border-white/20 group-hover:bg-white/20 transition-all duration-300 flex-shrink-0">
-                        <Leaf className="w-4 h-4 sm:w-6 sm:h-6 text-white" />
-                    </div>
-                    <div className="flex flex-col overflow-hidden">
-                        <span className="text-white text-sm sm:text-xl font-bold tracking-tight whitespace-nowrap truncate">
-                            Smart Agro
-                        </span>
-                    </div>
-                </Link>
-            </div>
-
-            {/* Language Toggle amélioré avec dropdown - RESPONSIVE FIX */}
-            <div className="absolute top-4 sm:top-6 right-3 sm:right-6 z-50">
-                <div className="relative">
-                    <button
-                        onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
-                        className="bg-white/10 backdrop-blur-sm rounded-full p-2 sm:p-3 shadow-lg border border-white/20 hover:shadow-xl hover:border-white/30 transition-all duration-300 flex items-center gap-1 sm:gap-2 group"
-                    >
-                        <div className="flex items-center gap-1 sm:gap-2">
-                            <Globe className="w-4 h-4 sm:w-5 sm:h-5 text-white group-hover:text-[#b2f2bb] transition-colors" />
-                            <span className="text-xs sm:text-sm font-semibold text-white group-hover:text-[#b2f2bb] transition-colors whitespace-nowrap">
-                                {currentLanguage?.flag} <span className="hidden xs:inline">{currentLanguage?.name}</span>
-                            </span>
+            {/* Premium Header/Nav */}
+            <header className="fixed top-0 left-0 right-0 z-50 px-2 md:px-6 py-4 transition-all duration-300 backdrop-blur-md bg-white/5">
+                <div className="max-w-7xl mx-auto flex items-center justify-between bg-white/40 backdrop-blur-2xl rounded-[24px] md:rounded-[32px] px-3 md:px-8 py-3 md:py-4 border border-white/40 shadow-sm transition-all">
+                    <Link href="/" className="flex items-center gap-1.5 md:gap-2 group">
+                        <div className="w-8 h-8 md:w-10 md:h-10 bg-[#052E16] rounded-xl flex items-center justify-center group-hover:bg-[#1A4D2E] transition-all">
+                            <Leaf className="w-4 h-4 md:w-6 md:h-6 text-emerald-400" />
                         </div>
-                        <ChevronDown className={`w-3 h-3 sm:w-4 sm:h-4 text-white/70 group-hover:text-[#b2f2bb] transition-all duration-300 ${showLanguageDropdown ? 'rotate-180' : ''}`} />
-                    </button>
+                        <span className="text-[#052E16] text-[15px] md:text-xl font-black tracking-tighter">Smart Agro</span>
+                    </Link>
 
-                    {/* Dropdown menu */}
-                    {showLanguageDropdown && (
-                        <div className="absolute top-full right-0 mt-2 w-40 sm:w-48 bg-white/95 backdrop-blur-md rounded-xl shadow-2xl border border-gray-100 overflow-hidden animate-fadeIn">
-                            <div className="py-2">
-                                {languages.map((lang) => (
-                                    <button
-                                        key={lang.code}
-                                        onClick={() => {
-                                            setLanguage(lang.code);
-                                            setShowLanguageDropdown(false);
-                                        }}
-                                        className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-3 hover:bg-agro-bg-gray transition-all duration-200 ${language === lang.code ? 'bg-agro-bg-gray' : ''}`}
+                    <div className="hidden md:flex items-center gap-10">
+                        <button onClick={() => scrollToSection(solutionRef)} className="text-[#052E16]/60 hover:text-emerald-600 font-black text-[10px] uppercase tracking-widest transition-colors">{t('landing.nav.solution')}</button>
+                        <button onClick={() => scrollToSection(featuresRef)} className="text-[#052E16]/60 hover:text-emerald-600 font-black text-[10px] uppercase tracking-widest transition-colors">{t('landing.nav.expertise')}</button>
+                    </div>
+
+                    <div className="flex items-center gap-2 md:gap-4">
+                        <div className="relative group/lang">
+                            <button
+                                onClick={() => setShowLanguageDropdown(!showLanguageDropdown)}
+                                className="flex items-center gap-1.5 px-3 md:px-4 py-2 bg-emerald-50 rounded-2xl hover:bg-emerald-100 transition-all font-black text-[10px] uppercase tracking-widest text-emerald-700"
+                            >
+                                <span>{currentLanguage?.flag}</span>
+                                <ChevronDown className={`w-3 h-3 transition-transform ${showLanguageDropdown ? 'rotate-180' : ''}`} />
+                            </button>
+                            {showLanguageDropdown && (
+                                <div className="absolute top-full right-0 mt-2 w-48 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl border border-emerald-50 overflow-hidden animate-fadeIn p-2 z-50">
+                                    {languages.map((langObj) => (
+                                        <button
+                                            key={langObj.code}
+                                            onClick={() => { setLang(langObj.code as 'en' | 'fr'); setShowLanguageDropdown(false); }}
+                                            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-emerald-50 transition-all font-black text-[10px] uppercase tracking-widest text-[#052E16]"
+                                        >
+                                            {langObj.flag} {langObj.name}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        <Link href="/login" className="px-4 md:px-6 py-2.5 bg-[#052E16] text-white rounded-full font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-lg active:scale-95">
+                            {t('nav.login')}
+                        </Link>
+                    </div>
+                </div>
+            </header>
+
+            <main className="flex-grow pt-12">
+                {/* SECTION 1: HERO (Side-by-side Inspired by Demo) */}
+                <section className="relative px-6 py-20 lg:py-32">
+                    <div className="max-w-7xl mx-auto h-full">
+                        <div className="grid lg:grid-cols-2 gap-20 items-center">
+                            <div className="relative z-10 text-left animate-fadeIn">
+                                <div className="inline-flex items-center gap-2 bg-emerald-100/50 px-4 py-2 rounded-full mb-8 border border-emerald-200">
+                                    <div className="w-2 h-2 bg-emerald-600 rounded-full animate-ping shadow-[0_0_15px_rgba(5,150,105,0.9)]"></div>
+                                    <span className="text-emerald-900 text-[10px] font-black uppercase tracking-[0.3em]">Smart Agro Intelligence</span>
+                                </div>
+
+                                <h1 className="text-4xl xs:text-5xl sm:text-7xl md:text-8xl font-black text-[#052E16] mb-8 leading-[0.9] tracking-tighter">
+                                    {t('landing.hero.title_line1')} <br />
+                                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 via-emerald-500 to-lime-500">
+                                        {t('landing.hero.title_line2')}
+                                    </span>
+                                </h1>
+
+                                <p className="text-xl text-emerald-900/60 font-medium max-w-xl mb-12 leading-relaxed">
+                                    {t('landing.hero.subtitle')}
+                                </p>
+
+                                <div className="flex flex-col sm:flex-row gap-6">
+                                    <Link
+                                        href="/demo"
+                                        className="group relative px-10 py-5 bg-[#052E16] text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] overflow-hidden transition-all hover:scale-105 active:scale-95 shadow-[0_20px_40px_-15px_rgba(5,46,22,0.3)] flex items-center justify-center gap-3"
                                     >
-                                        <Globe className="w-3 h-3 sm:w-4 sm:h-4 text-agro-dark flex-shrink-0" />
-                                        <span className={`text-sm sm:text-base font-medium ${language === lang.code ? 'text-agro-primary' : 'text-gray-700'} flex-shrink-0`}>
-                                            {lang.flag} {lang.name}
-                                        </span>
-                                        {language === lang.code && (
-                                            <div className="ml-auto w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full flex-shrink-0"></div>
-                                        )}
+                                        <Play className="w-4 h-4 fill-current" />
+                                        {t('landing.hero.cta.vision')}
+                                    </Link>
+
+                                    <button
+                                        onClick={() => scrollToSection(solutionRef)}
+                                        className="px-10 py-5 bg-white border-2 border-emerald-100 text-[#052E16] rounded-[24px] font-black uppercase tracking-widest text-[10px] transition-all hover:border-emerald-500 hover:bg-emerald-50 flex items-center justify-center gap-3"
+                                    >
+                                        {t('landing.hero.cta.more')}
+                                        <ArrowRight className="w-4 h-4" />
                                     </button>
+                                </div>
+                            </div>
+
+                            <div className="relative group h-full flex items-center justify-center lg:justify-end">
+                                <div className="absolute -inset-10 bg-emerald-100/40 rounded-full blur-[100px] z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-1000"></div>
+                                <div className="relative bg-white p-4 rounded-[56px] shadow-[0_64px_96px_-24px_rgba(0,0,0,0.12)] border border-emerald-50 transform hover:-translate-y-8 transition-all duration-700 w-full max-w-lg aspect-[5/6] overflow-hidden">
+                                    <NextImage // Replaced img
+                                        src="/strawberry-field.jpg"
+                                        alt="Green field"
+                                        fill
+                                        className="object-cover rounded-[48px] brightness-110 hover:scale-110 transition-transform duration-[2s]"
+                                        sizes="(max-width: 768px) 100vw, 50vw"
+                                    />
+                                    <div className="absolute inset-x-8 bottom-8 p-8 bg-white/20 backdrop-blur-3xl rounded-[32px] border border-white/30 shadow-2xl flex items-center gap-6">
+                                        <div className="w-16 h-14 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-xl">
+                                            <BarChart3 className="w-8 h-8" />
+                                        </div>
+                                        <div>
+                                            <p className="text-white text-[10px] font-black uppercase tracking-widest opacity-80">Précision Actuelle</p>
+                                            <p className="text-white text-3xl font-black">99.8%</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                {/* SECTION 2: STATS */}
+                <section ref={statsRef} className="py-24 bg-white relative">
+                    <div className="max-w-7xl mx-auto px-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-8">
+                            {stats.map((stat, idx) => (
+                                <div key={idx} className="group bg-slate-50 rounded-[48px] p-12 border border-emerald-50 transition-all hover:bg-white hover:shadow-2xl hover:border-emerald-200">
+                                    <p className={`text-7xl font-black mb-4 tracking-tighter ${stat.color}`}>{stat.value}</p>
+                                    <p className="text-[#052E16]/40 text-xs font-black uppercase tracking-[0.2em]">{stat.label}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
+                {/* SECTION 3: THE SOLUTION / PROBLEM */}
+                <section ref={solutionRef} className="py-32 bg-slate-50 relative overflow-hidden">
+                    <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-24 items-center">
+                        <div className="relative aspect-square">
+                            <div className="absolute inset-0 bg-emerald-500 rounded-[56px] rotate-3 opacity-20 transform group-hover:rotate-6 transition-transform"></div>
+                            <NextImage // Replaced img
+                                src="/handful-soil-being-sprinkled-agricultural-land.jpg"
+                                alt="Soil"
+                                fill
+                                className="object-cover rounded-[56px] shadow-2xl grayscale-[20%] hover:grayscale-0 transition-all duration-1000"
+                                sizes="(max-width: 768px) 100vw, 50vw"
+                            />
+                            <div className="absolute -bottom-10 -right-10 w-48 h-48 bg-white/40 backdrop-blur-2xl rounded-[40px] border border-white/40 shadow-xl p-8 flex flex-col justify-center">
+                                <p className="text-[#052E16] text-4xl font-black tracking-tighter">1.5M</p>
+                                <p className="text-[#052E16]/40 text-[9px] font-black uppercase tracking-widest">Données/Heure</p>
+                            </div>
+                        </div>
+
+                        <div className="space-y-10">
+                            <span className="text-emerald-600 font-black text-xs uppercase tracking-[0.4em]">{t('landing.solution.vocation')}</span>
+                            <h2 className="text-4xl xs:text-5xl sm:text-7xl font-black text-[#052E16] leading-[0.9] tracking-tighter">
+                                {t('landing.solution.title_line1')}<br />{t('landing.solution.title_line2')}
+                            </h2>
+                            <p className="text-emerald-900/60 text-xl font-medium leading-relaxed">
+                                {t('landing.solution.desc')}
+                            </p>
+
+                            <div className="space-y-6">
+                                {[
+                                    { t: t('landing.solution.points.point1.title'), d: t('landing.solution.points.point1.desc') },
+                                    { t: t('landing.solution.points.point2.title'), d: t('landing.solution.points.point2.desc') }
+                                ].map((item, idx) => (
+                                    <div key={idx} className="flex gap-6 items-start">
+                                        <div className="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 shrink-0">
+                                            <CheckCircle2 className="w-6 h-6" />
+                                        </div>
+                                        <div>
+                                            <h4 className="text-[#052E16] font-black text-lg">{item.t}</h4>
+                                            <p className="text-gray-400 font-medium text-sm">{item.d}</p>
+                                        </div>
+                                    </div>
                                 ))}
                             </div>
                         </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Fermer le dropdown en cliquant ailleurs */}
-            {showLanguageDropdown && (
-                <div
-                    className="fixed inset-0 z-40"
-                    onClick={() => setShowLanguageDropdown(false)}
-                />
-            )}
-
-            <main className="flex-grow relative z-10">
-                {/* HERO SECTION - Agriculture Intelligente sur la même ligne */}
-                <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-                    <div
-                        className="absolute inset-0 bg-gradient-to-br from-agro-dark via-[#1A4D2E] to-agro-primary"
-                        style={{
-                            backgroundImage: `linear-gradient(rgba(5, 46, 22, 0.9), rgba(5, 46, 22, 0.9)), url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2832&auto=format&fit=crop')`,
-                            backgroundSize: 'cover',
-                            backgroundPosition: 'center',
-                            backgroundBlendMode: 'overlay'
-                        }}
-                    />
-
-                    {/* Animated gradient overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-agro-dark/90 via-transparent to-transparent"></div>
-
-                    {/* Floating elements */}
-                    <div className="absolute top-1/4 left-10 w-4 h-4 bg-[#22C55E] rounded-full animate-pulse"></div>
-                    <div className="absolute top-1/3 right-1/4 w-3 h-3 bg-[#22C55E] rounded-full animate-pulse delay-300"></div>
-                    <div className="absolute bottom-1/4 right-20 w-2 h-2 bg-[#22C55E] rounded-full animate-pulse delay-700"></div>
-
-                    <div className="relative z-10 text-center px-4 sm:px-6 w-full">
-                        <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-black text-white mb-6 md:mb-8 leading-tight tracking-tight whitespace-normal sm:whitespace-nowrap">
-                            <span className="bg-clip-text text-transparent bg-gradient-to-r from-white via-[#b2f2bb] to-[#22C55E]">
-                                Agriculture Intelligente
-                            </span>
-                        </h1>
-
-                        <p className="text-base xs:text-lg sm:text-xl md:text-2xl text-white/80 font-light leading-relaxed max-w-3xl mx-auto mb-8 sm:mb-12 px-4">
-                            Optimisez vos récoltes avec notre plateforme IoT et IA
-                        </p>
-                    </div>
-
-                    {/* Scroll indicator */}
-                    <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
-                        <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center">
-                            <div className="w-1 h-3 bg-white/70 rounded-full mt-2"></div>
-                        </div>
                     </div>
                 </section>
 
-                {/* STATS SECTION - Responsive */}
-                <section className="py-16 sm:py-20 bg-gradient-to-b from-white to-agro-bg-gray">
-                    <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 md:gap-10">
-                            {stats.map((stat, index) => (
-                                <div
-                                    key={index}
-                                    className="text-center p-6 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl bg-white/90 backdrop-blur-sm border border-gray-100 shadow-lg hover:shadow-xl sm:hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 sm:hover:-translate-y-2"
-                                    style={{
-                                        background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248, 250, 252, 0.95) 100%)',
-                                        boxShadow: '0 10px 30px rgba(34, 197, 94, 0.1), 0 1px 2px rgba(0, 0, 0, 0.05)'
-                                    }}
-                                >
-                                    <div
-                                        className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black mb-4 sm:mb-6 leading-none"
-                                        style={{
-                                            background: 'linear-gradient(135deg, #22C55E 0%, #15803D 100%)',
-                                            WebkitBackgroundClip: 'text',
-                                            WebkitTextFillColor: 'transparent',
-                                            backgroundClip: 'text'
-                                        }}
-                                    >
-                                        {stat.value}
-                                    </div>
-                                    <div className="text-gray-800 text-base sm:text-lg font-bold mb-2">
-                                        {stat.label}
-                                    </div>
-                                    <div className="mt-4 sm:mt-6 md:mt-8 pt-4 sm:pt-6 border-t border-gray-100">
-                                        <div className="text-xs sm:text-sm text-[#22C55E] font-medium">
-                                            Performance moyenne
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* FEATURES SECTION - Responsive */}
-                <section id="features" className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-agro-bg-gray to-white">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                        <div className="text-center mb-12 sm:mb-16">
-                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-agro-dark mb-4 sm:mb-6">
-                                Notre Solution Complète
-                            </h2>
-                            <p className="text-lg sm:text-xl text-gray-600 max-w-3xl mx-auto px-4">
-                                Une plateforme intégrée combinant technologies de pointe pour une agriculture intelligente
-                            </p>
+                {/* SECTION 4: FEATURES */}
+                <section ref={featuresRef} className="py-32 bg-white relative">
+                    <div className="max-w-7xl mx-auto px-6">
+                        <div className="text-center mb-24">
+                            <span className="text-emerald-600 font-black text-xs uppercase tracking-[0.4em] mb-4 block">{t('landing.features.section_label')}</span>
+                            <h2 className="text-4xl xs:text-6xl font-black text-[#052E16] tracking-tighter">{t('landing.features.section_title')}</h2>
                         </div>
 
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-                            {features.map((feature, index) => (
-                                <div
-                                    key={index}
-                                    className="group bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl sm:hover:shadow-2xl transition-all duration-500 hover:-translate-y-1 sm:hover:-translate-y-2 hover:border-[#22C55E]/30"
-                                >
-                                    <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-gradient-to-br from-[#22C55E] to-agro-primary rounded-xl sm:rounded-2xl flex items-center justify-center text-white mb-4 sm:mb-6 group-hover:scale-105 sm:group-hover:scale-110 transition-transform duration-300">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                            {features.map((feature, idx) => (
+                                <div key={idx} className="group bg-slate-50/50 p-12 rounded-[52px] border border-slate-100 transition-all hover:bg-white hover:shadow-2xl hover:border-emerald-100">
+                                    <div className="w-20 h-20 bg-emerald-500 rounded-[28px] flex items-center justify-center text-white mb-10 shadow-lg group-hover:rotate-6 transition-transform">
                                         {feature.icon}
                                     </div>
-                                    <h3 className="text-lg sm:text-xl font-bold text-agro-dark mb-3 sm:mb-4">
-                                        {feature.title}
-                                    </h3>
-                                    <p className="text-gray-600 leading-relaxed text-sm sm:text-base">
-                                        {feature.desc}
-                                    </p>
+                                    <h3 className="text-[#052E16] font-black text-2xl mb-4 tracking-tight">{feature.title}</h3>
+                                    <p className="text-gray-400 font-medium leading-relaxed">{feature.desc}</p>
                                 </div>
                             ))}
                         </div>
                     </div>
                 </section>
 
-                {/* MISSION SECTION - Responsive */}
-                <section className="py-16 sm:py-20 md:py-24 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#F1F8F4] via-white to-[#F1F8F4]"></div>
-                    <div className="absolute top-0 left-0 w-1/3 h-full bg-gradient-to-r from-white/50 to-transparent"></div>
+                {/* SECTION 5: TECH / CTA INTEGRATED */}
+                <section ref={ctaRef} className="py-32 bg-[#052E16] relative overflow-hidden group">
+                    {/* Premium CTA Background Image */}
+                    <div className="absolute inset-0 z-0">
+                        <NextImage // Replaced img
+                            src="/agriculture-healthy-food.jpg"
+                            alt="Agriculture"
+                            fill
+                            className="object-cover opacity-60 transform group-hover:scale-105 transition-transform duration-[4s]"
+                            sizes="100vw"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#052E16] via-[#052E16]/60 to-transparent"></div>
+                    </div>
 
-                    <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8 relative">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 items-center">
-                            <div>
-                                <div className="mb-6 sm:mb-8">
-                                    <span className="inline-block px-3 py-1 sm:px-4 sm:py-2 bg-[#22C55E]/10 text-[#22C55E] rounded-full text-xs sm:text-sm font-semibold mb-3 sm:mb-4">
-                                        Notre Mission
-                                    </span>
-                                    <h2 className="text-3xl sm:text-4xl font-black text-agro-dark mb-4 sm:mb-6 leading-tight">
-                                        Notre Mission
-                                    </h2>
-                                </div>
+                    <div className="absolute inset-0 opacity-10">
+                        <div className="absolute top-0 left-1/4 w-[800px] h-[800px] bg-emerald-400 rounded-full blur-[150px] animate-pulse"></div>
+                    </div>
 
-                                <div className="space-y-4 sm:space-y-6">
-                                    <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
-                                        Transformer l'agriculture traditionnelle en une agriculture de précision grâce à l'innovation technologique.
-                                    </p>
-                                    <p className="text-gray-600 leading-relaxed text-base sm:text-lg">
-                                        Nous mettons à votre disposition des outils intelligents pour optimiser vos ressources, augmenter vos rendements et préserver l'environnement.
-                                    </p>
-                                </div>
-
-                                <div className="mt-8 sm:mt-10 p-4 sm:p-6 bg-gradient-to-r from-[#22C55E]/5 to-agro-primary/5 rounded-xl sm:rounded-2xl border border-[#22C55E]/20">
-                                    <div className="flex items-start sm:items-center gap-3 sm:gap-4">
-                                        <Users className="w-6 h-6 sm:w-8 sm:h-8 text-agro-primary flex-shrink-0" />
-                                        <div>
-                                            <h4 className="font-bold text-agro-dark text-base sm:text-lg mb-1">Notre Engagement</h4>
-                                            <p className="text-gray-600 text-xs sm:text-sm">
-                                                Accompagnement personnalisé et support technique 24/7
-                                            </p>
+                    <div className="max-w-7xl mx-auto px-6 relative z-10">
+                        <div className="grid lg:grid-cols-2 gap-24 items-center">
+                            <div className="space-y-12">
+                                <h2 className="text-4xl xs:text-5xl sm:text-7xl font-black text-white leading-[0.9] tracking-tighter">
+                                    {t('landing.infra.title_line1')}<br />{t('landing.infra.title_line2')}
+                                </h2>
+                                <div className="space-y-8">
+                                    {technologies.map((tech, idx) => (
+                                        <div key={idx} className="p-8 bg-white/5 backdrop-blur-3xl rounded-[32px] border border-white/10 flex gap-8 items-center group hover:bg-white/10 transition-all">
+                                            <div className="w-16 h-16 bg-white rounded-2xl flex items-center justify-center text-emerald-500 shadow-xl group-hover:scale-110 transition-transform">
+                                                {tech.icon}
+                                            </div>
+                                            <div>
+                                                <h4 className="text-white font-black text-xl mb-1">{tech.title}</h4>
+                                                <p className="text-white/40 text-[10px] font-black uppercase tracking-widest">{tech.details}</p>
+                                            </div>
                                         </div>
-                                    </div>
+                                    ))}
                                 </div>
                             </div>
 
                             <div className="relative">
-                                <div className="bg-white rounded-2xl sm:rounded-3xl md:rounded-[40px] shadow-xl sm:shadow-2xl border border-gray-100 p-6 sm:p-8 md:p-10 transition-all duration-500 hover:shadow-2xl sm:hover:shadow-3xl">
-                                    <div className="space-y-6 sm:space-y-8">
-                                        <div className="flex items-start gap-4 sm:gap-6">
-                                            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-[#22C55E] to-agro-primary rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
-                                                <Leaf className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-gray-800 text-base sm:text-lg md:text-xl">
-                                                    Durabilité
-                                                </h4>
-                                                <p className="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-base">
-                                                    Préserver le sol pour les générations futures.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start gap-4 sm:gap-6">
-                                            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-blue-500 to-cyan-400 rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
-                                                <Cpu className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-gray-800 text-base sm:text-lg md:text-xl">
-                                                    Innovation IoT
-                                                </h4>
-                                                <p className="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-base">
-                                                    Suivi en temps réel de vos parcelles.
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-start gap-4 sm:gap-6">
-                                            <div className="w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 bg-gradient-to-br from-purple-500 to-pink-400 rounded-xl sm:rounded-2xl flex items-center justify-center text-white flex-shrink-0">
-                                                <BarChart3 className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7" />
-                                            </div>
-                                            <div>
-                                                <h4 className="font-bold text-gray-800 text-base sm:text-lg md:text-xl">
-                                                    Intelligence Artificielle
-                                                </h4>
-                                                <p className="text-gray-500 mt-1 sm:mt-2 text-sm sm:text-base">
-                                                    Prédictions précises pour chaque type de culture.
-                                                </p>
-                                            </div>
-                                        </div>
+                                <div className="bg-white/90 backdrop-blur-2xl rounded-[64px] p-16 text-center border border-white/20 shadow-2xl relative overflow-hidden">
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-3xl"></div>
+                                    <h3 className="text-4xl font-black text-[#052E16] tracking-tighter mb-6 underline decoration-lime-500 decoration-8 underline-offset-8">{t('landing.cta.title')}</h3>
+                                    <p className="text-emerald-900/60 text-lg font-medium mb-12">{t('landing.cta.subtitle')}</p>
+                                    <div className="flex flex-col gap-4">
+                                        <Link href="/register" className="px-10 py-5 bg-[#052E16] text-white rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:scale-105 transition-all shadow-[0_20px_40px_-10px_rgba(5,46,22,0.4)] relative group/btn overflow-hidden">
+                                            <span className="relative z-10">{t('landing.cta.button_main')}</span>
+                                            <div className="absolute inset-0 bg-gradient-to-r from-emerald-600 to-lime-500 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500"></div>
+                                        </Link>
+                                        <Link href="/demo" className="px-10 py-5 bg-white border-2 border-emerald-100 text-[#052E16] rounded-[24px] font-black uppercase tracking-widest text-[10px] hover:bg-emerald-50 hover:border-emerald-500 transition-all">
+                                            {t('landing.hero.cta.vision')}
+                                        </Link>
                                     </div>
                                 </div>
-
-                                {/* Decorative elements */}
-                                <div className="absolute -top-4 -right-4 w-24 h-24 bg-gradient-to-br from-[#22C55E] to-agro-primary rounded-2xl -z-10 blur-xl opacity-20"></div>
-                                <div className="absolute -bottom-4 -left-4 w-20 h-20 bg-gradient-to-br from-cyan-400 to-blue-500 rounded-2xl -z-10 blur-xl opacity-20"></div>
                             </div>
-                        </div>
-                    </div>
-                </section>
-
-                {/* TEAM SECTION - Responsive */}
-                <section className="py-16 sm:py-20 md:py-24 bg-gradient-to-b from-white to-agro-bg-gray">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                        <div className="text-center mb-12 sm:mb-16">
-                            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-agro-dark mb-4 sm:mb-6">
-                                Notre Équipe
-                            </h2>
-                            <p className="text-lg sm:text-xl text-gray-600 max-w-2xl mx-auto px-4">
-                                Rencontrez notre équipe d'experts dédiée à la révolution agricole
-                            </p>
-                        </div>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-                            {team.map((member, idx) => (
-                                <div
-                                    key={idx}
-                                    className="group relative bg-white p-6 sm:p-8 rounded-2xl sm:rounded-3xl border border-gray-100 shadow-lg overflow-hidden transition-all duration-500 hover:shadow-xl sm:hover:shadow-2xl hover:-translate-y-1 sm:hover:-translate-y-2"
-                                >
-                                    {/* Background gradient on hover */}
-                                    <div className="absolute inset-0 bg-gradient-to-br from-white via-white to-[#F1F8F4] group-hover:from-[#22C55E]/5 group-hover:to-[#22C55E]/10 transition-all duration-500"></div>
-
-                                    <div className="relative z-10">
-                                        <div className="relative mb-6 sm:mb-8">
-                                            <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-40 md:h-40 rounded-full mx-auto overflow-hidden border-4 border-white shadow-lg sm:shadow-xl">
-                                                <img
-                                                    src={member.img}
-                                                    alt={member.name}
-                                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                                                />
-                                            </div>
-                                            <div className="absolute -bottom-1 sm:-bottom-2 right-1/4 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 bg-[#22C55E] rounded-full border-4 border-white"></div>
-                                        </div>
-
-                                        <h3 className="text-xl sm:text-2xl font-bold text-agro-dark text-center mb-2">{member.name}</h3>
-                                        <p className="text-agro-primary font-bold text-center mb-2 sm:mb-3 text-sm sm:text-base">
-                                            {member.roleKey === "agronomist" ? "Agronome" :
-                                                member.roleKey === "engineer" ? "Ingénieur IoT" :
-                                                    "Responsable Produit"}
-                                        </p>
-                                        <p className="text-gray-500 text-xs sm:text-sm text-center font-medium mb-4 sm:mb-6">
-                                            {member.expertise}
-                                        </p>
-
-                                        <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-gray-100">
-                                            <div className="flex justify-center gap-3 sm:gap-4">
-                                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full"></div>
-                                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full"></div>
-                                                <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-[#22C55E] rounded-full"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </section>
-
-                {/* CTA SECTION - Responsive */}
-                <section className="py-16 sm:py-20 md:py-24 relative overflow-hidden">
-                    <div className="absolute inset-0 bg-gradient-to-br from-agro-dark via-[#1A4D2E] to-agro-primary"></div>
-                    <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2832')] opacity-10 bg-cover bg-center"></div>
-
-                    {/* Animated circles */}
-                    <div className="absolute top-0 left-0 w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 bg-[#22C55E] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob"></div>
-                    <div className="absolute top-0 right-0 w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 bg-agro-primary rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
-                    <div className="absolute -bottom-6 left-1/2 w-48 h-48 sm:w-60 sm:h-60 md:w-72 md:h-72 bg-[#12A125] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
-
-                    <div className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 md:px-8 text-center">
-                        <div className="bg-white/10 backdrop-blur-sm rounded-2xl sm:rounded-3xl p-8 sm:p-10 md:p-12 border border-white/20">
-                            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 sm:mb-6 leading-tight">
-                                Prêt à révolutionner votre agriculture ?
-                            </h2>
-
-                            <p className="text-lg sm:text-xl text-white/80 mb-6 sm:mb-8 md:mb-10 max-w-2xl mx-auto">
-                                Rejoignez la révolution agricole intelligente dès aujourd'hui
-                            </p>
-
-                            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 justify-center items-center mb-6 sm:mb-8 md:mb-10">
-                                <Link
-                                    href="/register"
-                                    className="group bg-white hover:bg-gray-50 text-agro-dark px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg font-bold transition-all duration-300 shadow-xl sm:shadow-2xl hover:shadow-[0_20px_60px_-15px_rgba(255,255,255,0.5)] hover:-translate-y-1 active:scale-95 flex items-center gap-2 sm:gap-3 min-w-[180px] sm:min-w-[200px] justify-center"
-                                >
-                                    <span>Commencer maintenant</span>
-                                    <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-                                </Link>
-
-                                <Link
-                                    href="/demo"
-                                    className="px-6 sm:px-8 md:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg font-semibold transition-all duration-300 border-2 border-white/30 hover:border-white/60 text-white hover:bg-white/5 backdrop-blur-sm min-w-[180px] sm:min-w-[200px] text-center"
-                                >
-                                    Voir la démo
-                                </Link>
-                            </div>
-
-                            <p className="text-white/60 text-xs sm:text-sm mt-6 sm:mt-8">
-                                Aucune carte bancaire requise • Essai gratuit de 14 jours
-                            </p>
                         </div>
                     </div>
                 </section>
             </main>
 
-            {/* Animation keyframes */}
+            <SimpleFooter />
+
             <style jsx>{`
-                @keyframes blob {
-                    0% { transform: translate(0px, 0px) scale(1); }
-                    33% { transform: translate(30px, -50px) scale(1.1); }
-                    66% { transform: translate(-20px, 20px) scale(0.9); }
-                    100% { transform: translate(0px, 0px) scale(1); }
-                }
                 @keyframes fadeIn {
-                    from { opacity: 0; transform: translateY(-10px); }
+                    from { opacity: 0; transform: translateY(20px); }
                     to { opacity: 1; transform: translateY(0); }
                 }
-                .animate-blob {
-                    animation: blob 7s infinite;
-                }
                 .animate-fadeIn {
-                    animation: fadeIn 0.2s ease-out;
-                }
-                .animation-delay-2000 {
-                    animation-delay: 2s;
-                }
-                .animation-delay-4000 {
-                    animation-delay: 4s;
+                    animation: fadeIn 0.8s ease-out forwards;
                 }
             `}</style>
         </div>
     );
+}
+
+function CheckCircle2(props: any) {
+    return (
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+        >
+            <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
+            <path d="m9 12 2 2 4-4" />
+        </svg>
+    )
 }

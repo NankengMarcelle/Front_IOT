@@ -2,310 +2,243 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { 
-  Settings, 
-  Mail, 
-  MessageSquare, 
-  Bell, 
+import { UsersService } from '@/lib';
+import { authService } from '@/features/auth/services/authService';
+import { toast } from 'sonner';
+import {
+  Settings,
+  Mail,
+  MessageSquare,
+  Bell,
   CheckCircle,
   Smartphone,
-  Send
+  Send,
+  Loader2,
+  Zap,
+  ShieldCheck
 } from 'lucide-react';
-import DashboardHeader from '@/components/layout/Header';
-import DashboardFooter from '@/components/layout/Footer';
 
-// Type pour les méthodes de notification
 type NotificationMethod = 'email' | 'sms' | 'whatsapp' | 'telegram';
-
-interface NotificationSettings {
-  email: boolean;
-  sms: boolean;
-  whatsapp: boolean;
-  telegram: boolean;
-  emailAddress?: string;
-  phoneNumber?: string;
-  telegramUsername?: string;
-  whatsappNumber?: string;
-}
+type Frequency = 'weekly' | 'monthly' | 'quarterly' | 'none';
 
 export default function ParametresPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [saveSuccess, setSaveSuccess] = useState(false);
-  
-  const [settings, setSettings] = useState<NotificationSettings>({
-    email: true,
-    sms: false,
-    whatsapp: false,
-    telegram: false,
-    emailAddress: '',
-    phoneNumber: '',
-    telegramUsername: '',
-    whatsappNumber: '',
-  });
 
-  // Charger les paramètres sauvegardés
+  // Settings state: list of active notification modes
+  const [activeModes, setActiveModes] = useState<string[]>([]);
+  const [frequency, setFrequency] = useState<Frequency>('weekly');
+
   useEffect(() => {
-    const loadSettings = () => {
+    const loadSettings = async () => {
       try {
-        const saved = localStorage.getItem('notification_settings');
-        if (saved) {
-          setSettings(JSON.parse(saved));
+        const response: any = await UsersService.getMyProfileApiV1UsersMeGet();
+
+        // Handle API wrapper if present
+        const user = response.data || response;
+
+        if (user.notification_modes && Array.isArray(user.notification_modes)) {
+          setActiveModes(user.notification_modes);
+        } else {
+          // Default Fallback
+          setActiveModes(['email']);
         }
-        // Simuler le chargement des données utilisateur
-        const userEmail = localStorage.getItem('user_email');
-        const userPhone = localStorage.getItem('user_phone');
-        
-        if (userEmail && !settings.emailAddress) {
-          setSettings(prev => ({ ...prev, emailAddress: userEmail }));
+
+        if (user.recommendation_frequency) {
+          setFrequency(user.recommendation_frequency as Frequency);
+        } else {
+          // Check local storage for legacy fallback
+          const savedFreq = localStorage.getItem('recommendation_frequency');
+          if (savedFreq) setFrequency(savedFreq as Frequency);
         }
-        if (userPhone && !settings.phoneNumber) {
-          setSettings(prev => ({ ...prev, phoneNumber: userPhone }));
-        }
+
       } catch (error) {
-        console.error('Erreur lors du chargement des paramètres:', error);
+        console.error('Erreur chargement profil:', error);
+        toast.error("Impossible de charger vos préférences.");
       } finally {
         setLoading(false);
       }
     };
-
     loadSettings();
   }, []);
 
   const handleMethodToggle = (method: NotificationMethod) => {
-    setSettings(prev => ({
-      ...prev,
-      [method]: !prev[method]
-    }));
-  };
-
-  const handleInputChange = (field: keyof NotificationSettings, value: string) => {
-    setSettings(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
-  const handleSave = () => {
-    setSaving(true);
-    
-    // Simuler une sauvegarde API
-    setTimeout(() => {
-      try {
-        localStorage.setItem('notification_settings', JSON.stringify(settings));
-        setSaveSuccess(true);
-        
-        // Cacher le message de succès après 3 secondes
-        setTimeout(() => {
-          setSaveSuccess(false);
-        }, 3000);
-      } catch (error) {
-        console.error('Erreur lors de la sauvegarde:', error);
-      } finally {
-        setSaving(false);
+    setActiveModes(prev => {
+      if (prev.includes(method)) {
+        return prev.filter(m => m !== method);
+      } else {
+        return [...prev, method];
       }
-    }, 1000);
+    });
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      // Met à jour le profil avec les nouveaux modes de notification et la fréquence
+      await authService.updateProfile({
+        notification_modes: activeModes,
+        recommendation_frequency: frequency
+      });
+
+      toast.success("Préférences sauvegardées avec succès !");
+    } catch (error) {
+      console.error('Erreur sauvegarde:', error);
+      toast.error("Erreur lors de la sauvegarde.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const notificationMethods = [
-    {
-      id: 'email' as NotificationMethod,
-      name: 'Email',
-      icon: Mail,
-      description: 'Recevez les recommandations par email',
-      requiredField: 'emailAddress',
-      fieldLabel: 'Adresse email',
-      fieldPlaceholder: 'votre@email.com',
-    },
-    {
-      id: 'sms' as NotificationMethod,
-      name: 'SMS',
-      icon: MessageSquare,
-      description: 'Recevez les recommandations par SMS',
-      requiredField: 'phoneNumber',
-      fieldLabel: 'Numéro de téléphone',
-      fieldPlaceholder: '+33 6 12 34 56 78',
-    },
-    {
-      id: 'whatsapp' as NotificationMethod,
-      name: 'WhatsApp',
-      icon: Smartphone,
-      description: 'Recevez les recommandations sur WhatsApp',
-      requiredField: 'whatsappNumber',
-      fieldLabel: 'Numéro WhatsApp',
-      fieldPlaceholder: '+33 6 12 34 56 78',
-    },
-    {
-      id: 'telegram' as NotificationMethod,
-      name: 'Telegram',
-      icon: Send,
-      description: 'Recevez les recommandations sur Telegram',
-      requiredField: 'telegramUsername',
-      fieldLabel: 'Nom d\'utilisateur Telegram',
-      fieldPlaceholder: '@votre_nom',
-    },
+    { id: 'email' as NotificationMethod, name: 'Email Core', icon: Mail, desc: 'Rapports automatisés par email haute priorité' },
+    { id: 'sms' as NotificationMethod, name: 'SMS Instant', icon: MessageSquare, desc: 'Alertes biométriques temps réel par SMS' },
+    { id: 'whatsapp' as NotificationMethod, name: 'WhatsApp Bot', icon: Smartphone, desc: 'Diagnostic interactif sur WhatsApp Premium' },
+    { id: 'telegram' as NotificationMethod, name: 'Telegram HQ', icon: Send, desc: 'Flux de données crypté via Telegram Secure' },
   ];
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Chargement des paramètres...</p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-[#F8FAF9]">
+        <Loader2 className="animate-spin text-emerald-600 w-12 h-12" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <DashboardHeader />
-      
-      <main className="flex-1 py-6 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
-        {/* Header de la page */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Settings className="w-6 h-6 text-green-600" />
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Paramètres</h1>
-          </div>
-          <p className="text-gray-600">
-            Gérez vos préférences de notification pour les recommandations agricoles
-          </p>
-        </div>
+    <div className="relative min-h-screen overflow-hidden">
+      {/* Background Glows */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-emerald-50/50 rounded-full blur-[120px] -translate-y-1/2 translate-x-1/2 opacity-60"></div>
+        <div className="absolute bottom-0 left-0 w-[800px] h-[800px] bg-lime-50/50 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2 opacity-60"></div>
+      </div>
 
-        {/* Carte des paramètres */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <Bell className="w-6 h-6 text-green-600" />
-            <h2 className="text-xl font-semibold text-gray-900">Préférences de notification</h2>
-          </div>
-
-          <p className="text-gray-600 mb-8">
-            Choisissez comment vous souhaitez recevoir les recommandations agricoles, alertes météo et notifications importantes.
-          </p>
-
-          {/* Méthodes de notification */}
-          <div className="space-y-6">
-            {notificationMethods.map((method) => {
-              const Icon = method.icon;
-              const isActive = settings[method.id];
-              const fieldValue = settings[method.requiredField as keyof NotificationSettings] as string;
-
-              return (
-                <div key={method.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-start gap-3">
-                      <div className={`p-2 rounded-lg ${isActive ? 'bg-green-100' : 'bg-gray-100'}`}>
-                        <Icon className={`w-5 h-5 ${isActive ? 'text-green-600' : 'text-gray-400'}`} />
-                      </div>
-                      <div>
-                        <h3 className="font-medium text-gray-900">{method.name}</h3>
-                        <p className="text-sm text-gray-600">{method.description}</p>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3">
-                      {/* Champ de saisie conditionnel */}
-                      {isActive && (
-                        <div className="flex-1 min-w-0">
-                          <input
-                            type="text"
-                            value={fieldValue || ''}
-                            onChange={(e) => handleInputChange(method.requiredField as keyof NotificationSettings, e.target.value)}
-                            placeholder={method.fieldPlaceholder}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
-                          />
-                        </div>
-                      )}
-                      
-                      {/* Toggle switch */}
-                      <button
-                        onClick={() => handleMethodToggle(method.id)}
-                        className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isActive ? 'bg-green-600' : 'bg-gray-300'}`}
-                      >
-                        <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${isActive ? 'translate-x-6' : 'translate-x-1'}`} />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Note d'information */}
-          <div className="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-200">
-            <p className="text-sm text-blue-800">
-              <strong>Note :</strong> Les recommandations incluent les alertes météo, conseils d'irrigation, 
-              suggestions de fertilisation et notifications importantes pour vos parcelles.
-            </p>
-          </div>
-
-          {/* Bouton de sauvegarde */}
-          <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-end items-center">
-            {saveSuccess && (
-              <div className="flex items-center gap-2 text-green-600">
-                <CheckCircle className="w-5 h-5" />
-                <span className="text-sm font-medium">Paramètres sauvegardés avec succès !</span>
+      <main className="relative z-10 pt-8 md:pt-12 pb-16 md:pb-24 lg:pb-32 px-4 md:px-12 max-w-7xl mx-auto w-full">
+        {/* Elite Header */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-10 md:mb-16">
+          <div className="space-y-3 md:space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl md:rounded-2xl flex items-center justify-center text-emerald-600 shadow-xl border border-emerald-50">
+                <Settings className="w-6 h-6 md:w-7 h-7" />
               </div>
-            )}
-            
-            <button
-              onClick={handleSave}
-              disabled={saving}
-              className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white px-6 py-3 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 min-w-[150px] justify-center"
-            >
-              {saving ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Sauvegarde...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="w-4 h-4" />
-                  Sauvegarder les paramètres
-                </>
-              )}
-            </button>
+              <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[#052E16]/40">Système</p>
+            </div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#052E16] tracking-tighter leading-[0.9]">
+              Flux de <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Données.</span>
+            </h1>
+            <p className="text-[#052E16]/40 text-base md:text-lg font-medium italic">Gérez vos protocoles de communication et alertes critiques.</p>
           </div>
+
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="w-full md:w-auto bg-[#052E16] text-white px-8 md:px-10 py-4 md:py-5 rounded-xl md:rounded-2xl font-black text-[10px] md:text-xs uppercase tracking-widest shadow-xl shadow-emerald-900/20 hover:bg-emerald-800 active:scale-95 transition-all flex items-center justify-center gap-3 disabled:opacity-50 group border border-white/5"
+          >
+            {saving ? (
+              <Loader2 className="animate-spin w-5 h-5" />
+            ) : (
+              <>
+                <ShieldCheck size={20} className="text-lime-400 group-hover:rotate-12 transition-transform" />
+                Sauvegarder
+              </>
+            )}
+          </button>
         </div>
 
-        {/* Section d'information */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="font-semibold text-gray-900 mb-3">À propos des notifications</h3>
-            <ul className="space-y-2 text-sm text-gray-600">
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5"></div>
-                <span>Les notifications sont envoyées quotidiennement à 8h</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5"></div>
-                <span>Vous recevrez des alertes urgentes immédiatement</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <div className="w-1.5 h-1.5 bg-green-500 rounded-full mt-1.5"></div>
-                <span>Vous pouvez désactiver temporairement les notifications</span>
-              </li>
-            </ul>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12">
+          {/* Notification Controls */}
+          <div className="lg:col-span-8 space-y-6 md:space-y-10">
+            <div className="bg-white/40 backdrop-blur-3xl rounded-[32px] md:rounded-[48px] border border-emerald-50 shadow-2xl shadow-emerald-900/5 p-8 md:p-12 lg:p-16">
+              <div className="flex items-center gap-4 mb-8 md:mb-12">
+                <Bell className="w-6 h-6 md:w-8 md:h-8 text-emerald-600" />
+                <h3 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter">Préférences de Notification.</h3>
+              </div>
+
+              <div className="space-y-4 md:space-y-6">
+                {notificationMethods.map((method) => {
+                  const Icon = method.icon;
+                  const isActive = activeModes.includes(method.id);
+
+                  return (
+                    <div
+                      key={method.id}
+                      onClick={() => handleMethodToggle(method.id)}
+                      className={`group cursor-pointer transition-all duration-500 ${isActive ? 'bg-white shadow-xl shadow-emerald-900/5 rounded-[28px] md:rounded-[40px] border-emerald-100 p-6 md:p-8' : 'bg-transparent border-b border-emerald-50 py-6 md:py-8 px-2 md:px-4 hover:bg-white/30 hover:px-6 hover:rounded-[24px]'}`}
+                    >
+                      <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                        <div className="flex items-center gap-4 md:gap-6 w-full">
+                          <div className={`w-12 h-12 md:w-16 md:h-16 rounded-2xl md:rounded-3xl flex items-center justify-center transition-all duration-500 ${isActive ? 'bg-[#052E16] text-white rotate-6' : 'bg-emerald-50 text-emerald-400 group-hover:bg-emerald-100'}`}>
+                            <Icon className="w-6 h-6 md:w-8 md:h-8" />
+                          </div>
+                          <div>
+                            <h4 className={`text-lg md:text-xl font-black tracking-tight ${isActive ? 'text-[#052E16]' : 'text-[#052E16]/40 group-hover:text-[#052E16]/70'}`}>{method.name}</h4>
+                            <p className="text-[9px] md:text-[11px] font-black uppercase tracking-widest text-[#052E16]/30">{method.desc}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center gap-4 md:gap-6 flex-shrink-0">
+                          <div
+                            className={`relative inline-flex h-8 w-14 md:h-9 md:w-16 items-center rounded-full transition-all duration-500 shrink-0 ${isActive ? 'bg-[#052E16]' : 'bg-emerald-100 group-hover:bg-emerald-200'}`}
+                          >
+                            <span className={`inline-block h-5 w-5 md:h-6 md:w-6 transform rounded-full bg-white transition-transform duration-500 shadow-lg ${isActive ? 'translate-x-7 md:translate-x-8 scale-90' : 'translate-x-1.5 md:translate-x-2'}`} />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+            </div>
           </div>
-          
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="font-semibold text-gray-900 mb-3">Support technique</h3>
-            <p className="text-sm text-gray-600 mb-3">
-              Si vous rencontrez des problèmes avec les notifications, contactez notre support.
-            </p>
-            <button className="text-green-600 hover:text-green-700 text-sm font-medium flex items-center gap-1">
-              <MessageSquare className="w-4 h-4" />
-              Contacter le support
-            </button>
+
+          {/* Sidebar Info */}
+          <div className="lg:col-span-4 space-y-8 md:space-y-10">
+            <div className="bg-[#052E16] text-white rounded-[32px] md:rounded-[48px] p-8 md:p-10 shadow-2xl shadow-emerald-900/10">
+              <div className="w-12 h-12 md:w-14 md:h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-6 md:mb-8">
+                <Zap className="w-6 h-6 md:w-8 md:h-8 text-lime-400" />
+              </div>
+              <h3 className="text-2xl md:text-3xl font-black tracking-tighter mb-4">Urgence Biométrique.</h3>
+              <p className="text-xs md:text-sm font-medium opacity-60 leading-relaxed mb-6 md:mb-8">
+                Les alertes critiques (gel, sécheresse extrême, nuisibles détectés) contourneront vos réglages standards pour être délivrées instantanément par tous les canaux actifs.
+              </p>
+              <div className="p-4 bg-white/5 rounded-xl md:rounded-2xl border border-white/10">
+                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-lime-400/60">Service Elite Actif</p>
+              </div>
+            </div>
+
+            <div className="bg-white/40 backdrop-blur-md rounded-[32px] md:rounded-[40px] p-6 md:p-8 border border-emerald-50">
+              <h4 className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[#052E16]/30 mb-6">Fréquence des Recommandations</h4>
+
+              <div className="space-y-3">
+                {[
+                  { id: 'weekly', label: 'Hebdomadaire' },
+                  { id: 'monthly', label: 'Mensuel' },
+                  { id: 'quarterly', label: 'Trimestriel' },
+                  { id: 'none', label: 'Désactivé' }
+                ].map((opt) => (
+                  <button
+                    key={opt.id}
+                    onClick={() => setFrequency(opt.id as Frequency)}
+                    className={`w-full py-4 px-6 rounded-2xl flex items-center justify-between group transition-all duration-300 border ${frequency === opt.id
+                      ? 'bg-[#052E16] text-white border-[#052E16] shadow-lg shadow-emerald-900/20 transform scale-[1.02]'
+                      : 'bg-white text-[#052E16] border-emerald-50 hover:bg-emerald-50 hover:border-emerald-100'
+                      }`}
+                  >
+                    <span className={`font-black tracking-tight ${frequency === opt.id ? 'opacity-100' : 'opacity-60 group-hover:opacity-80'}`}>
+                      {opt.label}
+                    </span>
+                    {frequency === opt.id && (
+                      <CheckCircle className="w-5 h-5 text-lime-400" />
+                    )}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </main>
-      
-      <DashboardFooter />
     </div>
   );
 }
