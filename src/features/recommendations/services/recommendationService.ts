@@ -1,4 +1,4 @@
-const EXPERT_API_URL = process.env.NEXT_PUBLIC_EXPERT_SYSTEM_API_URL || 'https://systeme-expert-5iyu.onrender.com';
+const EXPERT_API_URL = process.env.NEXT_PUBLIC_EXPERT_SYSTEM_API_URL;
 
 export const recommendationService = {
   /**

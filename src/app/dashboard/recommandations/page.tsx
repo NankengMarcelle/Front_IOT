@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { useSearchParams } from "next/navigation";
 import { parcelService } from "@/features/parcels/services/parcelService";
 import { terrainService } from "@/features/terrains/services/terrainService";
 import { recommendationService } from "@/features/recommendations/services/recommendationService";
@@ -46,14 +45,6 @@ export default function RecommandationsPage() {
         const parcellesData = await parcelService.getParcelles();
         setParcelles(parcellesData);
         setFilteredParcelles(parcellesData);
-
-        // Auto-select parcel if parcelId is in URL
-        if (initialParcelId) {
-          const parcelToSelect = parcellesData.find(p => String(p.id) === String(initialParcelId));
-          if (parcelToSelect) {
-            handleParcelSelect(initialParcelId);
-          }
-        }
       } catch (e) {
         console.error("Error loading parcelles:", e);
       }

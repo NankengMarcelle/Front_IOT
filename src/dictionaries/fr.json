@@ -83,9 +83,7 @@
     "search_placeholder": "Chercher une unité...",
     "no_parcel_title": "Aucune parcelle définie",
     "no_parcel_desc": "Divisez vos terrains pour une gestion ultra-précise et commencez à recevoir vos premiers rapports IA.",
-    "unknown_terrain": "Terrain Inconnu",
-    "view_measurements": "Voir les mesures",
-    "history_title": "Historique des mesures"
+    "unknown_terrain": "Terrain Inconnu"
   },
   "history": {
     "title": "Historique",

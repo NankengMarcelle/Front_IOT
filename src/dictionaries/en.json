@@ -83,9 +83,7 @@
     "search_placeholder": "Search for a unit...",
     "no_parcel_title": "No parcels defined",
     "no_parcel_desc": "Divide your land for ultra-precise management and start receiving your first AI reports.",
-    "unknown_terrain": "Unknown Terrain",
-    "view_measurements": "View Measurements",
-    "history_title": "Measurement History"
+    "unknown_terrain": "Unknown Terrain"
   },
   "history": {
     "title": "History",
