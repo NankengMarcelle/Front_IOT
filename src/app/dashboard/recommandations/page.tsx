@@ -7,9 +7,7 @@ import { recommendationService } from "@/features/recommendations/services/recom
 import { sensorDataService } from "@/features/sensors/services/sensorDataService";
 import { useTranslation } from "@/providers/TranslationProvider";
 import { Bot, User, Loader2, Send, Sparkles, MapPin, ChevronRight, MessageSquare, Search } from "lucide-react";
-
-
-
+import { useSearchParams } from "next/navigation";
 export default function RecommandationsPage() {
   const { t } = useTranslation();
   const searchParams = useSearchParams();
