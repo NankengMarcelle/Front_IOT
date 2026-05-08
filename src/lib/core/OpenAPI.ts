@@ -20,7 +20,7 @@ export type OpenAPIConfig = {
 };
 
 export const OpenAPI: OpenAPIConfig = {
-    BASE: 'https://iotsoilbackend-production.up.railway.app',
+    BASE: 'https://smart-agro.duckdns.org',
     VERSION: '0.1.0',
     WITH_CREDENTIALS: true,
     CREDENTIALS: 'include',
