@@ -20,7 +20,7 @@ export default function ForgotPasswordForm({ role }: { role: string | null }) {
     // Simulation envoi
     setTimeout(() => {
       console.log("Envoi du lien à :", email);
-      toast.success("Lien envoyé ! Vérifiez votre boîte mail.", { id: toastId });
+      toast.success(t('auth.forgot_password.success_msg').replace('{{email}}', email), { id: toastId });
       setIsSent(true);
       setLoading(false);
     }, 1500);

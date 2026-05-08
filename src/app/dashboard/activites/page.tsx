@@ -27,9 +27,9 @@ export default function ActivitesPage() {
               <div className="w-10 h-10 md:w-12 md:h-12 bg-emerald-50 rounded-xl md:rounded-2xl flex items-center justify-center text-emerald-600">
                 <Clock className="w-6 h-6 md:w-7 h-7" />
               </div>
-              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-[0.9]">Flux d'<br /><span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Activités.</span></h1>
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter leading-[0.9]">{t('activites.flux_title')}<br /><span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">{t('activites.flux_highlight')}</span></h1>
             </div>
-            <p className="text-[#052E16]/40 text-xs md:text-sm font-medium italic">Journal temps-réel des opérations et diagnostics SmartAgro.</p>
+            <p className="text-[#052E16]/40 text-xs md:text-sm font-medium italic">{t('activites.realtime_journal')}</p>
           </header>
 
           <div className="space-y-6 md:space-y-10 relative">
@@ -63,7 +63,7 @@ export default function ActivitesPage() {
           </div>
 
           <button className="w-full mt-10 md:mt-16 py-6 md:py-8 rounded-[32px] md:rounded-[40px] border border-emerald-50 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] hover:bg-emerald-50 transition-all text-[#052E16]/30">
-            Charger plus d'historique
+            {t('activites.load_more')}
           </button>
         </div>
       </main>

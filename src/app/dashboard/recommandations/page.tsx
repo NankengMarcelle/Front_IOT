@@ -120,13 +120,13 @@ export default function RecommandationsPage() {
         setLatestSoilData(soilData);
 
         // Message d'accueil au lieu d'appeler l'API immédiatement
-        const cultureName = parcel.culturePredite && parcel.culturePredite !== "Non définie"
+        const cultureName = parcel.culturePredite && parcel.culturePredite !== t('define.not_define')
           ? parcel.culturePredite
-          : "cette parcelle";
+          : t('recommandations.this_parcel');
 
         const welcomeMessages = [{
-          agent: "Système Expert",
-          message: `Bonjour ! Je suis votre assistant agronomique pour ${cultureName}. Posez-moi vos questions sur l'irrigation, la fertilisation, les maladies, ou tout autre sujet agricole.`,
+          agent: t('common.expert_agro'),
+          message: t('recommandations.welcome_msg').replace('{{culture}}', cultureName),
           type: "bot"
         }];
 
@@ -134,8 +134,8 @@ export default function RecommandationsPage() {
         sessionStorage.setItem(`chat_messages_${id}`, JSON.stringify(welcomeMessages));
       } else {
         const noDataMessages = [{
-          agent: "Assistant",
-          message: "Aucune donnée de capteur disponible pour cette parcelle. Vous pouvez quand même me poser vos questions agricoles !",
+          agent: t('common.expert_agro'),
+          message: t('recommandations.no_sensor_data'),
           type: "bot"
         }];
 
@@ -176,7 +176,7 @@ export default function RecommandationsPage() {
       setMessages(prev => {
         const updated = [...prev, {
           agent: res.agent,
-          message: res.message || "Je n'ai pas pu générer de réponse spécifique.",
+          message: res.message || t('recommandations.error_response'),
           type: "bot"
         }];
         // Sauvegarder dans sessionStorage
@@ -187,8 +187,8 @@ export default function RecommandationsPage() {
       console.error("Error in AI chat:", error);
       setMessages(prev => {
         const updated = [...prev, {
-          agent: "Système",
-          message: "Désolé, une erreur s'est produite. Veuillez réessayer.",
+          agent: t('common.expert_agro'),
+          message: t('recommandations.error_response'),
           type: "bot"
         }];
         sessionStorage.setItem(`chat_messages_${selectedParcel.id}`, JSON.stringify(updated));
@@ -214,8 +214,8 @@ export default function RecommandationsPage() {
         <aside className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} fixed lg:relative z-[60] lg:z-10 w-full max-w-[320px] md:max-w-96 bg-white lg:bg-white/40 backdrop-blur-3xl border-r lg:border lg:border-white/40 lg:shadow-2xl lg:shadow-emerald-900/5 rounded-[32px] m-4 h-[calc(100vh-6rem)] lg:m-0 lg:h-full lg:rounded-[32px] border-emerald-50 flex flex-col transition-all duration-500 overflow-hidden`}>
           <div className="p-8 md:p-10 pb-6 border-b border-emerald-50/50 flex items-center justify-between">
             <div>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#052E16]/30 mb-2">Choisir une</h2>
-              <h1 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter leading-none">Parcelle.</h1>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#052E16]/30 mb-2">{t('recommandations.choose_a')}</h2>
+              <h1 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter leading-none">{t('recommandations.parcel_label')}</h1>
             </div>
             <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-3 bg-white rounded-2xl text-emerald-600">
               <ChevronRight className="w-6 h-6 rotate-180" />
@@ -228,7 +228,7 @@ export default function RecommandationsPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-emerald-900/30 group-focus-within:text-emerald-500 transition-colors" />
               <input
                 type="text"
-                placeholder="Filtrer les parcelles..."
+                placeholder={t('recommandations.filter_parcels')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full bg-slate-50 border border-emerald-50/50 rounded-2xl pl-10 pr-4 py-3 text-sm font-bold text-[#052E16] outline-none focus:bg-white focus:border-emerald-200 focus:shadow-lg transition-all placeholder:text-emerald-900/20"
@@ -269,10 +269,10 @@ export default function RecommandationsPage() {
                 {parcelles.length === 0 ? (
                   <>
                     <Loader2 className="w-8 h-8 text-emerald-200 animate-spin mx-auto" />
-                    <p className="text-[10px] font-black uppercase tracking-widest text-[#052E16]/20">Chargement...</p>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-[#052E16]/20">{t('recommandations.loading')}</p>
                   </>
                 ) : (
-                  <p className="text-[10px] font-black uppercase tracking-widest text-[#052E16]/40">Aucune parcelle trouvée</p>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-[#052E16]/40">{t('recommandations.no_parcel_found')}</p>
                 )}
               </div>
             )}
@@ -302,7 +302,7 @@ export default function RecommandationsPage() {
                 <h1 className="text-2xl md:text-4xl lg:text-5xl font-black text-[#052E16] tracking-tighter leading-none">
                   AI <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Expert.</span>
                 </h1>
-                <p className="text-[#052E16]/40 text-[10px] md:text-xs font-medium italic mt-1">Intelligence conversationnelle agronomique.</p>
+                <p className="text-[#052E16]/40 text-[10px] md:text-xs font-medium italic mt-1">{t('recommandations.conversational_intelligence')}</p>
               </div>
             </div>
             {selectedParcel && (
@@ -319,13 +319,13 @@ export default function RecommandationsPage() {
               {!selectedParcel ? (
                 <div className="h-full flex flex-col items-center justify-center text-[#052E16]/10 px-6 text-center">
                   <MessageSquare size={window?.innerWidth < 768 ? 80 : 120} strokeWidth={0.5} className="mb-6 md:mb-8" />
-                  <h3 className="text-xl md:text-2xl font-black tracking-tighter">Sélectionnez une zone</h3>
-                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest mt-2 px-10">Pour démarrer le diagnostic intelligent et recevoir vos recommandations personnalisées.</p>
+                  <h3 className="text-xl md:text-2xl font-black tracking-tighter">{t('recommandations.select_zone')}</h3>
+                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest mt-2 px-10">{t('recommandations.start_diagnostic')}</p>
                 </div>
               ) : loading ? (
                 <div className="h-full flex flex-col items-center justify-center">
                   <Loader2 className="w-10 h-10 md:w-12 md:h-12 text-emerald-500 animate-spin" />
-                  <p className="mt-4 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]/40 animate-pulse">Chargement de l'expertise...</p>
+                  <p className="mt-4 text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]/40 animate-pulse">{t('recommandations.loading_expertise')}</p>
                 </div>
               ) : (
                 <>
@@ -341,7 +341,10 @@ export default function RecommandationsPage() {
                         <div className={`flex items-center gap-2 mb-2 md:mb-3 opacity-30 ${msg.type === 'user' ? 'justify-end' : ''}`}>
                           <span className="text-[8px] md:text-[9px] font-black uppercase tracking-[0.2em]">{msg.agent}</span>
                         </div>
-                        <p className="text-sm md:text-base font-medium leading-relaxed tracking-tight">{msg.message}</p>
+                        {msg.type === 'user'
+                          ? <p className="text-sm md:text-base font-medium leading-relaxed tracking-tight">{msg.message}</p>
+                          : <FormattedMessage content={msg.message} />
+                        }
                       </div>
                     </div>
                   ))}
@@ -392,5 +395,133 @@ export default function RecommandationsPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+// ─── FormattedMessage Component ───────────────────────────────────────────────
+// Renders bot responses with proper markdown-like formatting
+function FormattedMessage({ content }: { content: string }) {
+  if (!content) return null;
+
+  // Split into lines for block-level parsing
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i];
+
+    // Empty line → spacing
+    if (line.trim() === '') {
+      elements.push(<div key={i} className="h-2" />);
+      i++;
+      continue;
+    }
+
+    // ### Header
+    if (line.startsWith('### ')) {
+      elements.push(
+        <h4 key={i} className="text-[11px] font-black uppercase tracking-[0.2em] text-emerald-600 mt-4 mb-2 first:mt-0 flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block" />
+          {parseInline(line.replace(/^### /, ''))}
+        </h4>
+      );
+      i++;
+      continue;
+    }
+
+    // ## Header
+    if (line.startsWith('## ')) {
+      elements.push(
+        <h3 key={i} className="text-sm font-black text-[#052E16] tracking-tighter mt-4 mb-2 first:mt-0 border-b border-emerald-100 pb-1">
+          {parseInline(line.replace(/^## /, ''))}
+        </h3>
+      );
+      i++;
+      continue;
+    }
+
+    // Bullet list: lines starting with - or *
+    if (/^[\-\*]\s/.test(line)) {
+      const listItems: React.ReactNode[] = [];
+      while (i < lines.length && /^[\-\*]\s/.test(lines[i])) {
+        listItems.push(
+          <li key={i} className="flex items-start gap-2.5 text-sm font-medium leading-relaxed text-[#052E16]/80">
+            <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0" />
+            <span>{parseInline(lines[i].replace(/^[\-\*]\s/, ''))}</span>
+          </li>
+        );
+        i++;
+      }
+      elements.push(
+        <ul key={`ul-${i}`} className="space-y-1.5 my-2 ml-1">{listItems}</ul>
+      );
+      continue;
+    }
+
+    // Numbered list: lines starting with 1. 2. etc.
+    if (/^\d+\.\s/.test(line)) {
+      const listItems: React.ReactNode[] = [];
+      let num = 1;
+      while (i < lines.length && /^\d+\.\s/.test(lines[i])) {
+        listItems.push(
+          <li key={i} className="flex items-start gap-3 text-sm font-medium leading-relaxed text-[#052E16]/80">
+            <span className="mt-0.5 w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 text-[10px] font-black flex items-center justify-center shrink-0">{num}</span>
+            <span>{parseInline(lines[i].replace(/^\d+\.\s/, ''))}</span>
+          </li>
+        );
+        num++;
+        i++;
+      }
+      elements.push(
+        <ol key={`ol-${i}`} className="space-y-2 my-2 ml-1">{listItems}</ol>
+      );
+      continue;
+    }
+
+    // Regular paragraph
+    elements.push(
+      <p key={i} className="text-sm md:text-base font-medium leading-relaxed text-[#052E16]/90">
+        {parseInline(line)}
+      </p>
+    );
+    i++;
+  }
+
+  return <div className="space-y-1">{elements}</div>;
+}
+
+// Parses inline formatting within a text segment
+function parseInline(text: string): React.ReactNode {
+  // Split on **bold**, *italic*, and `code` markers
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/g);
+
+  return (
+    <>
+      {parts.map((part, idx) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return (
+            <strong key={idx} className="font-black text-[#052E16]">
+              {part.slice(2, -2)}
+            </strong>
+          );
+        }
+        if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
+          return (
+            <em key={idx} className="italic text-emerald-700">
+              {part.slice(1, -1)}
+            </em>
+          );
+        }
+        if (part.startsWith('`') && part.endsWith('`')) {
+          return (
+            <code key={idx} className="bg-emerald-50 text-emerald-700 px-1.5 py-0.5 rounded-md text-xs font-mono font-bold border border-emerald-100">
+              {part.slice(1, -1)}
+            </code>
+          );
+        }
+        return <span key={idx}>{part}</span>;
+      })}
+    </>
   );
 }

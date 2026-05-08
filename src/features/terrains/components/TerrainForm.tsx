@@ -5,8 +5,10 @@ import { localiteService } from "../services/localiteService";
 import { ChevronDown, MapPin, AlignLeft, TreePine, X, Sprout } from "lucide-react";
 import { toast } from "sonner";
 import SearchableSelect from "@/components/ui/SearchableSelect";
+import { useTranslation } from "@/providers/TranslationProvider";
 
 export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [localites, setLocalites] = useState<any[]>([]);
 
@@ -45,18 +47,18 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
     const newErrors = { nom: "", localite_id: "", superficie: "" };
 
     if (!formData.nom || formData.nom.length < 3) {
-      newErrors.nom = "Le nom doit contenir au moins 3 caractères.";
+      newErrors.nom = t('terrain_form.error_nom');
       isValid = false;
     }
 
     if (!formData.localite_id) {
-      newErrors.localite_id = "Veuillez sélectionner une localité.";
+      newErrors.localite_id = t('terrain_form.error_localite');
       isValid = false;
     }
 
     const surfaceValue = Number(formData.superficie);
     if (!surfaceValue || surfaceValue <= 0) {
-      newErrors.superficie = "La superficie doit être supérieur à 0.";
+      newErrors.superficie = t('terrain_form.error_superficie');
       isValid = false;
     }
 
@@ -68,12 +70,12 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
     e.preventDefault();
 
     if (!validate()) {
-      toast.error("Veuillez corriger les erreurs du formulaire.");
+      toast.error(t('terrain_form.error_form'));
       return;
     }
 
     setLoading(true);
-    const toastId = toast.loading(initialData ? "Mise à jour du terrain..." : "Création du terrain...");
+    const toastId = toast.loading(initialData ? t('terrain_form.toast_updating') : t('terrain_form.toast_creating'));
     try {
       const terrainData: any = {
         nom: formData.nom,
@@ -87,11 +89,11 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
       }
 
       await terrainService.saveTerrain(terrainData);
-      toast.success(initialData ? "Terrain mis à jour !" : "Terrain créé avec succès !", { id: toastId });
+      toast.success(initialData ? t('terrain_form.toast_updated') : t('terrain_form.toast_created'), { id: toastId });
       onSuccess();
     } catch (error: any) {
       console.error("Erreur lors de l'enregistrement:", error);
-      const errorMsg = error.message || "Erreur lors de la sauvegarde.";
+      const errorMsg = error.message || t('terrain_form.toast_error');
       toast.error(errorMsg, { id: toastId });
     } finally {
       setLoading(false);
@@ -113,11 +115,11 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
                 <Sprout className="w-6 h-6" />
               </div>
               <h2 className="text-3xl font-black text-slate-800 tracking-tight">
-                {initialData ? "Modifier Terrain" : "Nouveau Terrain"}
+                {initialData ? t('terrain_form.edit_title') : t('terrain_form.new_title')}
               </h2>
             </div>
             <p className="text-slate-400 text-sm font-bold pl-1 uppercase tracking-widest">
-              Identité de l'exploitation
+              {t('terrain_form.identity_label')}
             </p>
           </div>
 
@@ -135,7 +137,7 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
             {/* Nom */}
             <div className="space-y-3">
               <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 flex items-center gap-2">
-                <TreePine className="w-3 h-3" /> Nom du domaine
+                <TreePine className="w-3 h-3" /> {t('terrain_form.domain_name_label')}
               </label>
               <div className="relative group">
                 <input
@@ -155,7 +157,7 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
             {/* Localité */}
             <div className="space-y-3">
               <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 flex items-center gap-2">
-                <MapPin className="w-3 h-3" /> Localisation
+                <MapPin className="w-3 h-3" /> {t('terrain_form.localisation_label')}
               </label>
               <div className="relative group">
                 <SearchableSelect
@@ -168,7 +170,7 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
                     setFormData({ ...formData, localite_id: val });
                     if (errors.localite_id) setErrors({ ...errors, localite_id: "" });
                   }}
-                  placeholder="Sélectionner une zone"
+                  placeholder={t('terrain_form.select_zone')}
                   disabled={!!initialData}
                   error={errors.localite_id}
                 />
@@ -179,7 +181,7 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
             {/* Superficie */}
             <div className="space-y-3">
               <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 flex items-center gap-2">
-                <AlignLeft className="w-3 h-3" /> Superficie (Hectares)
+                <AlignLeft className="w-3 h-3" /> {t('terrain_form.area_label')}
               </label>
               <div className="relative group">
                 <input
@@ -202,7 +204,7 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
             {/* Description */}
             <div className="space-y-3">
               <label className="text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] ml-2 flex items-center gap-2">
-                <AlignLeft className="w-3 h-3" /> Description
+                <AlignLeft className="w-3 h-3" /> {t('terrain_form.description_label')}
               </label>
               <textarea
                 placeholder="Détails supplémentaires sur ce terrain..."
@@ -217,10 +219,10 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
           <div className="bg-emerald-50/50 rounded-[24px] p-6 border border-emerald-100/50">
             <h4 className="text-emerald-800 font-bold text-sm mb-1 flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              Analyse Satellite & Capteurs
+              {t('terrain_form.satellite_info_title')}
             </h4>
             <p className="text-emerald-600/80 text-xs leading-relaxed">
-              La pente et les caractéristiques précises du sol seront affinées automatiquement via les données des capteurs et la cartographie satellite une fois le terrain créé.
+              {t('terrain_form.satellite_info_desc')}
             </p>
           </div>
 
@@ -231,7 +233,7 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
               onClick={onCancel}
               className="px-8 py-5 bg-slate-100 text-slate-500 rounded-[24px] font-black uppercase tracking-widest text-xs hover:bg-slate-200 hover:text-slate-800 transition-all duration-300"
             >
-              Annuler
+              {t('terrain_form.cancel')}
             </button>
             <button
               type="submit"
@@ -241,7 +243,7 @@ export default function TerrainForm({ initialData, onSuccess, onCancel }: any) {
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
               ) : (
-                <span>{initialData ? "Sauvegarder" : "Créer le Terrain"}</span>
+                <span>{initialData ? t('terrain_form.save') : t('terrain_form.create')}</span>
               )}
             </button>
           </div>

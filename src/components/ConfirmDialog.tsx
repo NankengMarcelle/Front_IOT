@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { AlertCircle, CheckCircle, Info, X } from 'lucide-react';
+import { useTranslation } from '@/providers/TranslationProvider';
 
 interface ConfirmDialogOptions {
     title: string;
@@ -38,12 +39,13 @@ interface DialogState {
 }
 
 export const ConfirmDialogProvider = ({ children }: { children: ReactNode }) => {
+    const { t } = useTranslation();
     const [dialog, setDialog] = useState<DialogState>({
         isOpen: false,
         title: '',
         message: '',
-        confirmText: 'Confirmer',
-        cancelText: 'Annuler',
+        confirmText: 'OK',
+        cancelText: '',
         type: 'info',
         isAlert: false,
     });
@@ -54,8 +56,8 @@ export const ConfirmDialogProvider = ({ children }: { children: ReactNode }) => 
                 isOpen: true,
                 title: options.title,
                 message: options.message,
-                confirmText: options.confirmText || 'Confirmer',
-                cancelText: options.cancelText || 'Annuler',
+                confirmText: options.confirmText || t('common.confirm'),
+                cancelText: options.cancelText || t('common.cancel'),
                 type: options.type || 'info',
                 isAlert: false,
                 resolve,

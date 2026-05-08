@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { UsersService } from '@/lib';
 import { authService } from '@/features/auth/services/authService';
 import { toast } from 'sonner';
+import { useTranslation } from '@/providers/TranslationProvider';
 import {
   Settings,
   Mail,
@@ -23,6 +24,7 @@ type Frequency = 'weekly' | 'monthly' | 'quarterly' | 'none';
 
 export default function ParametresPage() {
   const router = useRouter();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -55,7 +57,7 @@ export default function ParametresPage() {
 
       } catch (error) {
         console.error('Erreur chargement profil:', error);
-        toast.error("Impossible de charger vos préférences.");
+        toast.error(t('parametres.error_load'));
       } finally {
         setLoading(false);
       }
@@ -82,20 +84,20 @@ export default function ParametresPage() {
         recommendation_frequency: frequency
       });
 
-      toast.success("Préférences sauvegardées avec succès !");
+      toast.success(t('parametres.success_save'));
     } catch (error) {
       console.error('Erreur sauvegarde:', error);
-      toast.error("Erreur lors de la sauvegarde.");
+      toast.error(t('parametres.error_save'));
     } finally {
       setSaving(false);
     }
   };
 
   const notificationMethods = [
-    { id: 'email' as NotificationMethod, name: 'Email Core', icon: Mail, desc: 'Rapports automatisés par email haute priorité' },
-    { id: 'sms' as NotificationMethod, name: 'SMS Instant', icon: MessageSquare, desc: 'Alertes biométriques temps réel par SMS' },
-    { id: 'whatsapp' as NotificationMethod, name: 'WhatsApp Bot', icon: Smartphone, desc: 'Diagnostic interactif sur WhatsApp Premium' },
-    { id: 'telegram' as NotificationMethod, name: 'Telegram HQ', icon: Send, desc: 'Flux de données crypté via Telegram Secure' },
+    { id: 'email' as NotificationMethod, name: 'Email Core', icon: Mail, desc: t('parametres.email_desc') },
+    { id: 'sms' as NotificationMethod, name: 'SMS Instant', icon: MessageSquare, desc: t('parametres.sms_desc') },
+    { id: 'whatsapp' as NotificationMethod, name: 'WhatsApp Bot', icon: Smartphone, desc: t('parametres.whatsapp_desc') },
+    { id: 'telegram' as NotificationMethod, name: 'Telegram HQ', icon: Send, desc: t('parametres.telegram_desc') },
   ];
 
   if (loading) {
@@ -122,12 +124,12 @@ export default function ParametresPage() {
               <div className="w-10 h-10 md:w-12 md:h-12 bg-white rounded-xl md:rounded-2xl flex items-center justify-center text-emerald-600 shadow-xl border border-emerald-50">
                 <Settings className="w-6 h-6 md:w-7 h-7" />
               </div>
-              <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[#052E16]/40">Système</p>
+              <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[#052E16]/40">{t('parametres.system_label')}</p>
             </div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-[#052E16] tracking-tighter leading-[0.9]">
-              Flux de <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">Données.</span>
+              {t('parametres.data_flow_title')} <span className="bg-clip-text text-transparent bg-gradient-to-r from-emerald-600 to-lime-500">{t('parametres.data_flow_highlight')}</span>
             </h1>
-            <p className="text-[#052E16]/40 text-base md:text-lg font-medium italic">Gérez vos protocoles de communication et alertes critiques.</p>
+            <p className="text-[#052E16]/40 text-base md:text-lg font-medium italic">{t('parametres.data_flow_subtitle')}</p>
           </div>
 
           <button
@@ -140,7 +142,7 @@ export default function ParametresPage() {
             ) : (
               <>
                 <ShieldCheck size={20} className="text-lime-400 group-hover:rotate-12 transition-transform" />
-                Sauvegarder
+                {t('parametres.save_button')}
               </>
             )}
           </button>
@@ -152,7 +154,7 @@ export default function ParametresPage() {
             <div className="bg-white/40 backdrop-blur-3xl rounded-[32px] md:rounded-[48px] border border-emerald-50 shadow-2xl shadow-emerald-900/5 p-8 md:p-12 lg:p-16">
               <div className="flex items-center gap-4 mb-8 md:mb-12">
                 <Bell className="w-6 h-6 md:w-8 md:h-8 text-emerald-600" />
-                <h3 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter">Préférences de Notification.</h3>
+                <h3 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter">{t('parametres.notification_preferences')}</h3>
               </div>
 
               <div className="space-y-4 md:space-y-6">
@@ -199,24 +201,24 @@ export default function ParametresPage() {
               <div className="w-12 h-12 md:w-14 md:h-14 bg-white/10 rounded-2xl flex items-center justify-center mb-6 md:mb-8">
                 <Zap className="w-6 h-6 md:w-8 md:h-8 text-lime-400" />
               </div>
-              <h3 className="text-2xl md:text-3xl font-black tracking-tighter mb-4">Urgence Biométrique.</h3>
+              <h3 className="text-2xl md:text-3xl font-black tracking-tighter mb-4">{t('parametres.biometric_urgency_title')}</h3>
               <p className="text-xs md:text-sm font-medium opacity-60 leading-relaxed mb-6 md:mb-8">
-                Les alertes critiques (gel, sécheresse extrême, nuisibles détectés) contourneront vos réglages standards pour être délivrées instantanément par tous les canaux actifs.
+                {t('parametres.biometric_urgency_desc')}
               </p>
               <div className="p-4 bg-white/5 rounded-xl md:rounded-2xl border border-white/10">
-                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-lime-400/60">Service Elite Actif</p>
+                <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-lime-400/60">{t('parametres.elite_service_active')}</p>
               </div>
             </div>
 
             <div className="bg-white/40 backdrop-blur-md rounded-[32px] md:rounded-[40px] p-6 md:p-8 border border-emerald-50">
-              <h4 className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[#052E16]/30 mb-6">Fréquence des Recommandations</h4>
+              <h4 className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] md:tracking-[0.3em] text-[#052E16]/30 mb-6">{t('parametres.frequency_label')}</h4>
 
               <div className="space-y-3">
                 {[
-                  { id: 'weekly', label: 'Hebdomadaire' },
-                  { id: 'monthly', label: 'Mensuel' },
-                  { id: 'quarterly', label: 'Trimestriel' },
-                  { id: 'none', label: 'Désactivé' }
+                  { id: 'weekly', label: t('parametres.weekly') },
+                  { id: 'monthly', label: t('parametres.monthly') },
+                  { id: 'quarterly', label: t('parametres.quarterly') },
+                  { id: 'none', label: t('parametres.none') }
                 ].map((opt) => (
                   <button
                     key={opt.id}

@@ -19,9 +19,11 @@ import {
 import { predictionService } from "@/features/predictions/services/predictionService";
 import { toast } from "sonner";
 import { useConfirmDialog } from "@/components/ConfirmDialog";
+import { useTranslation } from "@/providers/TranslationProvider";
 
 export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRefresh }: any) {
   const { confirm } = useConfirmDialog();
+  const { t } = useTranslation();
   const [localPrediction, setLocalPrediction] = useState<string | null>(null);
   const [isPredicting, setIsPredicting] = useState(false);
 
@@ -43,7 +45,7 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
         window.location.reload();
       }, 1500);
     } catch (error: any) {
-      toast.error(error.message || "Erreur lors de la prédiction");
+      toast.error(error.message || t('parcel_card.prediction_error'));
     } finally {
       setIsPredicting(false);
     }
@@ -166,22 +168,22 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
               <div className="relative z-10">
                 <div className="inline-flex items-center gap-2 mb-3">
                   <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-                  <p className="text-[9px] font-black text-emerald-900/40 uppercase tracking-[0.2em]">IA de Recommandation</p>
+                  <p className="text-[9px] font-black text-emerald-900/40 uppercase tracking-[0.2em]">{t('parcel_card.ai_recommendation')}</p>
                 </div>
 
                 <p className="text-3xl md:text-4xl font-black text-[#052E16] tracking-tighter drop-shadow-sm leading-none mb-4">
-                  {localPrediction || parcel.culturePredite || "À analyser"}
+                  {localPrediction || parcel.culturePredite || t('parcel_card.to_analyze')}
                 </p>
 
                 {isPredicting ? (
                   <div className="flex flex-col items-center gap-2 py-2">
                     <Loader2 className="w-5 h-5 text-emerald-600 animate-spin" />
-                    <p className="text-[8px] font-black text-emerald-900/40 uppercase tracking-widest">Analyse en cours...</p>
+                    <p className="text-[8px] font-black text-emerald-900/40 uppercase tracking-widest">{t('parcel_card.analyzing')}</p>
                   </div>
                 ) : (localPrediction || (parcel.culturePredite && parcel.culturePredite !== "Non définie")) ? (
                   <div className="flex flex-col items-center gap-3">
                     <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-100 px-3 py-1 rounded-full border border-emerald-200">
-                      Prediction Optimale
+                      {t('parcel_card.optimal_prediction')}
                     </span>
                     <div className="flex gap-4">
                       <button
@@ -189,13 +191,13 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
                         className="text-[8px] font-black text-emerald-900/30 uppercase tracking-widest hover:text-emerald-600 transition-colors flex items-center gap-1"
                       >
                         <RefreshCw className="w-2.5 h-2.5" />
-                        Refaire l'analyse
+                        {t('parcel_card.redo_analysis')}
                       </button>
                       <button
                         onClick={() => window.location.href = `/dashboard/predictions?parcelId=${parcel.id}`}
                         className="text-[8px] font-black text-emerald-900/30 uppercase tracking-widest hover:text-emerald-600 transition-colors"
                       >
-                        Détails →
+                        {t('parcel_card.details')}
                       </button>
                     </div>
                   </div>
@@ -205,7 +207,7 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
                     className="w-full bg-[#052E16] text-white py-3 rounded-2xl font-black uppercase tracking-widest text-[9px] flex items-center justify-center gap-2 hover:scale-105 transition-all shadow-xl shadow-emerald-900/5"
                   >
                     <Sparkles className="w-3 h-3 text-lime-400" />
-                    Prédire la Culture
+                    {t('parcel_card.predict_culture')}
                   </button>
                 )}
               </div>
@@ -231,7 +233,7 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
                     <Cpu className="w-4 h-4" />
                   </div>
                   <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                    Pas de signal
+                    {t('parcel_card.no_signal')}
                   </span>
                 </div>
               )}
@@ -242,9 +244,9 @@ export default function ParcelCard({ parcel, terrainName, onEdit, onDelete, onRe
             <div className="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center text-slate-300 mb-2">
               <Activity className="w-8 h-8" />
             </div>
-            <h4 className="text-lg font-black text-slate-700">Aucune mesure</h4>
+            <h4 className="text-lg font-black text-slate-700">{t('parcel_card.no_measurements')}</h4>
             <p className="text-xs text-slate-400 font-medium leading-relaxed max-w-[200px]">
-              Aucune donnée télémétrique reçue pour cette parcelle.
+              {t('parcel_card.no_telemetry')}
             </p>
             {parcel.capteursListe ? (
               <div className="flex items-center gap-2 bg-slate-50 border border-slate-100 px-4 py-2 rounded-xl">

@@ -64,7 +64,7 @@ export default function PredictionsPage() {
       setIsApplied(true);
       setTimeout(() => router.push("/dashboard/parcelles"), 1500);
     } catch (error) {
-      alert("Erreur lors de l'enregistrement.");
+      alert(t('predictions.error_saving'));
     }
   };
 
@@ -81,8 +81,8 @@ export default function PredictionsPage() {
         <aside className={`${isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'} fixed lg:relative z-[60] lg:z-10 w-full max-w-[320px] md:max-w-96 bg-white/70 lg:bg-white/40 backdrop-blur-3xl border-r border-emerald-50 flex flex-col h-full shadow-2xl transition-transform duration-500`}>
           <div className="p-8 md:p-10 pb-6 border-b border-emerald-50/50 flex items-center justify-between">
             <div>
-              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#052E16]/30 mb-2">Analyser une</h2>
-              <h1 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter leading-none">Parcelle.</h1>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.3em] text-[#052E16]/30 mb-2">{t('predictions.analyze_a')}</h2>
+              <h1 className="text-2xl md:text-3xl font-black text-[#052E16] tracking-tighter leading-none">{t('predictions.parcel')}</h1>
             </div>
             <button onClick={() => setIsSidebarOpen(false)} className="lg:hidden p-3 bg-emerald-50 rounded-2xl text-emerald-600">
               <ChevronRight className="w-6 h-6 rotate-180" />
@@ -119,7 +119,7 @@ export default function PredictionsPage() {
             ) : (
               <div className="py-20 text-center space-y-4">
                 <Loader2 className="w-8 h-8 text-emerald-200 animate-spin mx-auto" />
-                <p className="text-[10px] font-black uppercase tracking-widest text-[#052E16]/20">Initialisation...</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-[#052E16]/20">{t('predictions.initializing')}</p>
               </div>
             )}
           </div>
@@ -148,10 +148,10 @@ export default function PredictionsPage() {
                 </div>
                 <div>
                   <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-[#052E16] tracking-tighter leading-[0.9]">
-                    Diagnostic <br />
-                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-amber-400">Prédictif.</span>
+                    {t('predictions.diagnostic')} <br />
+                    <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-600 to-amber-400">{t('predictions.predictive')}</span>
                   </h1>
-                  <p className="text-[#052E16]/40 text-sm md:text-lg font-medium italic mt-2">Optimisation biométrique des cultures par IA.</p>
+                  <p className="text-[#052E16]/40 text-sm md:text-lg font-medium italic mt-2">{t('predictions.biometric_optimization')}</p>
                 </div>
               </div>
             </header>
@@ -164,7 +164,7 @@ export default function PredictionsPage() {
                     <Loader2 className="w-8 md:w-10 md:h-10 text-emerald-600 animate-spin" />
                   </div>
                   <h3 className="text-xl md:text-2xl font-black text-[#052E16] tracking-tighter animate-pulse">{t('predictions.calculating')}</h3>
-                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]/30 mt-2">Analyse des données biométriques en cours</p>
+                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]/30 mt-2">{t('predictions.analyzing_biometrics')}</p>
                 </div>
               ) : prediction ? (
                 <div className="bg-white/60 backdrop-blur-3xl rounded-[40px] md:rounded-[64px] p-8 md:p-12 lg:p-20 shadow-2xl shadow-emerald-900/5 border border-white animate-fadeIn relative overflow-hidden group">
@@ -195,7 +195,7 @@ export default function PredictionsPage() {
                         <div className="mt-8 space-y-4">
                           <h3 className="text-sm md:text-md font-black text-[#052E16] uppercase tracking-widest flex items-center gap-2">
                             <BrainCircuit className="w-5 h-5 text-emerald-600" />
-                            Alternatives (Top 3)
+                            {t('predictions.alternatives')}
                           </h3>
                           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             {prediction.mlDetails.top3_global.map((item: any, idx: number) => (
@@ -217,7 +217,7 @@ export default function PredictionsPage() {
                                 )}
                                 <div className="flex justify-between items-start mb-3 relative z-10">
                                   <span className={`text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full ${idx === 0 ? 'bg-lime-100 text-lime-700' : 'bg-slate-100 text-slate-500'}`}>
-                                    Rang {item.rang || (idx + 1)}
+                                    {t('predictions.rank')} {item.rang || (idx + 1)}
                                   </span>
                                   <span className="text-sm font-black text-emerald-600">
                                     {Math.round(item.confiance_agregee || item.confiance || 0)}%
@@ -254,7 +254,7 @@ export default function PredictionsPage() {
                           )}
                         </button>
                         {isApplied && (
-                          <p className="text-center mt-6 text-[10px] font-black uppercase tracking-widest text-[#052E16]/30 animate-pulse">Redirection vers vos parcelles...</p>
+                          <p className="text-center mt-6 text-[10px] font-black uppercase tracking-widest text-[#052E16]/30 animate-pulse">{t('predictions.redirecting')}</p>
                         )}
                       </div>
                     </div>
@@ -266,7 +266,7 @@ export default function PredictionsPage() {
                     <BrainCircuit size={40} className="text-emerald-200 group-hover:text-emerald-400 transition-colors" />
                   </div>
                   <h3 className="text-xl md:text-2xl font-black text-[#052E16] tracking-tighter opacity-20">{t('predictions.select_zone_message')}</h3>
-                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]/10 mt-2">Cliquez sur une parcelle dans le menu latéral</p>
+                  <p className="text-[9px] md:text-[10px] font-black uppercase tracking-widest text-[#052E16]/10 mt-2">{t('predictions.click_sidebar')}</p>
                 </div>
               )}
             </div>
